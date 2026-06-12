@@ -1,7 +1,7 @@
 package templates
 
 templ CustomerForm(p CustomerFormPageData) {
-	@Layout(customerFormTitle(p.IsNew), &User{Name: "Admin"}) {
+	@Layout(customerFormTitle(p.IsNew)) {
 		<h1>{ customerFormTitle(p.IsNew) }</h1>
 		<form action="" method="post" autocomplete="off">
 			<fieldset>

@@ -1,36 +1,39 @@
 package templates
 
-templ Layout(title string, user *User, children ...templ.Component) {
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1"/>
-		<title>{ title } - FreeFSM</title>
-		<link rel="stylesheet" href="/static/css/pico.min.css"/>
-		<link rel="stylesheet" href="/static/css/app.css"/>
-		<script src="/static/js/htmx.min.js"></script>
-		<script src="/static/js/alpine.min.js" defer></script>
-	</head>
-	<body>
-		<nav class="container-fluid">
-			<ul>
-				<li><strong>FreeFSM</strong></li>
-				<li><a href="/">Dashboard</a></li>
-				<li><a href="/customers">Customers</a></li>
-			</ul>
-			if user != nil {
+templ Layout(title string, children ...templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en" data-theme="light">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>{ title } - FreeFSM</title>
+			<link rel="stylesheet" href="/static/css/pico.min.css"/>
+			<link rel="stylesheet" href="/static/css/app.css"/>
+			<script src="/static/js/htmx.min.js"></script>
+			<script src="/static/js/alpine.min.js" defer></script>
+		</head>
+		<body>
+			<nav class="container-fluid">
 				<ul>
-					<li><a href="#">{ user.Name }</a></li>
-					<li><form action="/logout" method="post"><button type="submit" class="outline">Logout</button></form></li>
+					<li><strong>FreeFSM</strong></li>
+					<li><a href="/">Dashboard</a></li>
+					<li><a href="/customers">Customers</a></li>
 				</ul>
-			}
-		</nav>
-		<main class="container">
-			for _, child := range children {
-				@child
-			}
-		</main>
-	</body>
-</html>
+				if getUser(ctx) != nil {
+					<ul>
+						<li><a href="#">{ getUser(ctx).Name }</a></li>
+						<li><form action="/logout" method="post"><button type="submit" class="outline">Logout</button></form></li>
+					</ul>
+				}
+			</nav>
+			<main class="container">
+				if getFlash(ctx) != "" {
+					<div class="flash-banner" role="alert">{ getFlash(ctx) }</div>
+				}
+				for _, child := range children {
+					@child
+				}
+			</main>
+		</body>
+	</html>
 }

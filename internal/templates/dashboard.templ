@@ -1,7 +1,7 @@
 package templates
 
 templ DashboardPage() {
-	@Layout("Dashboard", &User{Name: "Admin"}) {
+	@Layout("Dashboard") {
 		<h1>Dashboard</h1>
 		<p>Welcome to FreeFSM. Select a module from the navigation to get started.</p>
 		<div class="grid">
@@ -13,12 +13,12 @@ templ DashboardPage() {
 			<article>
 				<header>Jobs</header>
 				<p>Track work orders and field service</p>
-				<footer><a href="#" role="button" class="outline">View Jobs</a></footer>
+				<footer><a href="/jobs" role="button" class="outline">View Jobs</a></footer>
 			</article>
 			<article>
 				<header>Invoices</header>
 				<p>Create and manage invoices</p>
-				<footer><a href="#" role="button" class="outline">View Invoices</a></footer>
+				<footer><a href="/invoices" role="button" class="outline">View Invoices</a></footer>
 			</article>
 		</div>
 	}

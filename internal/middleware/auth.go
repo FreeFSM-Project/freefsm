@@ -3,16 +3,27 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"strings"
 
 	"github.com/MartialM1nd/freefsm/internal/services"
 )
 
 type contextKey string
 
-const UserIDKey contextKey = "user_id"
+const (
+	UserKey  contextKey = "user"
+	FlashKey contextKey = "flash"
+)
 
-func Auth(sessions *services.SessionService) func(http.Handler) http.Handler {
+type UserInfo struct {
+	ID    int64
+	Name  string
+	Email string
+	Role  string
+}
+
+type UserProvider func(ctx context.Context, userID int64) (*UserInfo, error)
+
+func Auth(sessions *services.SessionService, userFn UserProvider) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie("session")
@@ -30,17 +41,33 @@ func Auth(sessions *services.SessionService) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), UserIDKey, userID)
-			next.ServeHTTP(w, r.WithContext(ctx))
+			user, err := userFn(r.Context(), userID)
+			if err == nil {
+				ctx := context.WithValue(r.Context(), UserKey, user)
+				r = r.WithContext(ctx)
+			}
+
+			next.ServeHTTP(w, r)
 		})
 	}
 }
 
-func UserIDFromContext(ctx context.Context) (int64, bool) {
-	id, ok := ctx.Value(UserIDKey).(int64)
-	return id, ok
+func UserFromContext(ctx context.Context) (*UserInfo, bool) {
+	u, ok := ctx.Value(UserKey).(*UserInfo)
+	return u, ok
 }
 
-func Public(path string) bool {
-	return path == "/login" || path == "/setup" || path == "/health" || strings.HasPrefix(path, "/static/")
+func Flash(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if flash := r.URL.Query().Get("flash"); flash != "" {
+			ctx := context.WithValue(r.Context(), FlashKey, flash)
+			r = r.WithContext(ctx)
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func FlashFromContext(ctx context.Context) (string, bool) {
+	f, ok := ctx.Value(FlashKey).(string)
+	return f, ok
 }

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/MartialM1nd/freefsm/internal/config"
@@ -14,7 +15,20 @@ import (
 func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionService, cfg *config.Config) http.Handler {
 	r := chi.NewRouter()
 
-	authMW := middleware.Auth(sessions)
+	userService := services.NewUserService(entClient)
+	userFn := func(ctx context.Context, userID int64) (*middleware.UserInfo, error) {
+		u, err := userService.GetByID(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		return &middleware.UserInfo{
+			ID:    u.ID,
+			Name:  u.Name,
+			Email: u.Email,
+			Role:  u.Role,
+		}, nil
+	}
+	authMW := middleware.Auth(sessions, userFn)
 
 	customerHandler := NewCustomerHandler(services.NewCustomerService(entClient))
 

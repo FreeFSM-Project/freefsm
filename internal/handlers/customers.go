@@ -112,7 +112,7 @@ func (h *CustomerHandler) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	http.Redirect(w, r, "/customers", http.StatusSeeOther)
+	http.Redirect(w, r, "/customers?flash=Customer+created", http.StatusSeeOther)
 }
 
 func (h *CustomerHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -159,7 +159,7 @@ func (h *CustomerHandler) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	http.Redirect(w, r, "/customers/"+strconv.FormatInt(id, 10), http.StatusSeeOther)
+	http.Redirect(w, r, "/customers/"+strconv.FormatInt(id, 10)+"?flash=Customer+updated", http.StatusSeeOther)
 }
 
 func (h *CustomerHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -172,7 +172,7 @@ func (h *CustomerHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	http.Redirect(w, r, "/customers", http.StatusSeeOther)
+	http.Redirect(w, r, "/customers?flash=Customer+deleted", http.StatusSeeOther)
 }
 
 func formPtr(v string) *string {

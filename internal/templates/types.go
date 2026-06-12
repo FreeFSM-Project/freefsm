@@ -1,5 +1,29 @@
 package templates
 
+import (
+	"context"
+
+	"github.com/MartialM1nd/freefsm/internal/middleware"
+)
+
+func getUser(ctx context.Context) *User {
+	u, ok := middleware.UserFromContext(ctx)
+	if !ok || u == nil {
+		return nil
+	}
+	return &User{
+		ID:    u.ID,
+		Name:  u.Name,
+		Email: u.Email,
+		Role:  u.Role,
+	}
+}
+
+func getFlash(ctx context.Context) string {
+	f, _ := middleware.FlashFromContext(ctx)
+	return f
+}
+
 type User struct {
 	ID    int64
 	Name  string
