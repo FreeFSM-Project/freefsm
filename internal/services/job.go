@@ -231,34 +231,4 @@ func (s *JobService) LineItems(j *ent.Job) []LineItem {
 	return items
 }
 
-func (s *JobService) ConvertFromEstimate(ctx context.Context, estimateID int64, statusSvc *StatusService) (*ent.Job, error) {
-	e, err := s.client.Estimate.Get(ctx, estimateID)
-	if err != nil {
-		return nil, fmt.Errorf("get estimate %d: %w", estimateID, err)
-	}
-
-	newStatus, err := statusSvc.FindByName(ctx, "job", "New")
-	if err != nil {
-		return nil, fmt.Errorf("find status: %w", err)
-	}
-
-	items, _ := ParseLineItems(e.LineItems)
-
-	return s.Create(ctx, JobCreateParams{
-		CustomerID:  estCustID(e),
-		JobType:     e.Title,
-		StatusID:    newStatus.ID,
-		BillingType: "flat_rate",
-		Notes:       e.Notes,
-		LineItems:   items,
-	})
-}
-
-func estCustID(e *ent.Estimate) int64 {
-	if e.CustomerID == nil {
-		return 0
-	}
-	return *e.CustomerID
-}
-
 var JobBillingTypes = []string{"flat_rate", "hourly", "t_and_m"}

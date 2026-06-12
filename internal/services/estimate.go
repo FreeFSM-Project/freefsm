@@ -139,6 +139,30 @@ func EstimatePaginationTotalPages(total, perPage int) int {
 	return int(math.Ceil(float64(total) / float64(perPage)))
 }
 
+func (s *EstimateService) CreateFromJob(ctx context.Context, jobID int64, statusSvc *StatusService) (*ent.Estimate, error) {
+	j, err := s.client.Job.Get(ctx, jobID)
+	if err != nil {
+		return nil, fmt.Errorf("get job %d: %w", jobID, err)
+	}
+
+	draftStatus, err := statusSvc.FindByName(ctx, "estimate", "Draft")
+	if err != nil {
+		return nil, fmt.Errorf("find status: %w", err)
+	}
+
+	items, _ := ParseLineItems(j.LineItems)
+
+	return s.Create(ctx, EstimateCreateParams{
+		CustomerID: j.CustomerID,
+		JobID:      j.ID,
+		StatusID:   draftStatus.ID,
+		Title:      j.JobType,
+		Notes:      j.Notes,
+		TaxRate:    "0",
+		LineItems:  items,
+	})
+}
+
 func (s *EstimateService) LineItems(e *ent.Estimate) []LineItem {
 	items, _ := ParseLineItems(e.LineItems)
 	if items == nil {

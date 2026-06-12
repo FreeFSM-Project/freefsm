@@ -14,15 +14,16 @@ import (
 )
 
 type EstimateHandler struct {
-	svc       *services.EstimateService
-	custSvc   *services.CustomerService
-	jobSvc    *services.JobService
-	statusSvc *services.StatusService
-	itemSvc   *services.ItemService
+	svc        *services.EstimateService
+	custSvc    *services.CustomerService
+	jobSvc     *services.JobService
+	statusSvc  *services.StatusService
+	itemSvc    *services.ItemService
+	invoiceSvc *services.InvoiceService
 }
 
-func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService) *EstimateHandler {
-	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc}
+func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, invoiceSvc *services.InvoiceService) *EstimateHandler {
+	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, invoiceSvc: invoiceSvc}
 }
 
 func (h *EstimateHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -172,18 +173,32 @@ func (h *EstimateHandler) Update(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/estimates/%d?flash=Estimate+updated", id), http.StatusSeeOther)
 }
 
-func (h *EstimateHandler) ConvertToJob(w http.ResponseWriter, r *http.Request) {
+func (h *EstimateHandler) ConvertToInvoice(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		http.Error(w, "invalid id", 400)
 		return
 	}
-	job, err := h.jobSvc.ConvertFromEstimate(r.Context(), id, h.statusSvc)
+	inv, err := h.invoiceSvc.CreateFromEstimate(r.Context(), id, h.statusSvc)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/jobs/%d?flash=Job+created+from+estimate", job.ID), http.StatusSeeOther)
+	http.Redirect(w, r, fmt.Sprintf("/invoices/%d?flash=Invoice+created+from+estimate", inv.ID), http.StatusSeeOther)
+}
+
+func (h *EstimateHandler) CreateFromJob(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", 400)
+		return
+	}
+	est, err := h.svc.CreateFromJob(r.Context(), id, h.statusSvc)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("/estimates/%d?flash=Estimate+created+from+job", est.ID), http.StatusSeeOther)
 }
 
 func (h *EstimateHandler) Delete(w http.ResponseWriter, r *http.Request) {

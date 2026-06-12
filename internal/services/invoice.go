@@ -176,7 +176,42 @@ func (s *InvoiceService) Payments(i *ent.Invoice) []Payment {
 	return p
 }
 
-func (s *InvoiceService) ConvertFromJob(ctx context.Context, jobID int64, statusSvc *StatusService) (*ent.Invoice, error) {
+func (s *InvoiceService) CreateFromEstimate(ctx context.Context, estimateID int64, statusSvc *StatusService) (*ent.Invoice, error) {
+	e, err := s.client.Estimate.Get(ctx, estimateID)
+	if err != nil {
+		return nil, fmt.Errorf("get estimate %d: %w", estimateID, err)
+	}
+
+	draftStatus, err := statusSvc.FindByName(ctx, "invoice", "Draft")
+	if err != nil {
+		return nil, fmt.Errorf("find status: %w", err)
+	}
+
+	items, _ := ParseLineItems(e.LineItems)
+	now := time.Now()
+
+	custID := e.CustomerID
+	jobID := e.JobID
+
+	if err := s.client.Estimate.DeleteOneID(estimateID).Exec(ctx); err != nil {
+		return nil, fmt.Errorf("delete estimate %d: %w", estimateID, err)
+	}
+
+	return s.client.Invoice.Create().
+		SetID(estimateID).
+		SetTitle(e.Title).
+		SetNotes(e.Notes).
+		SetTaxRate(e.TaxRate).
+		SetLineItems(SerializeLineItems(items)).
+		SetStatusID(draftStatus.ID).
+		SetInvoiceDate(now).
+		SetDueDate(now.AddDate(0, 0, 30)).
+		SetNillableCustomerID(custID).
+		SetNillableJobID(jobID).
+		Save(ctx)
+}
+
+func (s *InvoiceService) CreateFromJob(ctx context.Context, jobID int64, statusSvc *StatusService) (*ent.Invoice, error) {
 	j, err := s.client.Job.Get(ctx, jobID)
 	if err != nil {
 		return nil, fmt.Errorf("get job %d: %w", jobID, err)

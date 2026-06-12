@@ -290,13 +290,13 @@ func invStatusID(i *ent.Invoice) int64 {
 	return *i.StatusID
 }
 
-func (h *InvoiceHandler) ConvertFromJob(w http.ResponseWriter, r *http.Request) {
+func (h *InvoiceHandler) CreateFromJob(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
 		http.Error(w, "invalid id", 400)
 		return
 	}
-	inv, err := h.svc.ConvertFromJob(r.Context(), id, h.statusSvc)
+	inv, err := h.svc.CreateFromJob(r.Context(), id, h.statusSvc)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
