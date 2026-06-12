@@ -7,8 +7,19 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/templates"
 )
 
-func handleDashboard(w http.ResponseWriter, r *http.Request) {
-	templates.DashboardPage().Render(r.Context(), w)
+type DashboardHandler struct {
+	dashboardSvc *services.DashboardService
+}
+
+func NewDashboardHandler(dashboardSvc *services.DashboardService) *DashboardHandler {
+	return &DashboardHandler{dashboardSvc: dashboardSvc}
+}
+
+func (h *DashboardHandler) Index(w http.ResponseWriter, r *http.Request) {
+	stats, _ := h.dashboardSvc.Stats(r.Context())
+	templates.DashboardPage(templates.DashboardData{
+		Stats: stats,
+	}).Render(r.Context(), w)
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request, sessions *services.SessionService) {

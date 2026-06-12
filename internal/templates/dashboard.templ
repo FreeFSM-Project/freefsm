@@ -1,29 +1,58 @@
 package templates
 
-templ DashboardPage() {
+import "fmt"
+
+templ DashboardPage(p DashboardData) {
 	@Layout("Dashboard") {
 		<h1>Dashboard</h1>
-		<p>Welcome to FreeFSM. Select a module from the navigation to get started.</p>
-		<div class="grid">
+		<div class="grid" style="margin-bottom:2rem">
 			<article>
 				<header>Customers</header>
-				<p>Manage your customer database</p>
+				<p style="font-size:2rem;font-weight:bold;text-align:center">{ fmt.Sprintf("%d", p.Stats.TotalCustomers) }</p>
 				<footer><a href="/customers" role="button" class="outline">View Customers</a></footer>
 			</article>
 			<article>
 				<header>Jobs</header>
-				<p>Track jobs and field service</p>
+				<p style="font-size:2rem;font-weight:bold;text-align:center">{ fmt.Sprintf("%d", p.Stats.TotalJobs) }</p>
 				<footer><a href="/jobs" role="button" class="outline">View Jobs</a></footer>
 			</article>
 			<article>
 				<header>Estimates</header>
-				<p>Create and send estimates</p>
+				<p style="font-size:2rem;font-weight:bold;text-align:center">{ fmt.Sprintf("%d", p.Stats.TotalEstimates) }</p>
 				<footer><a href="/estimates" role="button" class="outline">View Estimates</a></footer>
 			</article>
 			<article>
 				<header>Invoices</header>
-				<p>Create and manage invoices</p>
+				<p style="font-size:2rem;font-weight:bold;text-align:center">{ fmt.Sprintf("%d", p.Stats.TotalInvoices) }</p>
 				<footer><a href="/invoices" role="button" class="outline">View Invoices</a></footer>
+			</article>
+		</div>
+		if p.Stats.RevenueMonth > 0 {
+			<p style="text-align:center">
+				<strong>Revenue This Month: { fmt.Sprintf("$%.2f", p.Stats.RevenueMonth) }</strong>
+			</p>
+		}
+		<h3>Quick Links</h3>
+		<div class="grid">
+			<article>
+				<header>Schedule</header>
+				<p>View calendar and scheduled jobs</p>
+				<footer><a href="/schedule" role="button" class="outline">View Schedule</a></footer>
+			</article>
+			<article>
+				<header>Items</header>
+				<p>Manage pricebook and services</p>
+				<footer><a href="/items" role="button" class="outline">View Items</a></footer>
+			</article>
+			<article>
+				<header>New Job</header>
+				<p>Create a work order</p>
+				<footer><a href="/jobs/new" role="button" class="outline">New Job</a></footer>
+			</article>
+			<article>
+				<header>New Invoice</header>
+				<p>Create an invoice</p>
+				<footer><a href="/invoices/new" role="button" class="outline">New Invoice</a></footer>
 			</article>
 		</div>
 	}

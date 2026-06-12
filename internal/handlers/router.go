@@ -37,6 +37,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	contactSvc := services.NewCustomerContactService(entClient)
 	projectSvc := services.NewProjectService(entClient)
 	locationSvc := services.NewLocationService(entClient)
+	dashboardHandler := NewDashboardHandler(services.NewDashboardService(entClient))
 	customerHandler := NewCustomerHandler(customerService, contactSvc)
 	itemHandler := NewItemHandler(itemService)
 	jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc)
@@ -46,7 +47,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 
 	r.Group(func(r chi.Router) {
 		r.Use(authMW)
-		r.Get("/", handleDashboard)
+		r.Get("/", dashboardHandler.Index)
 		r.Get("/schedule", scheduleHandler.Month)
 		r.Post("/logout", func(w http.ResponseWriter, r *http.Request) {
 			handleLogout(w, r, sessions)

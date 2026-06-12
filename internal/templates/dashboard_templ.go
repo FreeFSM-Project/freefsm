@@ -8,7 +8,9 @@ package templates
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func DashboardPage() templ.Component {
+import "fmt"
+
+func DashboardPage(p DashboardData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -41,7 +43,82 @@ func DashboardPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1>Dashboard</h1><p>Welcome to FreeFSM. Select a module from the navigation to get started.</p><div class=\"grid\"><article><header>Customers</header><p>Manage your customer database</p><footer><a href=\"/customers\" role=\"button\" class=\"outline\">View Customers</a></footer></article><article><header>Jobs</header><p>Track jobs and field service</p><footer><a href=\"/jobs\" role=\"button\" class=\"outline\">View Jobs</a></footer></article><article><header>Estimates</header><p>Create and send estimates</p><footer><a href=\"/estimates\" role=\"button\" class=\"outline\">View Estimates</a></footer></article><article><header>Invoices</header><p>Create and manage invoices</p><footer><a href=\"/invoices\" role=\"button\" class=\"outline\">View Invoices</a></footer></article></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1>Dashboard</h1><div class=\"grid\" style=\"margin-bottom:2rem\"><article><header>Customers</header><p style=\"font-size:2rem;font-weight:bold;text-align:center\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", p.Stats.TotalCustomers))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/dashboard.templ`, Line: 11, Col: 108}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</p><footer><a href=\"/customers\" role=\"button\" class=\"outline\">View Customers</a></footer></article><article><header>Jobs</header><p style=\"font-size:2rem;font-weight:bold;text-align:center\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", p.Stats.TotalJobs))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/dashboard.templ`, Line: 16, Col: 103}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p><footer><a href=\"/jobs\" role=\"button\" class=\"outline\">View Jobs</a></footer></article><article><header>Estimates</header><p style=\"font-size:2rem;font-weight:bold;text-align:center\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", p.Stats.TotalEstimates))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/dashboard.templ`, Line: 21, Col: 108}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</p><footer><a href=\"/estimates\" role=\"button\" class=\"outline\">View Estimates</a></footer></article><article><header>Invoices</header><p style=\"font-size:2rem;font-weight:bold;text-align:center\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", p.Stats.TotalInvoices))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/dashboard.templ`, Line: 26, Col: 107}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</p><footer><a href=\"/invoices\" role=\"button\" class=\"outline\">View Invoices</a></footer></article></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if p.Stats.RevenueMonth > 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<p style=\"text-align:center\"><strong>Revenue This Month: ")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var7 string
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("$%.2f", p.Stats.RevenueMonth))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/dashboard.templ`, Line: 32, Col: 76}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</strong></p>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " <h3>Quick Links</h3><div class=\"grid\"><article><header>Schedule</header><p>View calendar and scheduled jobs</p><footer><a href=\"/schedule\" role=\"button\" class=\"outline\">View Schedule</a></footer></article><article><header>Items</header><p>Manage pricebook and services</p><footer><a href=\"/items\" role=\"button\" class=\"outline\">View Items</a></footer></article><article><header>New Job</header><p>Create a work order</p><footer><a href=\"/jobs/new\" role=\"button\" class=\"outline\">New Job</a></footer></article><article><header>New Invoice</header><p>Create an invoice</p><footer><a href=\"/invoices/new\" role=\"button\" class=\"outline\">New Invoice</a></footer></article></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

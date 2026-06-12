@@ -42,7 +42,9 @@ type SetupPageData struct {
 	Error string
 }
 
-type DashboardData struct{}
+type DashboardData struct {
+	Stats services.DashboardStats
+}
 
 type CustomerListPageData struct {
 	Customers     []CustomerRow
