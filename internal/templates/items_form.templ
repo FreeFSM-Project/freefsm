@@ -1,0 +1,75 @@
+package templates
+
+import "fmt"
+
+templ ItemForm(p ItemFormPageData) {
+	@Layout(itemFormTitle(p.IsNew)) {
+		<h1>{ itemFormTitle(p.IsNew) }</h1>
+		<form action="" method="post" autocomplete="off">
+			<label>
+				Name
+				<input type="text" name="name" value={ p.Item.Name } required autofocus/>
+				if p.Errors["name"] != "" {
+					<small class="error-msg">{ p.Errors["name"] }</small>
+				}
+			</label>
+			<div class="grid">
+				<label>
+					Type
+					<select name="type">
+						for _, t := range p.Types {
+							<option value={ t } selected?={ p.Item.Type == t }>{ t }</option>
+						}
+					</select>
+				</label>
+				<label>
+					SKU
+					<input type="text" name="sku" value={ p.Item.Sku } placeholder="Optional"/>
+				</label>
+			</div>
+			<div class="grid">
+				<label>
+					Unit Price
+					<input type="number" name="unit_price" step="0.01" min="0"
+						value={ fmt.Sprintf("%.2f", p.Item.UnitPrice) }/>
+				</label>
+				<label>
+					Unit Cost
+					<input type="number" name="unit_cost" step="0.01" min="0"
+						value={ fmt.Sprintf("%.2f", p.Item.UnitCost) }/>
+				</label>
+			</div>
+			<div class="grid">
+				<label>
+					<input type="checkbox" name="taxable" value="true"
+						checked?={ p.Item.Taxable }/>
+					Taxable
+				</label>
+				<label>
+					Tax Rate
+					<input type="text" name="tax_rate" value={ p.Item.TaxRate } placeholder="e.g. 8.25%"/>
+				</label>
+			</div>
+			<div class="grid">
+				<label>
+					<input type="checkbox" name="track_inventory" value="true"
+						checked?={ p.Item.TrackInventory }/>
+					Track Inventory
+				</label>
+				<label>
+					<input type="checkbox" name="is_active" value="true"
+						checked?={ p.Item.IsActive }/>
+					Active
+				</label>
+			</div>
+			<label>
+				Description
+				<textarea name="description" rows="3">{ p.Item.Description }</textarea>
+			</label>
+			<div style="display:flex;gap:0.5rem;margin-top:1rem">
+				<button type="submit">Save</button>
+				<a href="/items" role="button" class="outline">Cancel</a>
+			</div>
+		</form>
+	}
+}

@@ -1,0 +1,54 @@
+package templates
+
+import "fmt"
+
+templ ItemShow(p ItemDetail) {
+	@Layout("Item - "+p.Name) {
+		<div style="display:flex;justify-content:space-between;align-items:center">
+			<h1>{ p.Name }</h1>
+			<div style="display:flex;gap:0.5rem">
+				<a href={ templ.URL(fmt.Sprintf("/items/%d/edit", p.ID)) } role="button" class="outline">Edit</a>
+				<form action={ templ.URL(fmt.Sprintf("/items/%d/delete", p.ID)) } method="post" style="display:inline" onsubmit="return confirm('Delete this item?')">
+					<button class="outline contrast">Delete</button>
+				</form>
+			</div>
+		</div>
+		<table>
+			<tbody>
+				<tr><th>Type</th><td><mark>{ p.Type }</mark></td></tr>
+				<tr><th>SKU</th><td>{ p.Sku }</td></tr>
+				<tr><th>Unit Price</th><td>{ fmt.Sprintf("$%.2f", p.UnitPrice) }</td></tr>
+				<tr><th>Unit Cost</th><td>{ fmt.Sprintf("$%.2f", p.UnitCost) }</td></tr>
+				<tr><th>Taxable</th><td>
+					if p.Taxable {
+						Yes
+					} else {
+						No
+					}
+				</td></tr>
+				if p.Taxable && p.TaxRate != "" {
+					<tr><th>Tax Rate</th><td>{ p.TaxRate }</td></tr>
+				}
+				<tr><th>Track Inventory</th><td>
+					if p.TrackInventory {
+						Yes
+					} else {
+						No
+					}
+				</td></tr>
+				<tr><th>Active</th><td>
+					if p.IsActive {
+						Yes
+					} else {
+						No
+					}
+				</td></tr>
+			</tbody>
+		</table>
+		if p.Description != "" {
+			<h3>Description</h3>
+			<p>{ p.Description }</p>
+		}
+		<p><a href="/items">&larr; Back to Items</a></p>
+	}
+}

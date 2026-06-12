@@ -31,6 +31,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	authMW := middleware.Auth(sessions, userFn)
 
 	customerHandler := NewCustomerHandler(services.NewCustomerService(entClient))
+	itemHandler := NewItemHandler(services.NewItemService(entClient))
 
 	r.Group(func(r chi.Router) {
 		r.Use(authMW)
@@ -45,6 +46,13 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Get("/customers/{id}/edit", customerHandler.Update)
 		r.Post("/customers/{id}", customerHandler.Update)
 		r.Post("/customers/{id}/delete", customerHandler.Delete)
+		r.Get("/items", itemHandler.List)
+		r.Get("/items/new", itemHandler.Create)
+		r.Post("/items", itemHandler.Create)
+		r.Get("/items/{id}", itemHandler.Show)
+		r.Get("/items/{id}/edit", itemHandler.Update)
+		r.Post("/items/{id}", itemHandler.Update)
+		r.Post("/items/{id}/delete", itemHandler.Delete)
 	})
 
 	authHandler := NewAuthHandler(db, sessions)

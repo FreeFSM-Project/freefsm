@@ -1,0 +1,68 @@
+package templates
+
+import "fmt"
+
+templ ItemsIndex(p ItemListPageData) {
+	@Layout("Items") {
+		<h1>Items</h1>
+		<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+			<form hx-get="/items" hx-target="#item-table-wrap" hx-swap="outerHTML" hx-push-url="true" style="display:flex;gap:0.5rem;align-items:center;flex:1">
+				<input type="search" name="search" placeholder="Search by name or SKU..."
+					value={ p.Search } style="max-width:300px"
+					hx-trigger="input changed delay:300ms"/>
+			</form>
+			<a href="/items/new" role="button">New Item</a>
+		</div>
+		@ItemsTable(p)
+	}
+}
+
+templ ItemsTable(p ItemListPageData) {
+	<div id="item-table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>SKU</th>
+					<th>Price</th>
+					<th>Active</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				if len(p.Items) == 0 {
+					<tr><td colspan="6" style="text-align:center">No items found.</td></tr>
+				}
+				for _, i := range p.Items {
+					<tr>
+						<td>
+							<a href={ templ.URL(fmt.Sprintf("/items/%d", i.ID)) }>{ i.Name }</a>
+						</td>
+						<td><mark>{ i.Type }</mark></td>
+						<td>{ i.Sku }</td>
+						<td>{ fmt.Sprintf("$%.2f", i.UnitPrice) }</td>
+						<td>
+							if i.IsActive {
+								<ins>&check;</ins>
+							} else {
+								<del>&cross;</del>
+							}
+						</td>
+						<td style="text-align:right">
+							<a href={ templ.URL(fmt.Sprintf("/items/%d/edit", i.ID)) } role="button" class="outline small">Edit</a>
+							<form action={ templ.URL(fmt.Sprintf("/items/%d/delete", i.ID)) } method="post" style="display:inline" onsubmit="return confirm('Delete this item?')">
+								<button class="outline contrast small">Del</button>
+							</form>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+		@Pagination(PaginationData{
+			CurrentPage: p.Page,
+			TotalPages:  p.TotalPages,
+			BaseURL:     "/items",
+		})
+	</div>
+}

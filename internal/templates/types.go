@@ -104,9 +104,56 @@ type PaginationData struct {
 	BaseURL     string
 }
 
+type ItemRow struct {
+	ID          int64
+	Name        string
+	Type        string
+	Sku         string
+	UnitPrice   float64
+	UnitCost    float64
+	IsActive    bool
+}
+
+type ItemDetail struct {
+	ID             int64
+	Name           string
+	Type           string
+	Sku            string
+	UnitPrice      float64
+	UnitCost       float64
+	Taxable        bool
+	TaxRate        string
+	TrackInventory bool
+	Description    string
+	IsActive       bool
+}
+
+type ItemListPageData struct {
+	Items      []ItemRow
+	Page       int
+	PerPage    int
+	Total      int
+	TotalPages int
+	Search     string
+}
+
+type ItemFormPageData struct {
+	Item     *ItemDetail
+	Errors   map[string]string
+	IsNew    bool
+	Types    []string
+}
+
 func customerFormTitle(isNew bool) string {
 	if isNew {
 		return "New Customer"
 	}
 	return "Edit Customer"
+}
+
+func itemFormTitle(isNew bool) string {
+	if isNew {
+		return "New Item"
+	}
+	return "Edit Item"
 }
