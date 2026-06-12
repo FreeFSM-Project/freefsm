@@ -397,3 +397,33 @@ func paymentsTotal(payments []services.Payment) float64 {
 func today() string {
 	return time.Now().Format("2006-01-02")
 }
+
+type CalendarJob struct {
+	ID         int64
+	Day        int
+	JobType    string
+	Customer   string
+	Time       string
+	StatusName string
+}
+
+type DayData struct {
+	DayNum  int
+	IsToday bool
+	Date    string
+	Jobs    []CalendarJob
+}
+
+type WeekData struct {
+	Days []DayData
+}
+
+type SchedulePageData struct {
+	Title     string
+	Weeks     []WeekData
+	PrevYear  int
+	PrevMonth int
+	NextYear  int
+	NextMonth int
+	IsMonth   bool
+}

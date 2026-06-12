@@ -40,12 +40,14 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	customerHandler := NewCustomerHandler(customerService, contactSvc)
 	itemHandler := NewItemHandler(itemService)
 	jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc)
+	scheduleHandler := NewScheduleHandler(jobService, customerService, statusService)
 	estimateHandler := NewEstimateHandler(services.NewEstimateService(entClient), customerService, jobService, statusService, itemService)
 	invoiceHandler := NewInvoiceHandler(services.NewInvoiceService(entClient), customerService, jobService, statusService, itemService)
 
 	r.Group(func(r chi.Router) {
 		r.Use(authMW)
 		r.Get("/", handleDashboard)
+		r.Get("/schedule", scheduleHandler.Month)
 		r.Post("/logout", func(w http.ResponseWriter, r *http.Request) {
 			handleLogout(w, r, sessions)
 		})
