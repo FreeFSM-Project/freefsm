@@ -1,0 +1,16 @@
+[Unit]
+Description=FreeFSM Field Service Manager
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=freefsm
+Group=freefsm
+EnvironmentFile=-/etc/freefsm.conf
+ExecStart=/usr/local/bin/freefsm
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
