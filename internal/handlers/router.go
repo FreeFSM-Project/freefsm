@@ -33,11 +33,12 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	customerService := services.NewCustomerService(entClient)
 	statusService := services.NewStatusService(entClient)
 	jobService := services.NewJobService(entClient)
+	itemService := services.NewItemService(entClient)
 	customerHandler := NewCustomerHandler(customerService)
-	itemHandler := NewItemHandler(services.NewItemService(entClient))
+	itemHandler := NewItemHandler(itemService)
 	jobHandler := NewJobHandler(jobService, customerService, statusService)
-	estimateHandler := NewEstimateHandler(services.NewEstimateService(entClient), customerService, jobService, statusService)
-	invoiceHandler := NewInvoiceHandler(services.NewInvoiceService(entClient), customerService, jobService, statusService)
+	estimateHandler := NewEstimateHandler(services.NewEstimateService(entClient), customerService, jobService, statusService, itemService)
+	invoiceHandler := NewInvoiceHandler(services.NewInvoiceService(entClient), customerService, jobService, statusService, itemService)
 
 	r.Group(func(r chi.Router) {
 		r.Use(authMW)

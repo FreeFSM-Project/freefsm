@@ -28,6 +28,7 @@ type InvoiceCreateParams struct {
 	InvoiceDate time.Time
 	DueDate     time.Time
 	TaxRate     string
+	LineItems   []LineItem
 }
 
 type InvoiceUpdateParams struct {
@@ -40,6 +41,7 @@ type InvoiceUpdateParams struct {
 	InvoiceDate *time.Time
 	DueDate     *time.Time
 	TaxRate     *string
+	LineItems   *[]LineItem
 }
 
 func (s *InvoiceService) List(ctx context.Context, search string, statusID int64, page, perPage int) ([]*ent.Invoice, int, error) {
@@ -86,7 +88,8 @@ func (s *InvoiceService) Create(ctx context.Context, params InvoiceCreateParams)
 		SetNotes(params.Notes).
 		SetInvoiceDate(params.InvoiceDate).
 		SetDueDate(params.DueDate).
-		SetTaxRate(params.TaxRate)
+		SetTaxRate(params.TaxRate).
+		SetLineItems(SerializeLineItems(params.LineItems))
 
 	if params.JobID > 0 {
 		b.SetJobID(params.JobID)
@@ -135,6 +138,9 @@ func (s *InvoiceService) Update(ctx context.Context, id int64, params InvoiceUpd
 	if params.TaxRate != nil {
 		u.SetTaxRate(*params.TaxRate)
 	}
+	if params.LineItems != nil {
+		u.SetLineItems(SerializeLineItems(*params.LineItems))
+	}
 
 	i, err := u.Save(ctx)
 	if err != nil {
@@ -152,4 +158,12 @@ func (s *InvoiceService) Delete(ctx context.Context, id int64) error {
 
 func InvoicePaginationTotalPages(total, perPage int) int {
 	return int(math.Ceil(float64(total) / float64(perPage)))
+}
+
+func (s *InvoiceService) LineItems(i *ent.Invoice) []LineItem {
+	items, _ := ParseLineItems(i.LineItems)
+	if items == nil {
+		return []LineItem{}
+	}
+	return items
 }

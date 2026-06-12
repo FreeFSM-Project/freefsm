@@ -62,6 +62,81 @@ templ InvoiceForm(p InvoiceFormPageData) {
 				Notes
 				<textarea name="notes" rows="3">{ p.Invoice.Notes }</textarea>
 			</label>
+			<script type="application/json" id="items-catalog">@templ.Raw(p.ItemsJSON)</script>
+			<script type="application/json" id="existing-items">@templ.Raw(p.ExistingItemsJSON)</script>
+			<script>
+				document.addEventListener('alpine:init', () => {
+					Alpine.data('lineItemEditor', () => {
+						const catalog = JSON.parse(document.getElementById('items-catalog').textContent || '[]');
+						const existing = JSON.parse(document.getElementById('existing-items').textContent || '[]');
+						const makeItem = () => ({ item_id: 0, title: '', description: '', unit_price: 0, quantity: 1, taxable: false, tax_rate: '', discount: 0, surcharge: 0 });
+						existing.forEach(i => { if (!i.quantity) i.quantity = 1; });
+						return {
+							items: existing.length ? existing : [makeItem()],
+							catalog: catalog,
+							add() { this.items.push(makeItem()); },
+							remove(index) { this.items.splice(index, 1); },
+							selectItem(index, itemID) {
+								const c = catalog.find(f => f.id == itemID);
+								if (c) { this.items[index].title = c.name; this.items[index].description = c.description; this.items[index].unit_price = c.unit_price; this.items[index].taxable = c.taxable; this.items[index].tax_rate = c.tax_rate; }
+							},
+							lineTotal(item) { return (item.unit_price * item.quantity) - (item.discount || 0) + (item.surcharge || 0); },
+							get subtotal() { return this.items.reduce((s, i) => s + (i.unit_price * i.quantity), 0); },
+							get tax() { return this.items.reduce((s, i) => { if (i.taxable && i.tax_rate) { const r = parseFloat(i.tax_rate) || 0; return s + (i.unit_price * i.quantity * r / 100); } return s; }, 0); },
+							get total() { return this.subtotal + this.tax - this.items.reduce((s, i) => s + (i.discount || 0), 0) + this.items.reduce((s, i) => s + (i.surcharge || 0), 0); },
+							get json() { return JSON.stringify(this.items.filter(i => i.item_id > 0 || i.title)); },
+						};
+					});
+				});
+			</script>
+			<fieldset x-data="lineItemEditor()">
+				<legend>Line Items</legend>
+				<table>
+					<thead>
+						<tr>
+							<th>Item</th>
+							<th>Qty</th>
+							<th>Price</th>
+							<th>Tax</th>
+							<th>Total</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<template x-for="(item, index) in items" :key="index">
+							<tr>
+								<td>
+									<select x-model="item.item_id" @change="selectItem(index, $el.value)">
+										<option value="0">Select item...</option>
+										<template x-for="c in catalog" :key="c.id">
+											<option :value="c.id" x-text="c.name"></option>
+										</template>
+									</select>
+								</td>
+								<td><input type="number" x-model="item.quantity" min="1" style="width:70px"></td>
+								<td><input type="number" x-model="item.unit_price" step="0.01" style="width:100px"></td>
+								<td>
+									<template x-if="item.taxable && item.tax_rate">
+										<span x-text="'Yes'"></span>
+									</template>
+									<template x-if="!item.taxable || !item.tax_rate">
+										<span x-text="'No'"></span>
+									</template>
+								</td>
+								<td><span x-text="lineTotal(item).toFixed(2)"></span></td>
+								<td><button @click.prevent="remove(index)" class="outline contrast small">X</button></td>
+							</tr>
+						</template>
+					</tbody>
+				</table>
+				<button @click.prevent="add()" class="outline">+ Add Item</button>
+				<div style="text-align:right;margin-top:1rem">
+					<p>Subtotal: $<span x-text="subtotal.toFixed(2)"></span></p>
+					<p>Tax: $<span x-text="tax.toFixed(2)"></span></p>
+					<p><strong>Total: $<span x-text="total.toFixed(2)"></span></strong></p>
+				</div>
+				<input type="hidden" name="line_items" :value="json">
+			</fieldset>
 			<div style="display:flex;gap:0.5rem;margin-top:1rem">
 				<button type="submit">Save</button>
 				<a href="/invoices" role="button" class="outline">Cancel</a>

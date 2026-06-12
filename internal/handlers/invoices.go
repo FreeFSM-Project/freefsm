@@ -17,10 +17,11 @@ type InvoiceHandler struct {
 	custSvc   *services.CustomerService
 	jobSvc    *services.JobService
 	statusSvc *services.StatusService
+	itemSvc   *services.ItemService
 }
 
-func NewInvoiceHandler(svc *services.InvoiceService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService) *InvoiceHandler {
-	return &InvoiceHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc}
+func NewInvoiceHandler(svc *services.InvoiceService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService) *InvoiceHandler {
+	return &InvoiceHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc}
 }
 
 func (h *InvoiceHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +78,9 @@ func (h *InvoiceHandler) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	statuses := h.statusesForSelect(r.Context())
-	templates.InvoiceShow(invoiceToDetail(i, statuses)).Render(r.Context(), w)
+	d := invoiceToDetail(i, statuses)
+	d.LineItems = h.svc.LineItems(i)
+	templates.InvoiceShow(d).Render(r.Context(), w)
 }
 
 func (h *InvoiceHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -92,6 +95,8 @@ func (h *InvoiceHandler) Create(w http.ResponseWriter, r *http.Request) {
 	custID, _ := strconv.ParseInt(r.FormValue("customer_id"), 10, 64)
 	jobID, _ := strconv.ParseInt(r.FormValue("job_id"), 10, 64)
 	statusID, _ := strconv.ParseInt(r.FormValue("status_id"), 10, 64)
+	lineItems, _ := services.ParseLineItems(r.FormValue("line_items"))
+
 	params := services.InvoiceCreateParams{
 		CustomerID:  custID,
 		JobID:       jobID,
@@ -101,6 +106,10 @@ func (h *InvoiceHandler) Create(w http.ResponseWriter, r *http.Request) {
 		InvoiceDate: parseDate(r.FormValue("invoice_date")),
 		DueDate:     parseDate(r.FormValue("due_date")),
 		TaxRate:     r.FormValue("tax_rate"),
+		LineItems:   lineItems,
+	}
+	if params.LineItems == nil {
+		params.LineItems = []services.LineItem{}
 	}
 	_, err := h.svc.Create(r.Context(), params)
 	if err != nil {
@@ -134,6 +143,8 @@ func (h *InvoiceHandler) Update(w http.ResponseWriter, r *http.Request) {
 	custID, _ := strconv.ParseInt(r.FormValue("customer_id"), 10, 64)
 	jobID, _ := strconv.ParseInt(r.FormValue("job_id"), 10, 64)
 	statusID, _ := strconv.ParseInt(r.FormValue("status_id"), 10, 64)
+	lineItems, _ := services.ParseLineItems(r.FormValue("line_items"))
+
 	params := services.InvoiceUpdateParams{
 		CustomerID: int64Ptr(custID),
 		JobID:      int64Ptr(jobID),
@@ -149,6 +160,9 @@ func (h *InvoiceHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if d := r.FormValue("due_date"); d != "" {
 		t := parseDate(d)
 		params.DueDate = &t
+	}
+	if lineItems != nil {
+		params.LineItems = &lineItems
 	}
 	if _, err := h.svc.Update(r.Context(), id, params); err != nil {
 		http.Error(w, err.Error(), 500)
@@ -175,16 +189,23 @@ func (h *InvoiceHandler) statusesForSelect(ctx context.Context) []*ent.Status {
 	return statuses
 }
 
+func (h *InvoiceHandler) itemsCatalog(ctx context.Context) string {
+	items, _ := h.itemSvc.ListActive(ctx)
+	return itemsToJSON(items)
+}
+
 func (h *InvoiceHandler) newInvoiceForm(ctx context.Context) templates.InvoiceFormPageData {
 	statuses := h.statusesForSelect(ctx)
 	customers, _ := h.custSvc.ListAll(ctx)
 	jobs, _ := h.jobSvc.ListAll(ctx)
 	return templates.InvoiceFormPageData{
-		Invoice:   &templates.InvoiceDetail{},
-		IsNew:     true,
-		Customers: customerOptions(customers),
-		Jobs:      jobOptions(jobs),
-		Statuses:  statusOptions(statuses),
+		Invoice:           &templates.InvoiceDetail{},
+		IsNew:             true,
+		Customers:         customerOptions(customers),
+		Jobs:              jobOptions(jobs),
+		Statuses:          statusOptions(statuses),
+		ItemsJSON:         h.itemsCatalog(ctx),
+		ExistingItemsJSON: "[]",
 	}
 }
 
@@ -192,12 +213,15 @@ func (h *InvoiceHandler) formDataFromInvoice(ctx context.Context, i *ent.Invoice
 	customers, _ := h.custSvc.ListAll(ctx)
 	jobs, _ := h.jobSvc.ListAll(ctx)
 	d := invoiceToDetail(i, statuses)
+	items := h.svc.LineItems(i)
 	return templates.InvoiceFormPageData{
-		Invoice:   &d,
-		IsNew:     false,
-		Customers: customerOptions(customers),
-		Jobs:      jobOptions(jobs),
-		Statuses:  statusOptions(statuses),
+		Invoice:           &d,
+		IsNew:             false,
+		Customers:         customerOptions(customers),
+		Jobs:              jobOptions(jobs),
+		Statuses:          statusOptions(statuses),
+		ItemsJSON:         h.itemsCatalog(ctx),
+		ExistingItemsJSON: services.SerializeLineItems(items),
 	}
 }
 

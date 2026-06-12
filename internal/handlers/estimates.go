@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -17,10 +18,11 @@ type EstimateHandler struct {
 	custSvc   *services.CustomerService
 	jobSvc    *services.JobService
 	statusSvc *services.StatusService
+	itemSvc   *services.ItemService
 }
 
-func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService) *EstimateHandler {
-	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc}
+func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService) *EstimateHandler {
+	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc}
 }
 
 func (h *EstimateHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +79,9 @@ func (h *EstimateHandler) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	statuses := h.statusesForSelect(r.Context())
-	templates.EstimateShow(estimateToDetail(e, statuses)).Render(r.Context(), w)
+	d := estimateToDetail(e, statuses)
+	d.LineItems = h.svc.LineItems(e)
+	templates.EstimateShow(d).Render(r.Context(), w)
 }
 
 func (h *EstimateHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -92,6 +96,8 @@ func (h *EstimateHandler) Create(w http.ResponseWriter, r *http.Request) {
 	custID, _ := strconv.ParseInt(r.FormValue("customer_id"), 10, 64)
 	jobID, _ := strconv.ParseInt(r.FormValue("job_id"), 10, 64)
 	statusID, _ := strconv.ParseInt(r.FormValue("status_id"), 10, 64)
+	lineItems, _ := services.ParseLineItems(r.FormValue("line_items"))
+
 	params := services.EstimateCreateParams{
 		CustomerID: custID,
 		JobID:      jobID,
@@ -99,6 +105,10 @@ func (h *EstimateHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Title:      r.FormValue("title"),
 		Notes:      r.FormValue("notes"),
 		TaxRate:    r.FormValue("tax_rate"),
+		LineItems:  lineItems,
+	}
+	if params.LineItems == nil {
+		params.LineItems = []services.LineItem{}
 	}
 	_, err := h.svc.Create(r.Context(), params)
 	if err != nil {
@@ -132,6 +142,8 @@ func (h *EstimateHandler) Update(w http.ResponseWriter, r *http.Request) {
 	custID, _ := strconv.ParseInt(r.FormValue("customer_id"), 10, 64)
 	jobID, _ := strconv.ParseInt(r.FormValue("job_id"), 10, 64)
 	statusID, _ := strconv.ParseInt(r.FormValue("status_id"), 10, 64)
+	lineItems, _ := services.ParseLineItems(r.FormValue("line_items"))
+
 	params := services.EstimateUpdateParams{
 		CustomerID: int64Ptr(custID),
 		JobID:      int64Ptr(jobID),
@@ -139,6 +151,9 @@ func (h *EstimateHandler) Update(w http.ResponseWriter, r *http.Request) {
 		Title:      formPtr(r.FormValue("title")),
 		Notes:      formPtr(r.FormValue("notes")),
 		TaxRate:    formPtr(r.FormValue("tax_rate")),
+	}
+	if lineItems != nil {
+		params.LineItems = &lineItems
 	}
 	if _, err := h.svc.Update(r.Context(), id, params); err != nil {
 		http.Error(w, err.Error(), 500)
@@ -165,16 +180,27 @@ func (h *EstimateHandler) statusesForSelect(ctx context.Context) []*ent.Status {
 	return statuses
 }
 
+func (h *EstimateHandler) itemsCatalog(ctx context.Context) string {
+	items, _ := h.itemSvc.ListActive(ctx)
+	return itemsToJSON(items)
+}
+
+func (h *EstimateHandler) existingItemsJSON(items []services.LineItem) string {
+	return services.SerializeLineItems(items)
+}
+
 func (h *EstimateHandler) newEstimateForm(ctx context.Context) templates.EstimateFormPageData {
 	statuses := h.statusesForSelect(ctx)
 	customers, _ := h.custSvc.ListAll(ctx)
 	jobs, _ := h.jobSvc.ListAll(ctx)
 	return templates.EstimateFormPageData{
-		Estimate:  &templates.EstimateDetail{},
-		IsNew:     true,
-		Customers: customerOptions(customers),
-		Jobs:      jobOptions(jobs),
-		Statuses:  statusOptions(statuses),
+		Estimate:          &templates.EstimateDetail{},
+		IsNew:             true,
+		Customers:         customerOptions(customers),
+		Jobs:              jobOptions(jobs),
+		Statuses:          statusOptions(statuses),
+		ItemsJSON:         h.itemsCatalog(ctx),
+		ExistingItemsJSON: "[]",
 	}
 }
 
@@ -182,12 +208,15 @@ func (h *EstimateHandler) formDataFromEstimate(ctx context.Context, e *ent.Estim
 	customers, _ := h.custSvc.ListAll(ctx)
 	jobs, _ := h.jobSvc.ListAll(ctx)
 	d := estimateToDetail(e, statuses)
+	items := h.svc.LineItems(e)
 	return templates.EstimateFormPageData{
-		Estimate:  &d,
-		IsNew:     false,
-		Customers: customerOptions(customers),
-		Jobs:      jobOptions(jobs),
-		Statuses:  statusOptions(statuses),
+		Estimate:          &d,
+		IsNew:             false,
+		Customers:         customerOptions(customers),
+		Jobs:              jobOptions(jobs),
+		Statuses:          statusOptions(statuses),
+		ItemsJSON:         h.itemsCatalog(ctx),
+		ExistingItemsJSON: h.existingItemsJSON(items),
 	}
 }
 
@@ -246,4 +275,35 @@ func jobOptions(jobs []*ent.Job) []templates.SelectOption {
 		opts[i] = templates.SelectOption{Value: j.ID, Label: label}
 	}
 	return opts
+}
+
+type catalogItem struct {
+	ID          int64   `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	UnitPrice   float64 `json:"unit_price"`
+	Taxable     bool    `json:"taxable"`
+	TaxRate     string  `json:"tax_rate"`
+}
+
+func itemsToJSON(items []*ent.Item) string {
+	if len(items) == 0 {
+		return "[]"
+	}
+	c := make([]catalogItem, len(items))
+	for i, item := range items {
+		c[i] = catalogItem{
+			ID:          item.ID,
+			Name:        item.Name,
+			Description: item.Description,
+			UnitPrice:   item.UnitPrice,
+			Taxable:     item.Taxable,
+			TaxRate:     item.TaxRate,
+		}
+	}
+	b, err := json.Marshal(c)
+	if err != nil {
+		return "[]"
+	}
+	return string(b)
 }

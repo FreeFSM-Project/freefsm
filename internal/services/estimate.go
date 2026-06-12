@@ -24,6 +24,7 @@ type EstimateCreateParams struct {
 	Title      string
 	Notes      string
 	TaxRate    string
+	LineItems  []LineItem
 }
 
 type EstimateUpdateParams struct {
@@ -33,6 +34,7 @@ type EstimateUpdateParams struct {
 	Title      *string
 	Notes      *string
 	TaxRate    *string
+	LineItems  *[]LineItem
 }
 
 func (s *EstimateService) List(ctx context.Context, search string, statusID int64, page, perPage int) ([]*ent.Estimate, int, error) {
@@ -77,7 +79,8 @@ func (s *EstimateService) Create(ctx context.Context, params EstimateCreateParam
 		SetCustomerID(params.CustomerID).
 		SetTitle(params.Title).
 		SetNotes(params.Notes).
-		SetTaxRate(params.TaxRate)
+		SetTaxRate(params.TaxRate).
+		SetLineItems(SerializeLineItems(params.LineItems))
 
 	if params.JobID > 0 {
 		b.SetJobID(params.JobID)
@@ -114,6 +117,9 @@ func (s *EstimateService) Update(ctx context.Context, id int64, params EstimateU
 	if params.TaxRate != nil {
 		u.SetTaxRate(*params.TaxRate)
 	}
+	if params.LineItems != nil {
+		u.SetLineItems(SerializeLineItems(*params.LineItems))
+	}
 
 	e, err := u.Save(ctx)
 	if err != nil {
@@ -131,4 +137,12 @@ func (s *EstimateService) Delete(ctx context.Context, id int64) error {
 
 func EstimatePaginationTotalPages(total, perPage int) int {
 	return int(math.Ceil(float64(total) / float64(perPage)))
+}
+
+func (s *EstimateService) LineItems(e *ent.Estimate) []LineItem {
+	items, _ := ParseLineItems(e.LineItems)
+	if items == nil {
+		return []LineItem{}
+	}
+	return items
 }

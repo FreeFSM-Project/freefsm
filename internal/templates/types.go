@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/MartialM1nd/freefsm/internal/middleware"
+	"github.com/MartialM1nd/freefsm/internal/services"
 )
 
 func getUser(ctx context.Context) *User {
@@ -230,6 +231,7 @@ type EstimateDetail struct {
 	Title      string
 	Notes      string
 	TaxRate    string
+	LineItems  []services.LineItem
 }
 
 type EstimateListPageData struct {
@@ -244,12 +246,14 @@ type EstimateListPageData struct {
 }
 
 type EstimateFormPageData struct {
-	Estimate *EstimateDetail
-	Errors   map[string]string
-	IsNew    bool
-	Customers []SelectOption
-	Jobs      []SelectOption
-	Statuses  []SelectOption
+	Estimate          *EstimateDetail
+	Errors            map[string]string
+	IsNew             bool
+	Customers         []SelectOption
+	Jobs              []SelectOption
+	Statuses          []SelectOption
+	ItemsJSON         string
+	ExistingItemsJSON string
 }
 
 type InvoiceRow struct {
@@ -275,6 +279,7 @@ type InvoiceDetail struct {
 	InvoiceDate string
 	DueDate     string
 	TaxRate     string
+	LineItems   []services.LineItem
 }
 
 type InvoiceListPageData struct {
@@ -289,12 +294,14 @@ type InvoiceListPageData struct {
 }
 
 type InvoiceFormPageData struct {
-	Invoice   *InvoiceDetail
-	Errors    map[string]string
-	IsNew     bool
-	Customers []SelectOption
-	Jobs      []SelectOption
-	Statuses  []SelectOption
+	Invoice          *InvoiceDetail
+	Errors           map[string]string
+	IsNew            bool
+	Customers        []SelectOption
+	Jobs             []SelectOption
+	Statuses         []SelectOption
+	ItemsJSON        string
+	ExistingItemsJSON string
 }
 
 func jobFormTitle(isNew bool) string {
@@ -316,4 +323,19 @@ func invoiceFormTitle(isNew bool) string {
 		return "New Invoice"
 	}
 	return "Edit Invoice"
+}
+
+func lineItemTotal(li services.LineItem) float64 {
+	total := li.UnitPrice * float64(li.Quantity)
+	total -= li.Discount
+	total += li.Surcharge
+	return total
+}
+
+func lineItemsTotal(items []services.LineItem) float64 {
+	var total float64
+	for _, li := range items {
+		total += lineItemTotal(li)
+	}
+	return total
 }

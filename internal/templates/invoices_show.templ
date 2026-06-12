@@ -22,6 +22,40 @@ templ InvoiceShow(p InvoiceDetail) {
 				<tr><th>Tax Rate</th><td>{ p.TaxRate }</td></tr>
 			</tbody>
 		</table>
+		if len(p.LineItems) > 0 {
+			<h3>Line Items</h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Item</th>
+						<th>Qty</th>
+						<th>Price</th>
+						<th>Tax</th>
+						<th>Total</th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, li := range p.LineItems {
+						<tr>
+							<td>{ li.Title }</td>
+							<td>{ fmt.Sprintf("%d", li.Quantity) }</td>
+							<td>{ fmt.Sprintf("$%.2f", li.UnitPrice) }</td>
+							<td>
+								if li.Taxable && li.TaxRate != "" {
+									{ li.TaxRate }
+								} else {
+									No
+								}
+							</td>
+							<td>{ fmt.Sprintf("$%.2f", lineItemTotal(li)) }</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+			<div style="text-align:right;margin-top:0.5rem">
+				<p><strong>Total: { fmt.Sprintf("$%.2f", lineItemsTotal(p.LineItems)) }</strong></p>
+			</div>
+		}
 		if p.Notes != "" {
 			<h3>Notes</h3>
 			<p>{ p.Notes }</p>
