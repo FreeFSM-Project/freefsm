@@ -52,8 +52,8 @@ templ EstimateForm(p EstimateFormPageData) {
 				Notes
 				<textarea name="notes" rows="3">{ p.Estimate.Notes }</textarea>
 			</label>
-			<script type="application/json" id="items-catalog">@templ.Raw(p.ItemsJSON)</script>
-			<script type="application/json" id="existing-items">@templ.Raw(p.ExistingItemsJSON)</script>
+			<script type="application/json" id="items-catalog">{ templ.Raw(p.ItemsJSON) }</script>
+			<script type="application/json" id="existing-items">{ templ.Raw(p.ExistingItemsJSON) }</script>
 			<script>
 				document.addEventListener('alpine:init', () => {
 					Alpine.data('lineItemEditor', () => {
