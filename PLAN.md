@@ -1,7 +1,7 @@
 # FreeFSM — Free Field Service Manager
 
 ## Vision
-Self-hosted, open-source FieldPulse clone for FreeBSD and Linux. Single binary, PostgreSQL, zero proprietary dependencies.
+Self-hosted, open-source field service management for FreeBSD and Linux. Single binary, PostgreSQL, zero proprietary dependencies.
 
 ---
 
@@ -25,7 +25,7 @@ Self-hosted, open-source FieldPulse clone for FreeBSD and Linux. Single binary, 
 │            Go Binary (chi)              │
 │  ┌──────────────┬────────────────────┐  │
 │  │  Web UI      │    REST API       │  │
-│  │ (Templ+HTMX) │ (FieldPulse clone)│  │
+│  │ (Templ+HTMX) │    (JSON API)     │  │
 │  ├──────────────┴────────────────────┤  │
 │  │       Services (CQRS-lite)       │  │
 │  ├──────────────────────────────────┤  │
@@ -60,7 +60,7 @@ Self-hosted, open-source FieldPulse clone for FreeBSD and Linux. Single binary, 
 - `statuses` (workflow_id, name, color, sort_order)
 - Each entity has `status_id` FK -> `statuses`
 
-## Data Model — Reverse Engineered from FieldPulse API
+## Data Model
 
 ### Core Entities (MVP — Phase 1)
 
@@ -128,7 +128,7 @@ Self-hosted, open-source FieldPulse clone for FreeBSD and Linux. Single binary, 
 - **Lead Source** — Marketing source tracking
 - **Pipeline Status** — Sales pipeline stages
 
-## API Endpoints (mirrored from FieldPulse — Phase 4)
+## API Endpoints (Phase 4)
 
 113 endpoints across 26 resource groups, all using:
 - `x-api-key` header auth
@@ -204,7 +204,7 @@ freefsm/
 │   │   ├── payments.go
 │   │   ├── projects.go
 │   │   └── api/
-│   │       └── ... (FieldPulse API mirror)
+│   │       └── ... (REST API)
 │   ├── middleware/
 │   │   ├── auth.go
 │   │   └── session.go
@@ -334,15 +334,15 @@ freefsm/
 - Recurring job / maintenance agreement templates
 
 ### Phase 4 — Integration + Advanced
-- REST API mirroring FieldPulse's 113 endpoints
-- Webhook system (same events as FieldPulse)
+- REST API covering 113 standardized endpoints
+- Webhook system (standard webhook events)
 - Chromium-based PDF rendering (swap from maroto)
 - QuickBooks export (QBO/QBD)
 - Customer portal / self-service booking
 - Zapier-compatible webhook triggers
 - Mobile-responsive UI refinements
 
-## Key Architectural Patterns (from FieldPulse API)
+## Key Architectural Patterns
 
 1. **Polymorphic Relations** — Tags, custom fields, comments, and locations use `object_type` + `object_id` to attach to multiple entities. Built via `entpoly`.
 
