@@ -83,6 +83,8 @@ func (h *JobHandler) Show(w http.ResponseWriter, r *http.Request) {
 	statuses := h.statusesForSelect(r.Context())
 	d := jobToDetail(j, statuses)
 	d.LineItems = h.svc.LineItems(j)
+	d.Visits = services.ParseVisits(j.Visits)
+	d.Assignments = services.ParseAssignments(j.Assignments)
 	projects, _ := h.projectSvc.ListAll(r.Context())
 	locations, _ := h.locSvc.ListAll(r.Context())
 	if j.CustomerID > 0 {
@@ -132,8 +134,10 @@ func (h *JobHandler) Create(w http.ResponseWriter, r *http.Request) {
 		StartTime: parseTime(r.FormValue("start_time")),
 		EndTime:   parseTime(r.FormValue("end_time")),
 		DueDate:   parseDate(r.FormValue("due_date")),
-		Notes:     r.FormValue("notes"),
-		TechNotes:         r.FormValue("tech_notes"),
+		Notes:       r.FormValue("notes"),
+		TechNotes:   r.FormValue("tech_notes"),
+		Visits:      services.ParseVisits(r.FormValue("visits")),
+		Assignments: services.ParseAssignments(r.FormValue("assignments")),
 	}
 	if params.BillingType == "" {
 		params.BillingType = "flat_rate"
@@ -183,6 +187,14 @@ func (h *JobHandler) Update(w http.ResponseWriter, r *http.Request) {
 		BillingType:       formPtr(r.FormValue("billing_type")),
 		Notes:             formPtr(r.FormValue("notes")),
 		TechNotes:         formPtr(r.FormValue("tech_notes")),
+	}
+	if v := r.FormValue("visits"); v != "" {
+		visits := services.ParseVisits(v)
+		params.Visits = &visits
+	}
+	if a := r.FormValue("assignments"); a != "" {
+		assignments := services.ParseAssignments(a)
+		params.Assignments = &assignments
 	}
 	if st := r.FormValue("start_time"); st != "" {
 		t := parseTime(st)
@@ -237,6 +249,8 @@ func (h *JobHandler) newJobForm(ctx context.Context) templates.JobFormPageData {
 		Locations:    locationOptions(locations),
 		Statuses:     statusOptions(statuses),
 		BillingTypes: services.JobBillingTypes,
+		ExistingVisitsJSON:    "[]",
+		ExistingAssignmentsJSON: "[]",
 	}
 }
 
@@ -253,6 +267,8 @@ func (h *JobHandler) formDataFromJob(ctx context.Context, j *ent.Job, statuses [
 		Locations:    locationOptions(locations),
 		Statuses:     statusOptions(statuses),
 		BillingTypes: services.JobBillingTypes,
+		ExistingVisitsJSON:    services.SerializeVisits(services.ParseVisits(j.Visits)),
+		ExistingAssignmentsJSON: services.SerializeAssignments(services.ParseAssignments(j.Assignments)),
 	}
 }
 

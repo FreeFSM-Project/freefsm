@@ -1,0 +1,41 @@
+package services
+
+import "encoding/json"
+
+type JobVisit struct {
+	Date      string `json:"date"`
+	StartTime string `json:"start_time"`
+	EndTime   string `json:"end_time"`
+	Notes     string `json:"notes"`
+}
+
+type JobAssignment struct {
+	Name string `json:"name"`
+	Role string `json:"role"`
+}
+
+func ParseVisits(s string) []JobVisit {
+	if s == "" || s == "[]" { return nil }
+	var v []JobVisit
+	json.Unmarshal([]byte(s), &v)
+	return v
+}
+
+func SerializeVisits(visits []JobVisit) string {
+	if len(visits) == 0 { return "[]" }
+	b, _ := json.Marshal(visits)
+	return string(b)
+}
+
+func ParseAssignments(s string) []JobAssignment {
+	if s == "" || s == "[]" { return nil }
+	var a []JobAssignment
+	json.Unmarshal([]byte(s), &a)
+	return a
+}
+
+func SerializeAssignments(assignments []JobAssignment) string {
+	if len(assignments) == 0 { return "[]" }
+	b, _ := json.Marshal(assignments)
+	return string(b)
+}

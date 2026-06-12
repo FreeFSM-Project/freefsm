@@ -35,6 +35,8 @@ type JobCreateParams struct {
 	Notes             string
 	TechNotes         string
 	LineItems         []LineItem
+	Visits            []JobVisit
+	Assignments       []JobAssignment
 }
 
 type JobUpdateParams struct {
@@ -54,6 +56,8 @@ type JobUpdateParams struct {
 	Notes             *string
 	TechNotes         *string
 	LineItems         *[]LineItem
+	Visits            *[]JobVisit
+	Assignments       *[]JobAssignment
 }
 
 func (s *JobService) ListAll(ctx context.Context) ([]*ent.Job, error) {
@@ -119,7 +123,9 @@ func (s *JobService) Create(ctx context.Context, params JobCreateParams) (*ent.J
 		SetBillingType(params.BillingType).
 		SetNotes(params.Notes).
 		SetTechNotes(params.TechNotes).
-		SetLineItems(SerializeLineItems(params.LineItems))
+		SetLineItems(SerializeLineItems(params.LineItems)).
+		SetVisits(SerializeVisits(params.Visits)).
+		SetAssignments(SerializeAssignments(params.Assignments))
 
 	if params.ProjectID > 0 {
 		b.SetProjectID(params.ProjectID)
@@ -203,6 +209,12 @@ func (s *JobService) Update(ctx context.Context, id int64, params JobUpdateParam
 	}
 	if params.LineItems != nil {
 		u.SetLineItems(SerializeLineItems(*params.LineItems))
+	}
+	if params.Visits != nil {
+		u.SetVisits(SerializeVisits(*params.Visits))
+	}
+	if params.Assignments != nil {
+		u.SetAssignments(SerializeAssignments(*params.Assignments))
 	}
 
 	j, err := u.Save(ctx)

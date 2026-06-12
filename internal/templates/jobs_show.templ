@@ -50,6 +50,36 @@ templ JobShow(p JobDetail) {
 				}
 			</tbody>
 		</table>
+		if len(p.Visits) > 0 {
+			<h3>Visits</h3>
+			<table>
+				<thead><tr><th>Date</th><th>Start</th><th>End</th><th>Notes</th></tr></thead>
+				<tbody>
+					for _, v := range p.Visits {
+						<tr>
+							<td>{ v.Date }</td>
+							<td>{ v.StartTime }</td>
+							<td>{ v.EndTime }</td>
+							<td>{ v.Notes }</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+		if len(p.Assignments) > 0 {
+			<h3>Assignments</h3>
+			<table>
+				<thead><tr><th>Name</th><th>Role</th></tr></thead>
+				<tbody>
+					for _, a := range p.Assignments {
+						<tr>
+							<td>{ a.Name }</td>
+							<td>{ a.Role }</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
 		if p.Notes != "" {
 			<h3>Notes</h3>
 			<p>{ p.Notes }</p>

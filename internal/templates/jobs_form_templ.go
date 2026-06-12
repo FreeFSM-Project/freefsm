@@ -462,7 +462,33 @@ func JobForm(p JobFormPageData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</textarea></label><div style=\"display:flex;gap:0.5rem;margin-top:1rem\"><button type=\"submit\">Save</button> <a href=\"/jobs\" role=\"button\" class=\"outline\">Cancel</a></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 48, "</textarea></label><fieldset x-data=\"visitsEditor()\" data-existing=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var26 string
+			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.ExistingVisitsJSON)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/jobs_form.templ`, Line: 101, Col: 73}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var26)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "\"><legend>Visits</legend><table><thead><tr><th>Date</th><th>Start</th><th>End</th><th>Notes</th><th></th></tr></thead> <tbody><template x-for=\"(v, idx) in items\" :key=\"idx\"><tr><td><input type=\"date\" x-model=\"v.date\"></td><td><input type=\"time\" x-model=\"v.start_time\"></td><td><input type=\"time\" x-model=\"v.end_time\"></td><td><input type=\"text\" x-model=\"v.notes\"></td><td><button @click.prevent=\"remove(idx)\" class=\"outline contrast small\">X</button></td></tr></template></tbody></table><button @click.prevent=\"add()\" class=\"outline\">+ Add Visit</button> <input type=\"hidden\" name=\"visits\" :value=\"json\"></fieldset><fieldset x-data=\"assignmentsEditor()\" data-existing=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var27 string
+			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.ExistingAssignmentsJSON)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/jobs_form.templ`, Line: 120, Col: 83}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "\"><legend>Assignments</legend><table><thead><tr><th>Name</th><th>Role</th><th></th></tr></thead> <tbody><template x-for=\"(a, idx) in items\" :key=\"idx\"><tr><td><input type=\"text\" x-model=\"a.name\"></td><td><input type=\"text\" x-model=\"a.role\"></td><td><button @click.prevent=\"remove(idx)\" class=\"outline contrast small\">X</button></td></tr></template></tbody></table><button @click.prevent=\"add()\" class=\"outline\">+ Add Assignment</button> <input type=\"hidden\" name=\"assignments\" :value=\"json\"></fieldset><div style=\"display:flex;gap:0.5rem;margin-top:1rem\"><button type=\"submit\">Save</button> <a href=\"/jobs\" role=\"button\" class=\"outline\">Cancel</a></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -486,6 +512,22 @@ func JobForm(p JobFormPageData) templ.Component {
 				const st = new Date(this.value);
 				st.setHours(st.getHours()+1);
 				endEl.value = st.getFullYear() + '-' + pad(st.getMonth()+1) + '-' + pad(st.getDate()) + 'T' + pad(st.getHours()) + ':' + pad(st.getMinutes());
+			});
+			document.addEventListener('alpine:init', () => {
+				Alpine.data('visitsEditor', () => ({
+					items: [],
+					init() { try { this.items = JSON.parse(this.$el.dataset.existing || '[]'); } catch(e) {} },
+					add() { this.items.push({date:'',start_time:'',end_time:'',notes:''}); },
+					remove(idx) { this.items.splice(idx, 1); },
+					get json() { return JSON.stringify(this.items); },
+				}));
+				Alpine.data('assignmentsEditor', () => ({
+					items: [],
+					init() { try { this.items = JSON.parse(this.$el.dataset.existing || '[]'); } catch(e) {} },
+					add() { this.items.push({name:'',role:''}); },
+					remove(idx) { this.items.splice(idx, 1); },
+					get json() { return JSON.stringify(this.items); },
+				}));
 			});
 		</script>`).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {

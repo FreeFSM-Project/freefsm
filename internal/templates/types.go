@@ -171,6 +171,8 @@ type JobDetail struct {
 	ContactID       int64
 	ContactName     string
 	LineItems       []services.LineItem
+	Visits          []services.JobVisit
+	Assignments     []services.JobAssignment
 	JobType         string
 	Subtitle        string
 	StatusID        int64
@@ -200,14 +202,16 @@ type JobListPageData struct {
 }
 
 type JobFormPageData struct {
-	Job          *JobDetail
-	Errors       map[string]string
-	IsNew        bool
-	Customers    []SelectOption
-	Projects     []SelectOption
-	Locations    []SelectOption
-	Statuses     []SelectOption
-	BillingTypes []string
+	Job                   *JobDetail
+	Errors                map[string]string
+	IsNew                 bool
+	Customers             []SelectOption
+	Projects              []SelectOption
+	Locations             []SelectOption
+	Statuses              []SelectOption
+	BillingTypes          []string
+	ExistingVisitsJSON    string
+	ExistingAssignmentsJSON string
 }
 
 func customerFormTitle(isNew bool) string {
