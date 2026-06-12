@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"github.com/MartialM1nd/freefsm/internal/config"
@@ -95,6 +96,9 @@ func (h *SetupHandler) create(w http.ResponseWriter, r *http.Request) {
 
 func needsSetup(ctx context.Context, db *pgxpool.Pool) bool {
 	var count int
-	db.QueryRow(ctx, `SELECT COUNT(*) FROM users`).Scan(&count)
+	if err := db.QueryRow(ctx, `SELECT COUNT(*) FROM users`).Scan(&count); err != nil {
+		slog.Error("needsSetup: query failed", "error", err)
+		return false
+	}
 	return count == 0
 }
