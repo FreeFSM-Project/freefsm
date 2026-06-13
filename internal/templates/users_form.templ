@@ -1,0 +1,36 @@
+package templates
+
+templ UserForm(p UserFormData) {
+	@Layout(userFormTitle(p.IsNew)) {
+		<h1>{ userFormTitle(p.IsNew) }</h1>
+		<form action={ templ.URL(userFormAction(p.IsNew, p.User.User.ID)) } method="post">
+			<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+			<label>
+				Name
+				<input type="text" name="name" value={ p.User.User.Name } required autofocus/>
+			</label>
+			<label>
+				Email
+				<input type="email" name="email" value={ p.User.User.Email } required/>
+			</label>
+			if p.IsNew {
+				<label>
+					Password
+					<input type="password" name="password" required minlength="8"/>
+				</label>
+			}
+			<label>
+				Role
+				<select name="role">
+					for _, r := range p.Roles {
+						<option value={ r } selected?={ p.User.User.Role == r }>{ r }</option>
+					}
+				</select>
+			</label>
+			<div style="display:flex;gap:0.5rem;margin-top:1rem">
+				<button type="submit">Save</button>
+				<a href="/users" role="button" class="outline">Cancel</a>
+			</div>
+		</form>
+	}
+}

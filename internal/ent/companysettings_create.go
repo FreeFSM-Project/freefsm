@@ -188,6 +188,76 @@ func (_c *CompanySettingsCreate) SetNillableDefaultDueDays(v *int) *CompanySetti
 	return _c
 }
 
+// SetSMTPHost sets the "smtp_host" field.
+func (_c *CompanySettingsCreate) SetSMTPHost(v string) *CompanySettingsCreate {
+	_c.mutation.SetSMTPHost(v)
+	return _c
+}
+
+// SetNillableSMTPHost sets the "smtp_host" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableSMTPHost(v *string) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetSMTPHost(*v)
+	}
+	return _c
+}
+
+// SetSMTPPort sets the "smtp_port" field.
+func (_c *CompanySettingsCreate) SetSMTPPort(v int) *CompanySettingsCreate {
+	_c.mutation.SetSMTPPort(v)
+	return _c
+}
+
+// SetNillableSMTPPort sets the "smtp_port" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableSMTPPort(v *int) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetSMTPPort(*v)
+	}
+	return _c
+}
+
+// SetSMTPUser sets the "smtp_user" field.
+func (_c *CompanySettingsCreate) SetSMTPUser(v string) *CompanySettingsCreate {
+	_c.mutation.SetSMTPUser(v)
+	return _c
+}
+
+// SetNillableSMTPUser sets the "smtp_user" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableSMTPUser(v *string) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetSMTPUser(*v)
+	}
+	return _c
+}
+
+// SetSMTPPassword sets the "smtp_password" field.
+func (_c *CompanySettingsCreate) SetSMTPPassword(v string) *CompanySettingsCreate {
+	_c.mutation.SetSMTPPassword(v)
+	return _c
+}
+
+// SetNillableSMTPPassword sets the "smtp_password" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableSMTPPassword(v *string) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetSMTPPassword(*v)
+	}
+	return _c
+}
+
+// SetSMTPFrom sets the "smtp_from" field.
+func (_c *CompanySettingsCreate) SetSMTPFrom(v string) *CompanySettingsCreate {
+	_c.mutation.SetSMTPFrom(v)
+	return _c
+}
+
+// SetNillableSMTPFrom sets the "smtp_from" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableSMTPFrom(v *string) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetSMTPFrom(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *CompanySettingsCreate) SetCreatedAt(v time.Time) *CompanySettingsCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -305,6 +375,26 @@ func (_c *CompanySettingsCreate) defaults() {
 		v := companysettings.DefaultDefaultDueDays
 		_c.mutation.SetDefaultDueDays(v)
 	}
+	if _, ok := _c.mutation.SMTPHost(); !ok {
+		v := companysettings.DefaultSMTPHost
+		_c.mutation.SetSMTPHost(v)
+	}
+	if _, ok := _c.mutation.SMTPPort(); !ok {
+		v := companysettings.DefaultSMTPPort
+		_c.mutation.SetSMTPPort(v)
+	}
+	if _, ok := _c.mutation.SMTPUser(); !ok {
+		v := companysettings.DefaultSMTPUser
+		_c.mutation.SetSMTPUser(v)
+	}
+	if _, ok := _c.mutation.SMTPPassword(); !ok {
+		v := companysettings.DefaultSMTPPassword
+		_c.mutation.SetSMTPPassword(v)
+	}
+	if _, ok := _c.mutation.SMTPFrom(); !ok {
+		v := companysettings.DefaultSMTPFrom
+		_c.mutation.SetSMTPFrom(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := companysettings.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -352,6 +442,21 @@ func (_c *CompanySettingsCreate) check() error {
 	}
 	if _, ok := _c.mutation.DefaultDueDays(); !ok {
 		return &ValidationError{Name: "default_due_days", err: errors.New(`ent: missing required field "CompanySettings.default_due_days"`)}
+	}
+	if _, ok := _c.mutation.SMTPHost(); !ok {
+		return &ValidationError{Name: "smtp_host", err: errors.New(`ent: missing required field "CompanySettings.smtp_host"`)}
+	}
+	if _, ok := _c.mutation.SMTPPort(); !ok {
+		return &ValidationError{Name: "smtp_port", err: errors.New(`ent: missing required field "CompanySettings.smtp_port"`)}
+	}
+	if _, ok := _c.mutation.SMTPUser(); !ok {
+		return &ValidationError{Name: "smtp_user", err: errors.New(`ent: missing required field "CompanySettings.smtp_user"`)}
+	}
+	if _, ok := _c.mutation.SMTPPassword(); !ok {
+		return &ValidationError{Name: "smtp_password", err: errors.New(`ent: missing required field "CompanySettings.smtp_password"`)}
+	}
+	if _, ok := _c.mutation.SMTPFrom(); !ok {
+		return &ValidationError{Name: "smtp_from", err: errors.New(`ent: missing required field "CompanySettings.smtp_from"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "CompanySettings.created_at"`)}
@@ -438,6 +543,26 @@ func (_c *CompanySettingsCreate) createSpec() (*CompanySettings, *sqlgraph.Creat
 	if value, ok := _c.mutation.DefaultDueDays(); ok {
 		_spec.SetField(companysettings.FieldDefaultDueDays, field.TypeInt, value)
 		_node.DefaultDueDays = value
+	}
+	if value, ok := _c.mutation.SMTPHost(); ok {
+		_spec.SetField(companysettings.FieldSMTPHost, field.TypeString, value)
+		_node.SMTPHost = value
+	}
+	if value, ok := _c.mutation.SMTPPort(); ok {
+		_spec.SetField(companysettings.FieldSMTPPort, field.TypeInt, value)
+		_node.SMTPPort = value
+	}
+	if value, ok := _c.mutation.SMTPUser(); ok {
+		_spec.SetField(companysettings.FieldSMTPUser, field.TypeString, value)
+		_node.SMTPUser = value
+	}
+	if value, ok := _c.mutation.SMTPPassword(); ok {
+		_spec.SetField(companysettings.FieldSMTPPassword, field.TypeString, value)
+		_node.SMTPPassword = value
+	}
+	if value, ok := _c.mutation.SMTPFrom(); ok {
+		_spec.SetField(companysettings.FieldSMTPFrom, field.TypeString, value)
+		_node.SMTPFrom = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(companysettings.FieldCreatedAt, field.TypeTime, value)

@@ -203,6 +203,83 @@ func (_u *CompanySettingsUpdate) AddDefaultDueDays(v int) *CompanySettingsUpdate
 	return _u
 }
 
+// SetSMTPHost sets the "smtp_host" field.
+func (_u *CompanySettingsUpdate) SetSMTPHost(v string) *CompanySettingsUpdate {
+	_u.mutation.SetSMTPHost(v)
+	return _u
+}
+
+// SetNillableSMTPHost sets the "smtp_host" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableSMTPHost(v *string) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetSMTPHost(*v)
+	}
+	return _u
+}
+
+// SetSMTPPort sets the "smtp_port" field.
+func (_u *CompanySettingsUpdate) SetSMTPPort(v int) *CompanySettingsUpdate {
+	_u.mutation.ResetSMTPPort()
+	_u.mutation.SetSMTPPort(v)
+	return _u
+}
+
+// SetNillableSMTPPort sets the "smtp_port" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableSMTPPort(v *int) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetSMTPPort(*v)
+	}
+	return _u
+}
+
+// AddSMTPPort adds value to the "smtp_port" field.
+func (_u *CompanySettingsUpdate) AddSMTPPort(v int) *CompanySettingsUpdate {
+	_u.mutation.AddSMTPPort(v)
+	return _u
+}
+
+// SetSMTPUser sets the "smtp_user" field.
+func (_u *CompanySettingsUpdate) SetSMTPUser(v string) *CompanySettingsUpdate {
+	_u.mutation.SetSMTPUser(v)
+	return _u
+}
+
+// SetNillableSMTPUser sets the "smtp_user" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableSMTPUser(v *string) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetSMTPUser(*v)
+	}
+	return _u
+}
+
+// SetSMTPPassword sets the "smtp_password" field.
+func (_u *CompanySettingsUpdate) SetSMTPPassword(v string) *CompanySettingsUpdate {
+	_u.mutation.SetSMTPPassword(v)
+	return _u
+}
+
+// SetNillableSMTPPassword sets the "smtp_password" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableSMTPPassword(v *string) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetSMTPPassword(*v)
+	}
+	return _u
+}
+
+// SetSMTPFrom sets the "smtp_from" field.
+func (_u *CompanySettingsUpdate) SetSMTPFrom(v string) *CompanySettingsUpdate {
+	_u.mutation.SetSMTPFrom(v)
+	return _u
+}
+
+// SetNillableSMTPFrom sets the "smtp_from" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableSMTPFrom(v *string) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetSMTPFrom(*v)
+	}
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *CompanySettingsUpdate) SetUpdatedAt(v time.Time) *CompanySettingsUpdate {
 	_u.mutation.SetUpdatedAt(v)
@@ -297,6 +374,24 @@ func (_u *CompanySettingsUpdate) sqlSave(ctx context.Context) (_node int, err er
 	}
 	if value, ok := _u.mutation.AddedDefaultDueDays(); ok {
 		_spec.AddField(companysettings.FieldDefaultDueDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.SMTPHost(); ok {
+		_spec.SetField(companysettings.FieldSMTPHost, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.SMTPPort(); ok {
+		_spec.SetField(companysettings.FieldSMTPPort, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedSMTPPort(); ok {
+		_spec.AddField(companysettings.FieldSMTPPort, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.SMTPUser(); ok {
+		_spec.SetField(companysettings.FieldSMTPUser, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.SMTPPassword(); ok {
+		_spec.SetField(companysettings.FieldSMTPPassword, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.SMTPFrom(); ok {
+		_spec.SetField(companysettings.FieldSMTPFrom, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(companysettings.FieldUpdatedAt, field.TypeTime, value)
@@ -496,6 +591,83 @@ func (_u *CompanySettingsUpdateOne) AddDefaultDueDays(v int) *CompanySettingsUpd
 	return _u
 }
 
+// SetSMTPHost sets the "smtp_host" field.
+func (_u *CompanySettingsUpdateOne) SetSMTPHost(v string) *CompanySettingsUpdateOne {
+	_u.mutation.SetSMTPHost(v)
+	return _u
+}
+
+// SetNillableSMTPHost sets the "smtp_host" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableSMTPHost(v *string) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetSMTPHost(*v)
+	}
+	return _u
+}
+
+// SetSMTPPort sets the "smtp_port" field.
+func (_u *CompanySettingsUpdateOne) SetSMTPPort(v int) *CompanySettingsUpdateOne {
+	_u.mutation.ResetSMTPPort()
+	_u.mutation.SetSMTPPort(v)
+	return _u
+}
+
+// SetNillableSMTPPort sets the "smtp_port" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableSMTPPort(v *int) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetSMTPPort(*v)
+	}
+	return _u
+}
+
+// AddSMTPPort adds value to the "smtp_port" field.
+func (_u *CompanySettingsUpdateOne) AddSMTPPort(v int) *CompanySettingsUpdateOne {
+	_u.mutation.AddSMTPPort(v)
+	return _u
+}
+
+// SetSMTPUser sets the "smtp_user" field.
+func (_u *CompanySettingsUpdateOne) SetSMTPUser(v string) *CompanySettingsUpdateOne {
+	_u.mutation.SetSMTPUser(v)
+	return _u
+}
+
+// SetNillableSMTPUser sets the "smtp_user" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableSMTPUser(v *string) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetSMTPUser(*v)
+	}
+	return _u
+}
+
+// SetSMTPPassword sets the "smtp_password" field.
+func (_u *CompanySettingsUpdateOne) SetSMTPPassword(v string) *CompanySettingsUpdateOne {
+	_u.mutation.SetSMTPPassword(v)
+	return _u
+}
+
+// SetNillableSMTPPassword sets the "smtp_password" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableSMTPPassword(v *string) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetSMTPPassword(*v)
+	}
+	return _u
+}
+
+// SetSMTPFrom sets the "smtp_from" field.
+func (_u *CompanySettingsUpdateOne) SetSMTPFrom(v string) *CompanySettingsUpdateOne {
+	_u.mutation.SetSMTPFrom(v)
+	return _u
+}
+
+// SetNillableSMTPFrom sets the "smtp_from" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableSMTPFrom(v *string) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetSMTPFrom(*v)
+	}
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *CompanySettingsUpdateOne) SetUpdatedAt(v time.Time) *CompanySettingsUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
@@ -620,6 +792,24 @@ func (_u *CompanySettingsUpdateOne) sqlSave(ctx context.Context) (_node *Company
 	}
 	if value, ok := _u.mutation.AddedDefaultDueDays(); ok {
 		_spec.AddField(companysettings.FieldDefaultDueDays, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.SMTPHost(); ok {
+		_spec.SetField(companysettings.FieldSMTPHost, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.SMTPPort(); ok {
+		_spec.SetField(companysettings.FieldSMTPPort, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedSMTPPort(); ok {
+		_spec.AddField(companysettings.FieldSMTPPort, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.SMTPUser(); ok {
+		_spec.SetField(companysettings.FieldSMTPUser, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.SMTPPassword(); ok {
+		_spec.SetField(companysettings.FieldSMTPPassword, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.SMTPFrom(); ok {
+		_spec.SetField(companysettings.FieldSMTPFrom, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(companysettings.FieldUpdatedAt, field.TypeTime, value)

@@ -13,6 +13,7 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent/item"
 	"github.com/MartialM1nd/freefsm/internal/ent/job"
 	"github.com/MartialM1nd/freefsm/internal/ent/location"
+	"github.com/MartialM1nd/freefsm/internal/ent/passwordresettoken"
 	"github.com/MartialM1nd/freefsm/internal/ent/project"
 	"github.com/MartialM1nd/freefsm/internal/ent/schema"
 	"github.com/MartialM1nd/freefsm/internal/ent/status"
@@ -74,12 +75,32 @@ func init() {
 	companysettingsDescDefaultDueDays := companysettingsFields[12].Descriptor()
 	// companysettings.DefaultDefaultDueDays holds the default value on creation for the default_due_days field.
 	companysettings.DefaultDefaultDueDays = companysettingsDescDefaultDueDays.Default.(int)
+	// companysettingsDescSMTPHost is the schema descriptor for smtp_host field.
+	companysettingsDescSMTPHost := companysettingsFields[13].Descriptor()
+	// companysettings.DefaultSMTPHost holds the default value on creation for the smtp_host field.
+	companysettings.DefaultSMTPHost = companysettingsDescSMTPHost.Default.(string)
+	// companysettingsDescSMTPPort is the schema descriptor for smtp_port field.
+	companysettingsDescSMTPPort := companysettingsFields[14].Descriptor()
+	// companysettings.DefaultSMTPPort holds the default value on creation for the smtp_port field.
+	companysettings.DefaultSMTPPort = companysettingsDescSMTPPort.Default.(int)
+	// companysettingsDescSMTPUser is the schema descriptor for smtp_user field.
+	companysettingsDescSMTPUser := companysettingsFields[15].Descriptor()
+	// companysettings.DefaultSMTPUser holds the default value on creation for the smtp_user field.
+	companysettings.DefaultSMTPUser = companysettingsDescSMTPUser.Default.(string)
+	// companysettingsDescSMTPPassword is the schema descriptor for smtp_password field.
+	companysettingsDescSMTPPassword := companysettingsFields[16].Descriptor()
+	// companysettings.DefaultSMTPPassword holds the default value on creation for the smtp_password field.
+	companysettings.DefaultSMTPPassword = companysettingsDescSMTPPassword.Default.(string)
+	// companysettingsDescSMTPFrom is the schema descriptor for smtp_from field.
+	companysettingsDescSMTPFrom := companysettingsFields[17].Descriptor()
+	// companysettings.DefaultSMTPFrom holds the default value on creation for the smtp_from field.
+	companysettings.DefaultSMTPFrom = companysettingsDescSMTPFrom.Default.(string)
 	// companysettingsDescCreatedAt is the schema descriptor for created_at field.
-	companysettingsDescCreatedAt := companysettingsFields[13].Descriptor()
+	companysettingsDescCreatedAt := companysettingsFields[18].Descriptor()
 	// companysettings.DefaultCreatedAt holds the default value on creation for the created_at field.
 	companysettings.DefaultCreatedAt = companysettingsDescCreatedAt.Default.(func() time.Time)
 	// companysettingsDescUpdatedAt is the schema descriptor for updated_at field.
-	companysettingsDescUpdatedAt := companysettingsFields[14].Descriptor()
+	companysettingsDescUpdatedAt := companysettingsFields[19].Descriptor()
 	// companysettings.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	companysettings.DefaultUpdatedAt = companysettingsDescUpdatedAt.Default.(func() time.Time)
 	// companysettings.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -416,6 +437,16 @@ func init() {
 	location.DefaultUpdatedAt = locationDescUpdatedAt.Default.(func() time.Time)
 	// location.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	location.UpdateDefaultUpdatedAt = locationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	passwordresettokenFields := schema.PasswordResetToken{}.Fields()
+	_ = passwordresettokenFields
+	// passwordresettokenDescTokenHash is the schema descriptor for token_hash field.
+	passwordresettokenDescTokenHash := passwordresettokenFields[1].Descriptor()
+	// passwordresettoken.TokenHashValidator is a validator for the "token_hash" field. It is called by the builders before save.
+	passwordresettoken.TokenHashValidator = passwordresettokenDescTokenHash.Validators[0].(func(string) error)
+	// passwordresettokenDescCreatedAt is the schema descriptor for created_at field.
+	passwordresettokenDescCreatedAt := passwordresettokenFields[4].Descriptor()
+	// passwordresettoken.DefaultCreatedAt holds the default value on creation for the created_at field.
+	passwordresettoken.DefaultCreatedAt = passwordresettokenDescCreatedAt.Default.(func() time.Time)
 	projectFields := schema.Project{}.Fields()
 	_ = projectFields
 	// projectDescName is the schema descriptor for name field.

@@ -43,6 +43,31 @@ templ SettingsPage(p SettingsPageData) {
 				Tax ID (EIN)
 				<input type="text" name="tax_id" value={ p.Settings.TaxID }/>
 			</label>
+			<h3>Email (SMTP)</h3>
+			<div class="grid">
+				<label>
+					SMTP Host
+					<input type="text" name="smtp_host" value={ p.Settings.SMTPHost } placeholder="smtp.example.com"/>
+				</label>
+				<label>
+					SMTP Port
+					<input type="number" name="smtp_port" value={ fmt.Sprintf("%d", p.Settings.SMTPPort) }/>
+				</label>
+			</div>
+			<div class="grid">
+				<label>
+					Username
+					<input type="text" name="smtp_user" value={ p.Settings.SMTPUser }/>
+				</label>
+				<label>
+					Password
+					<input type="password" name="smtp_password" value={ p.Settings.SMTPPassword }/>
+				</label>
+			</div>
+			<label>
+				From Address
+				<input type="email" name="smtp_from" value={ p.Settings.SMTPFrom } placeholder="freefsm@example.com"/>
+			</label>
 			<h3>Document Settings</h3>
 			<div class="grid">
 				<label>

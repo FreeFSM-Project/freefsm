@@ -24,6 +24,11 @@ var (
 		{Name: "invoice_prefix", Type: field.TypeString, Default: "INV-"},
 		{Name: "estimate_prefix", Type: field.TypeString, Default: "EST-"},
 		{Name: "default_due_days", Type: field.TypeInt, Default: 30},
+		{Name: "smtp_host", Type: field.TypeString, Default: ""},
+		{Name: "smtp_port", Type: field.TypeInt, Default: 587},
+		{Name: "smtp_user", Type: field.TypeString, Default: ""},
+		{Name: "smtp_password", Type: field.TypeString, Default: ""},
+		{Name: "smtp_from", Type: field.TypeString, Default: ""},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}
@@ -299,6 +304,32 @@ var (
 			},
 		},
 	}
+	// PasswordResetTokensColumns holds the columns for the "password_reset_tokens" table.
+	PasswordResetTokensColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "token_hash", Type: field.TypeString, Unique: true},
+		{Name: "user_id", Type: field.TypeInt64},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// PasswordResetTokensTable holds the schema information for the "password_reset_tokens" table.
+	PasswordResetTokensTable = &schema.Table{
+		Name:       "password_reset_tokens",
+		Columns:    PasswordResetTokensColumns,
+		PrimaryKey: []*schema.Column{PasswordResetTokensColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "passwordresettoken_token_hash",
+				Unique:  false,
+				Columns: []*schema.Column{PasswordResetTokensColumns[1]},
+			},
+			{
+				Name:    "passwordresettoken_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{PasswordResetTokensColumns[2]},
+			},
+		},
+	}
 	// ProjectsColumns holds the columns for the "projects" table.
 	ProjectsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -397,6 +428,7 @@ var (
 		ItemsTable,
 		JobsTable,
 		LocationsTable,
+		PasswordResetTokensTable,
 		ProjectsTable,
 		StatusesTable,
 		StatusWorkflowsTable,
@@ -428,6 +460,9 @@ func init() {
 	}
 	LocationsTable.Annotation = &entsql.Annotation{
 		Table: "locations",
+	}
+	PasswordResetTokensTable.Annotation = &entsql.Annotation{
+		Table: "password_reset_tokens",
 	}
 	ProjectsTable.Annotation = &entsql.Annotation{
 		Table: "projects",

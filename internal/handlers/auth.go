@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/MartialM1nd/freefsm/internal/services"
@@ -10,12 +11,15 @@ import (
 )
 
 type AuthHandler struct {
-	db       *pgxpool.Pool
-	sessions *services.SessionService
+	db          *pgxpool.Pool
+	sessions    *services.SessionService
+	userSvc     *services.UserService
+	emailSvc    *services.EmailService
+	resetSvc    *services.PasswordResetService
 }
 
-func NewAuthHandler(db *pgxpool.Pool, sessions *services.SessionService) *AuthHandler {
-	return &AuthHandler{db: db, sessions: sessions}
+func NewAuthHandler(db *pgxpool.Pool, sessions *services.SessionService, userSvc *services.UserService, emailSvc *services.EmailService, resetSvc *services.PasswordResetService) *AuthHandler {
+	return &AuthHandler{db: db, sessions: sessions, userSvc: userSvc, emailSvc: emailSvc, resetSvc: resetSvc}
 }
 
 func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +55,7 @@ func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
 	var id int64
 	var hash string
 	err := h.db.QueryRow(r.Context(),
-		`SELECT id, password_hash FROM users WHERE email = $1 AND is_active = true`, email,
+		"SELECT id, password_hash FROM users WHERE email = $1 AND is_active = true", email,
 	).Scan(&id, &hash)
 	if err != nil {
 		http.Redirect(w, r, "/login?error=invalid+credentials", http.StatusSeeOther)
@@ -76,4 +80,59 @@ func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
 	})
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		templates.ForgotPasswordPage(templates.ForgotPasswordData{}).Render(r.Context(), w)
+		return
+	}
+	r.ParseForm()
+	email := r.FormValue("email")
+	u, err := h.userSvc.GetByEmail(r.Context(), email)
+	if err != nil {
+		templates.ForgotPasswordPage(templates.ForgotPasswordData{Error: "Email not found"}).Render(r.Context(), w)
+		return
+	}
+	tok, err := h.resetSvc.CreateToken(r.Context(), u.ID)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	scheme := "http"
+	if r.TLS != nil { scheme = "https" }
+	link := fmt.Sprintf("%s://%s/reset-password?token=%s", scheme, r.Host, tok)
+	var emailErr string
+	if err := h.emailSvc.SendPasswordReset(r.Context(), email, u.Name, link); err != nil {
+		emailErr = ""
+	}
+	templates.ForgotPasswordPage(templates.ForgotPasswordData{
+		Success:  true,
+		EMailErr: emailErr,
+		ResetURL: link,
+	}).Render(r.Context(), w)
+}
+
+func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		token := r.URL.Query().Get("token")
+		_, err := h.resetSvc.Validate(r.Context(), token)
+		if err != nil {
+			templates.ResetPasswordPage(templates.ResetPasswordData{Error: "Invalid or expired reset link"}).Render(r.Context(), w)
+			return
+		}
+		templates.ResetPasswordPage(templates.ResetPasswordData{Token: token, Valid: true}).Render(r.Context(), w)
+		return
+	}
+	r.ParseForm()
+	token := r.FormValue("token")
+	password := r.FormValue("password")
+	uid, err := h.resetSvc.Validate(r.Context(), token)
+	if err != nil {
+		http.Error(w, "invalid token", 400)
+		return
+	}
+	h.userSvc.SetPassword(r.Context(), uid, password)
+	h.resetSvc.Consume(r.Context(), token)
+	http.Redirect(w, r, "/login?flash=Password+reset+successfully", http.StatusSeeOther)
 }

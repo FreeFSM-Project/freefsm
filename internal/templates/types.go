@@ -312,6 +312,45 @@ type InvoiceListPageData struct {
 	Statuses   []SelectOption
 }
 
+type UserRow struct {
+	ID       int64
+	Name     string
+	Email    string
+	Role     string
+	IsActive bool
+}
+
+type UserListData struct {
+	Users []UserRow
+}
+
+type UserDetail struct {
+	User UserRow
+}
+
+type UserDetailPage struct {
+	User UserRow
+}
+
+type UserFormData struct {
+	User  *UserDetail
+	IsNew bool
+	Roles []string
+}
+
+type ForgotPasswordData struct {
+	Error    string
+	Success  bool
+	ResetURL string
+	EMailErr string
+}
+
+type ResetPasswordData struct {
+	Error string
+	Token string
+	Valid bool
+}
+
 type SettingsPageData struct {
 	Settings *ent.CompanySettings
 	IsSetup  bool
@@ -437,6 +476,16 @@ func estimatePrefix(ctx context.Context) string {
 		return "EST-"
 	}
 	return cs.EstimatePrefix
+}
+
+func userFormTitle(isNew bool) string {
+	if isNew { return "New User" }
+	return "Edit User"
+}
+
+func userFormAction(isNew bool, id int64) string {
+	if isNew { return "/users" }
+	return fmt.Sprintf("/users/%d", id)
 }
 
 func settingsButtonText(isSetup bool) string {

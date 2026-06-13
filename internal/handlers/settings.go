@@ -28,6 +28,7 @@ func (h *SettingsHandler) Show(w http.ResponseWriter, r *http.Request) {
 func (h *SettingsHandler) Save(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	dueDays, _ := strconv.Atoi(r.FormValue("default_due_days"))
+	smtpPort, _ := strconv.Atoi(r.FormValue("smtp_port"))
 	h.svc.Save(r.Context(), services.CompanySettingsParams{
 		BusinessName:   r.FormValue("business_name"),
 		Address:        r.FormValue("address"),
@@ -41,6 +42,11 @@ func (h *SettingsHandler) Save(w http.ResponseWriter, r *http.Request) {
 		InvoicePrefix:  r.FormValue("invoice_prefix"),
 		EstimatePrefix: r.FormValue("estimate_prefix"),
 		DefaultDueDays: dueDays,
+		SmtpHost:       r.FormValue("smtp_host"),
+		SmtpPort:       smtpPort,
+		SmtpUser:       r.FormValue("smtp_user"),
+		SmtpPassword:   r.FormValue("smtp_password"),
+		SmtpFrom:       r.FormValue("smtp_from"),
 	})
 	if r.URL.Path == "/setup/company" {
 		http.Redirect(w, r, "/?flash=Setup+complete", http.StatusSeeOther)

@@ -41,6 +41,16 @@ type CompanySettings struct {
 	EstimatePrefix string `json:"estimate_prefix,omitempty"`
 	// DefaultDueDays holds the value of the "default_due_days" field.
 	DefaultDueDays int `json:"default_due_days,omitempty"`
+	// SMTPHost holds the value of the "smtp_host" field.
+	SMTPHost string `json:"smtp_host,omitempty"`
+	// SMTPPort holds the value of the "smtp_port" field.
+	SMTPPort int `json:"smtp_port,omitempty"`
+	// SMTPUser holds the value of the "smtp_user" field.
+	SMTPUser string `json:"smtp_user,omitempty"`
+	// SMTPPassword holds the value of the "smtp_password" field.
+	SMTPPassword string `json:"smtp_password,omitempty"`
+	// SMTPFrom holds the value of the "smtp_from" field.
+	SMTPFrom string `json:"smtp_from,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -53,9 +63,9 @@ func (*CompanySettings) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case companysettings.FieldID, companysettings.FieldDefaultDueDays:
+		case companysettings.FieldID, companysettings.FieldDefaultDueDays, companysettings.FieldSMTPPort:
 			values[i] = new(sql.NullInt64)
-		case companysettings.FieldBusinessName, companysettings.FieldAddress, companysettings.FieldCity, companysettings.FieldState, companysettings.FieldZip, companysettings.FieldPhone, companysettings.FieldEmail, companysettings.FieldTaxID, companysettings.FieldDefaultTaxRate, companysettings.FieldInvoicePrefix, companysettings.FieldEstimatePrefix:
+		case companysettings.FieldBusinessName, companysettings.FieldAddress, companysettings.FieldCity, companysettings.FieldState, companysettings.FieldZip, companysettings.FieldPhone, companysettings.FieldEmail, companysettings.FieldTaxID, companysettings.FieldDefaultTaxRate, companysettings.FieldInvoicePrefix, companysettings.FieldEstimatePrefix, companysettings.FieldSMTPHost, companysettings.FieldSMTPUser, companysettings.FieldSMTPPassword, companysettings.FieldSMTPFrom:
 			values[i] = new(sql.NullString)
 		case companysettings.FieldCreatedAt, companysettings.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -152,6 +162,36 @@ func (_m *CompanySettings) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.DefaultDueDays = int(value.Int64)
 			}
+		case companysettings.FieldSMTPHost:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field smtp_host", values[i])
+			} else if value.Valid {
+				_m.SMTPHost = value.String
+			}
+		case companysettings.FieldSMTPPort:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field smtp_port", values[i])
+			} else if value.Valid {
+				_m.SMTPPort = int(value.Int64)
+			}
+		case companysettings.FieldSMTPUser:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field smtp_user", values[i])
+			} else if value.Valid {
+				_m.SMTPUser = value.String
+			}
+		case companysettings.FieldSMTPPassword:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field smtp_password", values[i])
+			} else if value.Valid {
+				_m.SMTPPassword = value.String
+			}
+		case companysettings.FieldSMTPFrom:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field smtp_from", values[i])
+			} else if value.Valid {
+				_m.SMTPFrom = value.String
+			}
 		case companysettings.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -235,6 +275,21 @@ func (_m *CompanySettings) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("default_due_days=")
 	builder.WriteString(fmt.Sprintf("%v", _m.DefaultDueDays))
+	builder.WriteString(", ")
+	builder.WriteString("smtp_host=")
+	builder.WriteString(_m.SMTPHost)
+	builder.WriteString(", ")
+	builder.WriteString("smtp_port=")
+	builder.WriteString(fmt.Sprintf("%v", _m.SMTPPort))
+	builder.WriteString(", ")
+	builder.WriteString("smtp_user=")
+	builder.WriteString(_m.SMTPUser)
+	builder.WriteString(", ")
+	builder.WriteString("smtp_password=")
+	builder.WriteString(_m.SMTPPassword)
+	builder.WriteString(", ")
+	builder.WriteString("smtp_from=")
+	builder.WriteString(_m.SMTPFrom)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

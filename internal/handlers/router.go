@@ -47,12 +47,25 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	invoiceHandler := NewInvoiceHandler(invoiceService, customerService, jobService, statusService, itemService)
 	companySettingsSvc := services.NewCompanySettingsService(entClient)
 	settingsHandler := NewSettingsHandler(companySettingsSvc)
+	userHandler := NewUserHandler(userService)
 
 	r.Group(func(r chi.Router) {
 		r.Use(authMW)
 		r.Get("/", dashboardHandler.Index)
 		r.Get("/settings", settingsHandler.Show)
 		r.Post("/settings", settingsHandler.Save)
+
+		r.Group(func(r chi.Router) {
+			r.Use(middleware.AdminOnly)
+			r.Get("/users", userHandler.List)
+			r.Get("/users/new", userHandler.Create)
+			r.Post("/users", userHandler.Create)
+			r.Get("/users/{id}", userHandler.Show)
+			r.Get("/users/{id}/edit", userHandler.Update)
+			r.Post("/users/{id}", userHandler.Update)
+			r.Post("/users/{id}/disable", userHandler.Disable)
+			r.Post("/users/{id}/reset-password", userHandler.ResetPassword)
+		})
 		r.Get("/schedule", scheduleHandler.Index)
 		r.Post("/logout", func(w http.ResponseWriter, r *http.Request) {
 			handleLogout(w, r, sessions)
@@ -114,9 +127,15 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Get("/invoices/{id}/pdf", invoiceHandler.PDF)
 	})
 
-	authHandler := NewAuthHandler(db, sessions)
+	emailSvc := services.NewEmailService(companySettingsSvc)
+	resetSvc := services.NewPasswordResetService(entClient)
+	authHandler := NewAuthHandler(db, sessions, userService, emailSvc, resetSvc)
 	r.Get("/login", authHandler.ServeHTTP)
 	r.Post("/login", authHandler.ServeHTTP)
+	r.Get("/forgot-password", authHandler.ForgotPassword)
+	r.Post("/forgot-password", authHandler.ForgotPassword)
+	r.Get("/reset-password", authHandler.ResetPassword)
+	r.Post("/reset-password", authHandler.ResetPassword)
 
 	setupHandler := NewSetupHandler(db, sessions, cfg)
 	r.Get("/setup", setupHandler.ServeHTTP)

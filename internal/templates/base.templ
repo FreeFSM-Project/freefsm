@@ -27,11 +27,21 @@ templ Layout(title string, children ...templ.Component) {
 				</ul>
 				if getUser(ctx) != nil {
 					<ul>
+						if getUser(ctx).Role == "admin" {
+							<li>
+								<details class="dropdown">
+									<summary>Administration</summary>
+									<ul>
+										<li><a href="/settings">Company Settings</a></li>
+										<li><a href="/users">User Accounts</a></li>
+									</ul>
+								</details>
+							</li>
+						}
 						<li>
 							<details class="dropdown">
 								<summary>{ getUser(ctx).Name }</summary>
 								<ul>
-									<li><a href="/settings">Settings</a></li>
 									<li>
 										<form action="/logout" method="post">
 											<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>

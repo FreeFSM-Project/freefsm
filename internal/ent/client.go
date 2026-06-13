@@ -23,6 +23,7 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent/item"
 	"github.com/MartialM1nd/freefsm/internal/ent/job"
 	"github.com/MartialM1nd/freefsm/internal/ent/location"
+	"github.com/MartialM1nd/freefsm/internal/ent/passwordresettoken"
 	"github.com/MartialM1nd/freefsm/internal/ent/project"
 	"github.com/MartialM1nd/freefsm/internal/ent/status"
 	"github.com/MartialM1nd/freefsm/internal/ent/statusworkflow"
@@ -50,6 +51,8 @@ type Client struct {
 	Job *JobClient
 	// Location is the client for interacting with the Location builders.
 	Location *LocationClient
+	// PasswordResetToken is the client for interacting with the PasswordResetToken builders.
+	PasswordResetToken *PasswordResetTokenClient
 	// Project is the client for interacting with the Project builders.
 	Project *ProjectClient
 	// Status is the client for interacting with the Status builders.
@@ -77,6 +80,7 @@ func (c *Client) init() {
 	c.Item = NewItemClient(c.config)
 	c.Job = NewJobClient(c.config)
 	c.Location = NewLocationClient(c.config)
+	c.PasswordResetToken = NewPasswordResetTokenClient(c.config)
 	c.Project = NewProjectClient(c.config)
 	c.Status = NewStatusClient(c.config)
 	c.StatusWorkflow = NewStatusWorkflowClient(c.config)
@@ -171,20 +175,21 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		CompanySettings: NewCompanySettingsClient(cfg),
-		Customer:        NewCustomerClient(cfg),
-		CustomerContact: NewCustomerContactClient(cfg),
-		Estimate:        NewEstimateClient(cfg),
-		Invoice:         NewInvoiceClient(cfg),
-		Item:            NewItemClient(cfg),
-		Job:             NewJobClient(cfg),
-		Location:        NewLocationClient(cfg),
-		Project:         NewProjectClient(cfg),
-		Status:          NewStatusClient(cfg),
-		StatusWorkflow:  NewStatusWorkflowClient(cfg),
-		User:            NewUserClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		CompanySettings:    NewCompanySettingsClient(cfg),
+		Customer:           NewCustomerClient(cfg),
+		CustomerContact:    NewCustomerContactClient(cfg),
+		Estimate:           NewEstimateClient(cfg),
+		Invoice:            NewInvoiceClient(cfg),
+		Item:               NewItemClient(cfg),
+		Job:                NewJobClient(cfg),
+		Location:           NewLocationClient(cfg),
+		PasswordResetToken: NewPasswordResetTokenClient(cfg),
+		Project:            NewProjectClient(cfg),
+		Status:             NewStatusClient(cfg),
+		StatusWorkflow:     NewStatusWorkflowClient(cfg),
+		User:               NewUserClient(cfg),
 	}, nil
 }
 
@@ -202,20 +207,21 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:             ctx,
-		config:          cfg,
-		CompanySettings: NewCompanySettingsClient(cfg),
-		Customer:        NewCustomerClient(cfg),
-		CustomerContact: NewCustomerContactClient(cfg),
-		Estimate:        NewEstimateClient(cfg),
-		Invoice:         NewInvoiceClient(cfg),
-		Item:            NewItemClient(cfg),
-		Job:             NewJobClient(cfg),
-		Location:        NewLocationClient(cfg),
-		Project:         NewProjectClient(cfg),
-		Status:          NewStatusClient(cfg),
-		StatusWorkflow:  NewStatusWorkflowClient(cfg),
-		User:            NewUserClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		CompanySettings:    NewCompanySettingsClient(cfg),
+		Customer:           NewCustomerClient(cfg),
+		CustomerContact:    NewCustomerContactClient(cfg),
+		Estimate:           NewEstimateClient(cfg),
+		Invoice:            NewInvoiceClient(cfg),
+		Item:               NewItemClient(cfg),
+		Job:                NewJobClient(cfg),
+		Location:           NewLocationClient(cfg),
+		PasswordResetToken: NewPasswordResetTokenClient(cfg),
+		Project:            NewProjectClient(cfg),
+		Status:             NewStatusClient(cfg),
+		StatusWorkflow:     NewStatusWorkflowClient(cfg),
+		User:               NewUserClient(cfg),
 	}, nil
 }
 
@@ -246,7 +252,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.CompanySettings, c.Customer, c.CustomerContact, c.Estimate, c.Invoice, c.Item,
-		c.Job, c.Location, c.Project, c.Status, c.StatusWorkflow, c.User,
+		c.Job, c.Location, c.PasswordResetToken, c.Project, c.Status, c.StatusWorkflow,
+		c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -257,7 +264,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.CompanySettings, c.Customer, c.CustomerContact, c.Estimate, c.Invoice, c.Item,
-		c.Job, c.Location, c.Project, c.Status, c.StatusWorkflow, c.User,
+		c.Job, c.Location, c.PasswordResetToken, c.Project, c.Status, c.StatusWorkflow,
+		c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -282,6 +290,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Job.mutate(ctx, m)
 	case *LocationMutation:
 		return c.Location.mutate(ctx, m)
+	case *PasswordResetTokenMutation:
+		return c.PasswordResetToken.mutate(ctx, m)
 	case *ProjectMutation:
 		return c.Project.mutate(ctx, m)
 	case *StatusMutation:
@@ -1359,6 +1369,139 @@ func (c *LocationClient) mutate(ctx context.Context, m *LocationMutation) (Value
 	}
 }
 
+// PasswordResetTokenClient is a client for the PasswordResetToken schema.
+type PasswordResetTokenClient struct {
+	config
+}
+
+// NewPasswordResetTokenClient returns a client for the PasswordResetToken from the given config.
+func NewPasswordResetTokenClient(c config) *PasswordResetTokenClient {
+	return &PasswordResetTokenClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `passwordresettoken.Hooks(f(g(h())))`.
+func (c *PasswordResetTokenClient) Use(hooks ...Hook) {
+	c.hooks.PasswordResetToken = append(c.hooks.PasswordResetToken, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `passwordresettoken.Intercept(f(g(h())))`.
+func (c *PasswordResetTokenClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PasswordResetToken = append(c.inters.PasswordResetToken, interceptors...)
+}
+
+// Create returns a builder for creating a PasswordResetToken entity.
+func (c *PasswordResetTokenClient) Create() *PasswordResetTokenCreate {
+	mutation := newPasswordResetTokenMutation(c.config, OpCreate)
+	return &PasswordResetTokenCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of PasswordResetToken entities.
+func (c *PasswordResetTokenClient) CreateBulk(builders ...*PasswordResetTokenCreate) *PasswordResetTokenCreateBulk {
+	return &PasswordResetTokenCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PasswordResetTokenClient) MapCreateBulk(slice any, setFunc func(*PasswordResetTokenCreate, int)) *PasswordResetTokenCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PasswordResetTokenCreateBulk{err: fmt.Errorf("calling to PasswordResetTokenClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PasswordResetTokenCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PasswordResetTokenCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for PasswordResetToken.
+func (c *PasswordResetTokenClient) Update() *PasswordResetTokenUpdate {
+	mutation := newPasswordResetTokenMutation(c.config, OpUpdate)
+	return &PasswordResetTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PasswordResetTokenClient) UpdateOne(_m *PasswordResetToken) *PasswordResetTokenUpdateOne {
+	mutation := newPasswordResetTokenMutation(c.config, OpUpdateOne, withPasswordResetToken(_m))
+	return &PasswordResetTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PasswordResetTokenClient) UpdateOneID(id int64) *PasswordResetTokenUpdateOne {
+	mutation := newPasswordResetTokenMutation(c.config, OpUpdateOne, withPasswordResetTokenID(id))
+	return &PasswordResetTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for PasswordResetToken.
+func (c *PasswordResetTokenClient) Delete() *PasswordResetTokenDelete {
+	mutation := newPasswordResetTokenMutation(c.config, OpDelete)
+	return &PasswordResetTokenDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PasswordResetTokenClient) DeleteOne(_m *PasswordResetToken) *PasswordResetTokenDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PasswordResetTokenClient) DeleteOneID(id int64) *PasswordResetTokenDeleteOne {
+	builder := c.Delete().Where(passwordresettoken.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PasswordResetTokenDeleteOne{builder}
+}
+
+// Query returns a query builder for PasswordResetToken.
+func (c *PasswordResetTokenClient) Query() *PasswordResetTokenQuery {
+	return &PasswordResetTokenQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePasswordResetToken},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a PasswordResetToken entity by its id.
+func (c *PasswordResetTokenClient) Get(ctx context.Context, id int64) (*PasswordResetToken, error) {
+	return c.Query().Where(passwordresettoken.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PasswordResetTokenClient) GetX(ctx context.Context, id int64) *PasswordResetToken {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *PasswordResetTokenClient) Hooks() []Hook {
+	return c.hooks.PasswordResetToken
+}
+
+// Interceptors returns the client interceptors.
+func (c *PasswordResetTokenClient) Interceptors() []Interceptor {
+	return c.inters.PasswordResetToken
+}
+
+func (c *PasswordResetTokenClient) mutate(ctx context.Context, m *PasswordResetTokenMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PasswordResetTokenCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PasswordResetTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PasswordResetTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PasswordResetTokenDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown PasswordResetToken mutation op: %q", m.Op())
+	}
+}
+
 // ProjectClient is a client for the Project schema.
 type ProjectClient struct {
 	config
@@ -1927,10 +2070,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 type (
 	hooks struct {
 		CompanySettings, Customer, CustomerContact, Estimate, Invoice, Item, Job,
-		Location, Project, Status, StatusWorkflow, User []ent.Hook
+		Location, PasswordResetToken, Project, Status, StatusWorkflow, User []ent.Hook
 	}
 	inters struct {
 		CompanySettings, Customer, CustomerContact, Estimate, Invoice, Item, Job,
-		Location, Project, Status, StatusWorkflow, User []ent.Interceptor
+		Location, PasswordResetToken, Project, Status, StatusWorkflow,
+		User []ent.Interceptor
 	}
 )

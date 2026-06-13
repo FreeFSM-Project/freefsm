@@ -37,6 +37,16 @@ const (
 	FieldEstimatePrefix = "estimate_prefix"
 	// FieldDefaultDueDays holds the string denoting the default_due_days field in the database.
 	FieldDefaultDueDays = "default_due_days"
+	// FieldSMTPHost holds the string denoting the smtp_host field in the database.
+	FieldSMTPHost = "smtp_host"
+	// FieldSMTPPort holds the string denoting the smtp_port field in the database.
+	FieldSMTPPort = "smtp_port"
+	// FieldSMTPUser holds the string denoting the smtp_user field in the database.
+	FieldSMTPUser = "smtp_user"
+	// FieldSMTPPassword holds the string denoting the smtp_password field in the database.
+	FieldSMTPPassword = "smtp_password"
+	// FieldSMTPFrom holds the string denoting the smtp_from field in the database.
+	FieldSMTPFrom = "smtp_from"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -60,6 +70,11 @@ var Columns = []string{
 	FieldInvoicePrefix,
 	FieldEstimatePrefix,
 	FieldDefaultDueDays,
+	FieldSMTPHost,
+	FieldSMTPPort,
+	FieldSMTPUser,
+	FieldSMTPPassword,
+	FieldSMTPFrom,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -99,6 +114,16 @@ var (
 	DefaultEstimatePrefix string
 	// DefaultDefaultDueDays holds the default value on creation for the "default_due_days" field.
 	DefaultDefaultDueDays int
+	// DefaultSMTPHost holds the default value on creation for the "smtp_host" field.
+	DefaultSMTPHost string
+	// DefaultSMTPPort holds the default value on creation for the "smtp_port" field.
+	DefaultSMTPPort int
+	// DefaultSMTPUser holds the default value on creation for the "smtp_user" field.
+	DefaultSMTPUser string
+	// DefaultSMTPPassword holds the default value on creation for the "smtp_password" field.
+	DefaultSMTPPassword string
+	// DefaultSMTPFrom holds the default value on creation for the "smtp_from" field.
+	DefaultSMTPFrom string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -173,6 +198,31 @@ func ByEstimatePrefix(opts ...sql.OrderTermOption) OrderOption {
 // ByDefaultDueDays orders the results by the default_due_days field.
 func ByDefaultDueDays(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDefaultDueDays, opts...).ToFunc()
+}
+
+// BySMTPHost orders the results by the smtp_host field.
+func BySMTPHost(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSMTPHost, opts...).ToFunc()
+}
+
+// BySMTPPort orders the results by the smtp_port field.
+func BySMTPPort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSMTPPort, opts...).ToFunc()
+}
+
+// BySMTPUser orders the results by the smtp_user field.
+func BySMTPUser(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSMTPUser, opts...).ToFunc()
+}
+
+// BySMTPPassword orders the results by the smtp_password field.
+func BySMTPPassword(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSMTPPassword, opts...).ToFunc()
+}
+
+// BySMTPFrom orders the results by the smtp_from field.
+func BySMTPFrom(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSMTPFrom, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

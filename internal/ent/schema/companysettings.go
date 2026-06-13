@@ -34,6 +34,11 @@ func (CompanySettings) Fields() []ent.Field {
 		field.String("invoice_prefix").Default("INV-"),
 		field.String("estimate_prefix").Default("EST-"),
 		field.Int("default_due_days").Default(30),
+		field.String("smtp_host").Default(""),
+		field.Int("smtp_port").Default(587),
+		field.String("smtp_user").Default(""),
+		field.String("smtp_password").Default(""),
+		field.String("smtp_from").Default(""),
 		field.Time("created_at").Default(time.Now).Immutable(),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 	}

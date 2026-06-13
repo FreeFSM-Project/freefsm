@@ -114,6 +114,31 @@ func DefaultDueDays(v int) predicate.CompanySettings {
 	return predicate.CompanySettings(sql.FieldEQ(FieldDefaultDueDays, v))
 }
 
+// SMTPHost applies equality check predicate on the "smtp_host" field. It's identical to SMTPHostEQ.
+func SMTPHost(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPHost, v))
+}
+
+// SMTPPort applies equality check predicate on the "smtp_port" field. It's identical to SMTPPortEQ.
+func SMTPPort(v int) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPPort, v))
+}
+
+// SMTPUser applies equality check predicate on the "smtp_user" field. It's identical to SMTPUserEQ.
+func SMTPUser(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPUser, v))
+}
+
+// SMTPPassword applies equality check predicate on the "smtp_password" field. It's identical to SMTPPasswordEQ.
+func SMTPPassword(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPPassword, v))
+}
+
+// SMTPFrom applies equality check predicate on the "smtp_from" field. It's identical to SMTPFromEQ.
+func SMTPFrom(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPFrom, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.CompanySettings {
 	return predicate.CompanySettings(sql.FieldEQ(FieldCreatedAt, v))
@@ -877,6 +902,306 @@ func DefaultDueDaysLT(v int) predicate.CompanySettings {
 // DefaultDueDaysLTE applies the LTE predicate on the "default_due_days" field.
 func DefaultDueDaysLTE(v int) predicate.CompanySettings {
 	return predicate.CompanySettings(sql.FieldLTE(FieldDefaultDueDays, v))
+}
+
+// SMTPHostEQ applies the EQ predicate on the "smtp_host" field.
+func SMTPHostEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPHost, v))
+}
+
+// SMTPHostNEQ applies the NEQ predicate on the "smtp_host" field.
+func SMTPHostNEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldSMTPHost, v))
+}
+
+// SMTPHostIn applies the In predicate on the "smtp_host" field.
+func SMTPHostIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldSMTPHost, vs...))
+}
+
+// SMTPHostNotIn applies the NotIn predicate on the "smtp_host" field.
+func SMTPHostNotIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldSMTPHost, vs...))
+}
+
+// SMTPHostGT applies the GT predicate on the "smtp_host" field.
+func SMTPHostGT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldSMTPHost, v))
+}
+
+// SMTPHostGTE applies the GTE predicate on the "smtp_host" field.
+func SMTPHostGTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldSMTPHost, v))
+}
+
+// SMTPHostLT applies the LT predicate on the "smtp_host" field.
+func SMTPHostLT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldSMTPHost, v))
+}
+
+// SMTPHostLTE applies the LTE predicate on the "smtp_host" field.
+func SMTPHostLTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldSMTPHost, v))
+}
+
+// SMTPHostContains applies the Contains predicate on the "smtp_host" field.
+func SMTPHostContains(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContains(FieldSMTPHost, v))
+}
+
+// SMTPHostHasPrefix applies the HasPrefix predicate on the "smtp_host" field.
+func SMTPHostHasPrefix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasPrefix(FieldSMTPHost, v))
+}
+
+// SMTPHostHasSuffix applies the HasSuffix predicate on the "smtp_host" field.
+func SMTPHostHasSuffix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasSuffix(FieldSMTPHost, v))
+}
+
+// SMTPHostEqualFold applies the EqualFold predicate on the "smtp_host" field.
+func SMTPHostEqualFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEqualFold(FieldSMTPHost, v))
+}
+
+// SMTPHostContainsFold applies the ContainsFold predicate on the "smtp_host" field.
+func SMTPHostContainsFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContainsFold(FieldSMTPHost, v))
+}
+
+// SMTPPortEQ applies the EQ predicate on the "smtp_port" field.
+func SMTPPortEQ(v int) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPPort, v))
+}
+
+// SMTPPortNEQ applies the NEQ predicate on the "smtp_port" field.
+func SMTPPortNEQ(v int) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldSMTPPort, v))
+}
+
+// SMTPPortIn applies the In predicate on the "smtp_port" field.
+func SMTPPortIn(vs ...int) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldSMTPPort, vs...))
+}
+
+// SMTPPortNotIn applies the NotIn predicate on the "smtp_port" field.
+func SMTPPortNotIn(vs ...int) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldSMTPPort, vs...))
+}
+
+// SMTPPortGT applies the GT predicate on the "smtp_port" field.
+func SMTPPortGT(v int) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldSMTPPort, v))
+}
+
+// SMTPPortGTE applies the GTE predicate on the "smtp_port" field.
+func SMTPPortGTE(v int) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldSMTPPort, v))
+}
+
+// SMTPPortLT applies the LT predicate on the "smtp_port" field.
+func SMTPPortLT(v int) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldSMTPPort, v))
+}
+
+// SMTPPortLTE applies the LTE predicate on the "smtp_port" field.
+func SMTPPortLTE(v int) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldSMTPPort, v))
+}
+
+// SMTPUserEQ applies the EQ predicate on the "smtp_user" field.
+func SMTPUserEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPUser, v))
+}
+
+// SMTPUserNEQ applies the NEQ predicate on the "smtp_user" field.
+func SMTPUserNEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldSMTPUser, v))
+}
+
+// SMTPUserIn applies the In predicate on the "smtp_user" field.
+func SMTPUserIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldSMTPUser, vs...))
+}
+
+// SMTPUserNotIn applies the NotIn predicate on the "smtp_user" field.
+func SMTPUserNotIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldSMTPUser, vs...))
+}
+
+// SMTPUserGT applies the GT predicate on the "smtp_user" field.
+func SMTPUserGT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldSMTPUser, v))
+}
+
+// SMTPUserGTE applies the GTE predicate on the "smtp_user" field.
+func SMTPUserGTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldSMTPUser, v))
+}
+
+// SMTPUserLT applies the LT predicate on the "smtp_user" field.
+func SMTPUserLT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldSMTPUser, v))
+}
+
+// SMTPUserLTE applies the LTE predicate on the "smtp_user" field.
+func SMTPUserLTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldSMTPUser, v))
+}
+
+// SMTPUserContains applies the Contains predicate on the "smtp_user" field.
+func SMTPUserContains(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContains(FieldSMTPUser, v))
+}
+
+// SMTPUserHasPrefix applies the HasPrefix predicate on the "smtp_user" field.
+func SMTPUserHasPrefix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasPrefix(FieldSMTPUser, v))
+}
+
+// SMTPUserHasSuffix applies the HasSuffix predicate on the "smtp_user" field.
+func SMTPUserHasSuffix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasSuffix(FieldSMTPUser, v))
+}
+
+// SMTPUserEqualFold applies the EqualFold predicate on the "smtp_user" field.
+func SMTPUserEqualFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEqualFold(FieldSMTPUser, v))
+}
+
+// SMTPUserContainsFold applies the ContainsFold predicate on the "smtp_user" field.
+func SMTPUserContainsFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContainsFold(FieldSMTPUser, v))
+}
+
+// SMTPPasswordEQ applies the EQ predicate on the "smtp_password" field.
+func SMTPPasswordEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordNEQ applies the NEQ predicate on the "smtp_password" field.
+func SMTPPasswordNEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordIn applies the In predicate on the "smtp_password" field.
+func SMTPPasswordIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldSMTPPassword, vs...))
+}
+
+// SMTPPasswordNotIn applies the NotIn predicate on the "smtp_password" field.
+func SMTPPasswordNotIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldSMTPPassword, vs...))
+}
+
+// SMTPPasswordGT applies the GT predicate on the "smtp_password" field.
+func SMTPPasswordGT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordGTE applies the GTE predicate on the "smtp_password" field.
+func SMTPPasswordGTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordLT applies the LT predicate on the "smtp_password" field.
+func SMTPPasswordLT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordLTE applies the LTE predicate on the "smtp_password" field.
+func SMTPPasswordLTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordContains applies the Contains predicate on the "smtp_password" field.
+func SMTPPasswordContains(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContains(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordHasPrefix applies the HasPrefix predicate on the "smtp_password" field.
+func SMTPPasswordHasPrefix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasPrefix(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordHasSuffix applies the HasSuffix predicate on the "smtp_password" field.
+func SMTPPasswordHasSuffix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasSuffix(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordEqualFold applies the EqualFold predicate on the "smtp_password" field.
+func SMTPPasswordEqualFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEqualFold(FieldSMTPPassword, v))
+}
+
+// SMTPPasswordContainsFold applies the ContainsFold predicate on the "smtp_password" field.
+func SMTPPasswordContainsFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContainsFold(FieldSMTPPassword, v))
+}
+
+// SMTPFromEQ applies the EQ predicate on the "smtp_from" field.
+func SMTPFromEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPFrom, v))
+}
+
+// SMTPFromNEQ applies the NEQ predicate on the "smtp_from" field.
+func SMTPFromNEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldSMTPFrom, v))
+}
+
+// SMTPFromIn applies the In predicate on the "smtp_from" field.
+func SMTPFromIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldSMTPFrom, vs...))
+}
+
+// SMTPFromNotIn applies the NotIn predicate on the "smtp_from" field.
+func SMTPFromNotIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldSMTPFrom, vs...))
+}
+
+// SMTPFromGT applies the GT predicate on the "smtp_from" field.
+func SMTPFromGT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldSMTPFrom, v))
+}
+
+// SMTPFromGTE applies the GTE predicate on the "smtp_from" field.
+func SMTPFromGTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldSMTPFrom, v))
+}
+
+// SMTPFromLT applies the LT predicate on the "smtp_from" field.
+func SMTPFromLT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldSMTPFrom, v))
+}
+
+// SMTPFromLTE applies the LTE predicate on the "smtp_from" field.
+func SMTPFromLTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldSMTPFrom, v))
+}
+
+// SMTPFromContains applies the Contains predicate on the "smtp_from" field.
+func SMTPFromContains(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContains(FieldSMTPFrom, v))
+}
+
+// SMTPFromHasPrefix applies the HasPrefix predicate on the "smtp_from" field.
+func SMTPFromHasPrefix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasPrefix(FieldSMTPFrom, v))
+}
+
+// SMTPFromHasSuffix applies the HasSuffix predicate on the "smtp_from" field.
+func SMTPFromHasSuffix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasSuffix(FieldSMTPFrom, v))
+}
+
+// SMTPFromEqualFold applies the EqualFold predicate on the "smtp_from" field.
+func SMTPFromEqualFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEqualFold(FieldSMTPFrom, v))
+}
+
+// SMTPFromContainsFold applies the ContainsFold predicate on the "smtp_from" field.
+func SMTPFromContainsFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContainsFold(FieldSMTPFrom, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -28,6 +28,8 @@ type Tx struct {
 	Job *JobClient
 	// Location is the client for interacting with the Location builders.
 	Location *LocationClient
+	// PasswordResetToken is the client for interacting with the PasswordResetToken builders.
+	PasswordResetToken *PasswordResetTokenClient
 	// Project is the client for interacting with the Project builders.
 	Project *ProjectClient
 	// Status is the client for interacting with the Status builders.
@@ -175,6 +177,7 @@ func (tx *Tx) init() {
 	tx.Item = NewItemClient(tx.config)
 	tx.Job = NewJobClient(tx.config)
 	tx.Location = NewLocationClient(tx.config)
+	tx.PasswordResetToken = NewPasswordResetTokenClient(tx.config)
 	tx.Project = NewProjectClient(tx.config)
 	tx.Status = NewStatusClient(tx.config)
 	tx.StatusWorkflow = NewStatusWorkflowClient(tx.config)

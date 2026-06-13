@@ -31,6 +31,11 @@ type CompanySettingsParams struct {
 	InvoicePrefix   string
 	EstimatePrefix  string
 	DefaultDueDays  int
+	SmtpHost        string
+	SmtpPort        int
+	SmtpUser        string
+	SmtpPassword    string
+	SmtpFrom        string
 }
 
 func (s *CompanySettingsService) Save(ctx context.Context, p CompanySettingsParams) error {
@@ -51,6 +56,11 @@ func (s *CompanySettingsService) Save(ctx context.Context, p CompanySettingsPara
 		SetInvoicePrefix(p.InvoicePrefix).
 		SetEstimatePrefix(p.EstimatePrefix).
 		SetDefaultDueDays(p.DefaultDueDays).
+		SetSMTPHost(p.SmtpHost).
+		SetSMTPPort(p.SmtpPort).
+		SetSMTPUser(p.SmtpUser).
+		SetSMTPPassword(p.SmtpPassword).
+		SetSMTPFrom(p.SmtpFrom).
 		Save(ctx)
 	return err
 }

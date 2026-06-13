@@ -20,6 +20,7 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent/item"
 	"github.com/MartialM1nd/freefsm/internal/ent/job"
 	"github.com/MartialM1nd/freefsm/internal/ent/location"
+	"github.com/MartialM1nd/freefsm/internal/ent/passwordresettoken"
 	"github.com/MartialM1nd/freefsm/internal/ent/project"
 	"github.com/MartialM1nd/freefsm/internal/ent/status"
 	"github.com/MartialM1nd/freefsm/internal/ent/statusworkflow"
@@ -84,18 +85,19 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			companysettings.Table: companysettings.ValidColumn,
-			customer.Table:        customer.ValidColumn,
-			customercontact.Table: customercontact.ValidColumn,
-			estimate.Table:        estimate.ValidColumn,
-			invoice.Table:         invoice.ValidColumn,
-			item.Table:            item.ValidColumn,
-			job.Table:             job.ValidColumn,
-			location.Table:        location.ValidColumn,
-			project.Table:         project.ValidColumn,
-			status.Table:          status.ValidColumn,
-			statusworkflow.Table:  statusworkflow.ValidColumn,
-			user.Table:            user.ValidColumn,
+			companysettings.Table:    companysettings.ValidColumn,
+			customer.Table:           customer.ValidColumn,
+			customercontact.Table:    customercontact.ValidColumn,
+			estimate.Table:           estimate.ValidColumn,
+			invoice.Table:            invoice.ValidColumn,
+			item.Table:               item.ValidColumn,
+			job.Table:                job.ValidColumn,
+			location.Table:           location.ValidColumn,
+			passwordresettoken.Table: passwordresettoken.ValidColumn,
+			project.Table:            project.ValidColumn,
+			status.Table:             status.ValidColumn,
+			statusworkflow.Table:     statusworkflow.ValidColumn,
+			user.Table:               user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)
