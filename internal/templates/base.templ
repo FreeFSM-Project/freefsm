@@ -14,52 +14,54 @@ templ Layout(title string, children ...templ.Component) {
 			<script src="/static/js/alpine.min.js" defer></script>
 		</head>
 		<body>
-			<nav class="container-fluid">
-				<ul>
-					<li><strong>{ companyBrandName(companyFromCtx(ctx)) }</strong></li>
-					<li><a href="/">Dashboard</a></li>
-					<li><a href="/schedule">Schedule</a></li>
-					<li><a href="/customers">Customers</a></li>
-					<li><a href="/jobs">Jobs</a></li>
-					<li><a href="/estimates">Estimates</a></li>
-					<li><a href="/invoices">Invoices</a></li>
-					<li><a href="/items">Items</a></li>
-				</ul>
-				if getUser(ctx) != nil {
-					<ul>
-						if getUser(ctx).Role == "admin" {
-							<li>
-								<details class="dropdown">
-									<summary>Administration</summary>
-									<ul>
-										<li><a href="/settings">Company Settings</a></li>
-										<li><a href="/users">User Accounts</a></li>
-									</ul>
-								</details>
-							</li>
-						}
-						<li>
-							<details class="dropdown">
-								<summary>{ getUser(ctx).Name }</summary>
-								<ul>
-									<li>
-										<form action="/logout" method="post">
-											<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
-											<button type="submit">Logout</button>
-										</form>
-									</li>
-								</ul>
-							</details>
-						</li>
-					</ul>
+			<button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">&#9776;</button>
+			<aside class="sidebar" id="sidebar">
+				<div class="sidebar-brand">
+					<img src="/static/img/favicon.svg" alt=""/>
+					<strong>{ companyBrandName(companyFromCtx(ctx)) }</strong>
+				</div>
+				<hr class="sidebar-divider"/>
+				<nav>
+					<a href="/">Dashboard</a>
+					<a href="/schedule">Schedule</a>
+					<a href="/customers">Customers</a>
+					<a href="/jobs">Jobs</a>
+					<a href="/estimates">Estimates</a>
+					<a href="/invoices">Invoices</a>
+					<a href="/items">Items</a>
+				</nav>
+				if getUser(ctx) != nil && getUser(ctx).Role == "admin" {
+					<hr class="sidebar-divider"/>
+					<details class="dropdown">
+						<summary>Administration</summary>
+						<ul>
+							<a href="/settings">Company Settings</a>
+							<a href="/users">Users</a>
+						</ul>
+					</details>
 				}
-			</nav>
-			<main class="container">
+				if getUser(ctx) != nil {
+					<div class="sidebar-footer">
+						<details class="dropdown">
+							<summary>{ getUser(ctx).Name }</summary>
+							<ul>
+								<li>
+									<form action="/logout" method="post">
+										<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+										<button type="submit">Logout</button>
+									</form>
+								</li>
+							</ul>
+						</details>
+					</div>
+				}
+			</aside>
+			<div class="main-content">
 				if getFlash(ctx) != "" {
 					<div class="flash-banner" role="alert">{ getFlash(ctx) }</div>
 				}
 				{ children... }
-			</main>
+			</div>
 		</body>
 	</html>
 }
