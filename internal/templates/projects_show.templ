@@ -1,0 +1,65 @@
+package templates
+
+import "fmt"
+
+templ ProjectShow(p ProjectShowPageData) {
+	@Layout("Project - "+p.Project.Name) {
+		<div style="display:flex;justify-content:space-between;align-items:center">
+			<h1>{ p.Project.Name }</h1>
+			<div style="display:flex;gap:0.5rem">
+				<a href={ templ.URL(fmt.Sprintf("/projects/%d/edit", p.Project.ID)) } role="button" class="outline">Edit</a>
+				<form action={ templ.URL(fmt.Sprintf("/projects/%d/delete", p.Project.ID)) } method="post" style="display:inline" onsubmit="return confirm('Delete this project?')">
+					<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+					<button class="outline contrast">Delete</button>
+				</form>
+			</div>
+		</div>
+		if p.Project.Description != "" {
+			<p><em>{ p.Project.Description }</em></p>
+		}
+		<table>
+			<tbody>
+				<tr><th>Customer</th><td><a href={ templ.URL(fmt.Sprintf("/customers/%d", p.Project.CustomerID)) }>{ p.Project.CustomerName }</a></td></tr>
+				<tr><th>Status</th><td><span class="status-badge" style={ badgeStyle(p.Project.StatusColor) }>{ p.Project.StatusName }</span></td></tr>
+				<tr><th>Progress</th><td>
+					<progress value={ fmt.Sprintf("%.0f", p.Project.CompletionPercentage) } max="100"></progress>
+					<small>{ fmt.Sprintf("%.0f%%", p.Project.CompletionPercentage) }</small>
+				</td></tr>
+				if p.Project.LocationName != "" {
+					<tr><th>Location</th><td>{ p.Project.LocationName }</td></tr>
+				}
+				if p.Project.StartTime != "" {
+					<tr><th>Start</th><td>{ p.Project.StartTime }</td></tr>
+				}
+				if p.Project.EndTime != "" {
+					<tr><th>End</th><td>{ p.Project.EndTime }</td></tr>
+				}
+			</tbody>
+		</table>
+		if p.Project.Notes != "" {
+			<h3>Notes</h3>
+			<p>{ p.Project.Notes }</p>
+		}
+		<h3>Jobs</h3>
+		if len(p.Jobs) == 0 {
+			<p>No jobs linked to this project.</p>
+		} else {
+			<table>
+				<thead>
+					<tr><th>Job</th><th>Customer</th><th>Status</th><th>Scheduled</th></tr>
+				</thead>
+				<tbody>
+					for _, j := range p.Jobs {
+						<tr>
+							<td><a href={ templ.URL(fmt.Sprintf("/jobs/%d", j.ID)) }>{ j.DisplayName }</a></td>
+							<td>{ j.Customer }</td>
+							<td><span class="status-badge" style={ badgeStyle(j.StatusColor) }>{ j.StatusName }</span></td>
+							<td>{ j.StartTime }</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+		<p><a href="/projects">&larr; Back to Projects</a></p>
+	}
+}

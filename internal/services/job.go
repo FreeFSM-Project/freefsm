@@ -71,6 +71,13 @@ func (s *JobService) ListByDateRange(ctx context.Context, start, end time.Time) 
 		All(ctx)
 }
 
+func (s *JobService) ListByProject(ctx context.Context, projectID int64) ([]*ent.Job, error) {
+	return s.client.Job.Query().
+		Where(job.ProjectIDEQ(projectID)).
+		Order(ent.Desc(job.FieldCreatedAt)).
+		All(ctx)
+}
+
 func (s *JobService) List(ctx context.Context, search string, statusID int64, page, perPage int) ([]*ent.Job, int, error) {
 	q := s.client.Job.Query()
 

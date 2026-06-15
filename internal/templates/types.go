@@ -113,6 +113,62 @@ type PaginationData struct {
 	Target      string
 }
 
+type ProjectRow struct {
+	ID                   int64
+	Name                 string
+	Description          string
+	CustomerID           int64
+	CustomerName         string
+	StatusID             int64
+	StatusName           string
+	StatusColor          string
+	CompletionPercentage float64
+	StartTime            string
+	EndTime              string
+}
+
+type ProjectDetail struct {
+	ID                   int64
+	Name                 string
+	Description          string
+	CustomerID           int64
+	CustomerName         string
+	StatusID             int64
+	StatusName           string
+	StatusColor          string
+	LocationID           int64
+	LocationName         string
+	CompletionPercentage float64
+	StartTime            string
+	EndTime              string
+	Notes                string
+}
+
+type ProjectListPageData struct {
+	Projects   []ProjectRow
+	Page       int
+	PerPage    int
+	Total      int
+	TotalPages int
+	Search     string
+	StatusID   int64
+	Statuses   []SelectOption
+}
+
+type ProjectShowPageData struct {
+	Project ProjectDetail
+	Jobs    []JobRow
+}
+
+type ProjectFormPageData struct {
+	Project       *ProjectDetail
+	Errors        map[string]string
+	IsNew         bool
+	Customers     []SelectOption
+	Statuses      []SelectOption
+	Locations     []SelectOption
+}
+
 type ItemRow struct {
 	ID          int64
 	Name        string
@@ -381,6 +437,20 @@ func jobFormTitle(isNew bool) string {
 		return "New Job"
 	}
 	return "Edit Job"
+}
+
+func projectFormTitle(isNew bool) string {
+	if isNew {
+		return "New Project"
+	}
+	return "Edit Project"
+}
+
+func projectFormAction(isNew bool, id int64) string {
+	if isNew {
+		return "/projects"
+	}
+	return fmt.Sprintf("/projects/%d", id)
 }
 
 func estimateFormTitle(isNew bool) string {

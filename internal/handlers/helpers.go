@@ -37,6 +37,14 @@ func statusName(statuses []*ent.Status, id *int64) string {
 	return "Unknown"
 }
 
+func statusMap(statuses []*ent.Status) map[int64]string {
+	m := make(map[int64]string, len(statuses))
+	for _, s := range statuses {
+		m[s.ID] = s.Name
+	}
+	return m
+}
+
 func statusColor(statuses []*ent.Status, id *int64) string {
 	if id == nil { return "#6B7280" }
 	for _, s := range statuses {

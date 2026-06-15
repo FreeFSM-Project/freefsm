@@ -1,0 +1,306 @@
+package handlers
+
+import (
+	"context"
+	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/MartialM1nd/freefsm/internal/ent"
+	"github.com/MartialM1nd/freefsm/internal/services"
+	"github.com/MartialM1nd/freefsm/internal/templates"
+	"github.com/go-chi/chi/v5"
+)
+
+type ProjectHandler struct {
+	svc       *services.ProjectService
+	custSvc   *services.CustomerService
+	statusSvc *services.StatusService
+	locSvc    *services.LocationService
+	jobSvc    *services.JobService
+}
+
+func NewProjectHandler(svc *services.ProjectService, custSvc *services.CustomerService, statusSvc *services.StatusService, locSvc *services.LocationService, jobSvc *services.JobService) *ProjectHandler {
+	return &ProjectHandler{svc: svc, custSvc: custSvc, statusSvc: statusSvc, locSvc: locSvc, jobSvc: jobSvc}
+}
+
+func (h *ProjectHandler) List(w http.ResponseWriter, r *http.Request) {
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	if page < 1 {
+		page = 1
+	}
+	perPage := 25
+	search := r.URL.Query().Get("search")
+	statusID, _ := strconv.ParseInt(r.URL.Query().Get("status_id"), 10, 64)
+
+	projects, total, err := h.svc.List(r.Context(), search, statusID, page, perPage)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	statuses := h.statusesForSelect(r.Context())
+	customers, _ := h.custSvc.ListAll(r.Context())
+	custMap := customerMap(customers)
+
+	rows := make([]templates.ProjectRow, len(projects))
+	for i, p := range projects {
+		rows[i] = projectRow(p, statuses, custMap)
+	}
+
+	data := templates.ProjectListPageData{
+		Projects:   rows,
+		Page:       page,
+		PerPage:    perPage,
+		Total:      total,
+		TotalPages: services.ProjectPaginationTotalPages(total, perPage),
+		Search:     search,
+		StatusID:   statusID,
+		Statuses:   statusOptions(statuses),
+	}
+
+	if r.Header.Get("HX-Request") == "true" && r.Header.Get("HX-Boosted") != "true" {
+		templates.ProjectTable(data).Render(r.Context(), w)
+		return
+	}
+	templates.ProjectIndex(data).Render(r.Context(), w)
+}
+
+func (h *ProjectHandler) Show(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	p, err := h.svc.GetByID(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	statuses := h.statusesForSelect(r.Context())
+	customers, _ := h.custSvc.ListAll(r.Context())
+	custMap := customerMap(customers)
+	locations, _ := h.locSvc.ListAll(r.Context())
+	jobs, _ := h.jobSvc.ListByProject(r.Context(), id)
+
+	jobRows := make([]templates.JobRow, len(jobs))
+	for i, j := range jobs {
+		jobRows[i] = jobRow(j, statuses, custMap)
+	}
+
+	statusesMap := statusMap(statuses)
+	d := templates.ProjectDetail{
+		ID:                   p.ID,
+		Name:                 p.Name,
+		Description:          p.Description,
+		CustomerID:           p.CustomerID,
+		CustomerName:         custMap[p.CustomerID],
+		StatusID:             projectStatusID(p),
+		StatusName:           statusesMap[projectStatusID(p)],
+		StatusColor:          statusColor(statuses, p.StatusID),
+		CompletionPercentage: p.CompletionPercentage,
+		Notes:                p.Notes,
+	}
+	if p.LocationID != nil {
+		d.LocationID = *p.LocationID
+		for _, l := range locations {
+			if l.ID == *p.LocationID {
+				d.LocationName = l.Title
+				break
+			}
+		}
+	}
+	if p.StartTime != nil && !p.StartTime.IsZero() {
+		d.StartTime = p.StartTime.Format("2006-01-02")
+	}
+	if p.EndTime != nil && !p.EndTime.IsZero() {
+		d.EndTime = p.EndTime.Format("2006-01-02")
+	}
+
+	templates.ProjectShow(templates.ProjectShowPageData{
+		Project: d,
+		Jobs:    jobRows,
+	}).Render(r.Context(), w)
+}
+
+func (h *ProjectHandler) Create(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		templates.ProjectForm(h.newProjectForm(r.Context())).Render(r.Context(), w)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", 400)
+		return
+	}
+	custID, _ := strconv.ParseInt(r.FormValue("customer_id"), 10, 64)
+	statusID, _ := strconv.ParseInt(r.FormValue("status_id"), 10, 64)
+	locationID, _ := strconv.ParseInt(r.FormValue("location_id"), 10, 64)
+	completion, _ := strconv.ParseFloat(r.FormValue("completion_percentage"), 64)
+	params := services.ProjectCreateParams{
+		CustomerID:           custID,
+		Name:                 r.FormValue("name"),
+		Description:          r.FormValue("description"),
+		StatusID:             statusID,
+		LocationID:           locationID,
+		CompletionPercentage: completion,
+		StartTime:            parseDatePtr(r.FormValue("start_time")),
+		EndTime:              parseDatePtr(r.FormValue("end_time")),
+		Notes:                r.FormValue("notes"),
+	}
+	_, err := h.svc.Create(r.Context(), params)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	http.Redirect(w, r, "/projects?flash=Project+created", http.StatusSeeOther)
+}
+
+func (h *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if r.Method == http.MethodGet {
+		p, err := h.svc.GetByID(r.Context(), id)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		statuses := h.statusesForSelect(r.Context())
+		templates.ProjectForm(h.formDataFromProject(r.Context(), p, statuses)).Render(r.Context(), w)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", 400)
+		return
+	}
+	custID, _ := strconv.ParseInt(r.FormValue("customer_id"), 10, 64)
+	statusID, _ := strconv.ParseInt(r.FormValue("status_id"), 10, 64)
+	locationID, _ := strconv.ParseInt(r.FormValue("location_id"), 10, 64)
+	completion, _ := strconv.ParseFloat(r.FormValue("completion_percentage"), 64)
+	params := services.ProjectUpdateParams{
+		CustomerID:           int64Ptr(custID),
+		Name:                 formPtr(r.FormValue("name")),
+		Description:          formPtr(r.FormValue("description")),
+		StatusID:             int64Ptr(statusID),
+		LocationID:           int64Ptr(locationID),
+		CompletionPercentage: &completion,
+		StartTime:            parseDatePtr(r.FormValue("start_time")),
+		EndTime:              parseDatePtr(r.FormValue("end_time")),
+		Notes:                formPtr(r.FormValue("notes")),
+	}
+	if _, err := h.svc.Update(r.Context(), id, params); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("/projects/%d?flash=Project+updated", id), http.StatusSeeOther)
+}
+
+func (h *ProjectHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", 400)
+		return
+	}
+	if err := h.svc.Delete(r.Context(), id); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	http.Redirect(w, r, "/projects?flash=Project+deleted", http.StatusSeeOther)
+}
+
+func (h *ProjectHandler) statusesForSelect(ctx context.Context) []*ent.Status {
+	statuses, _ := h.statusSvc.ByObjectType(ctx, "project")
+	return statuses
+}
+
+func (h *ProjectHandler) newProjectForm(ctx context.Context) templates.ProjectFormPageData {
+	statuses := h.statusesForSelect(ctx)
+	customers, _ := h.custSvc.ListAll(ctx)
+	locations, _ := h.locSvc.ListAll(ctx)
+	return templates.ProjectFormPageData{
+		Project: &templates.ProjectDetail{
+			CompletionPercentage: 0,
+		},
+		IsNew:     true,
+		Customers: customerOptions(customers),
+		Statuses:  statusOptions(statuses),
+		Locations: locationOptions(locations),
+	}
+}
+
+func (h *ProjectHandler) formDataFromProject(ctx context.Context, p *ent.Project, statuses []*ent.Status) templates.ProjectFormPageData {
+	customers, _ := h.custSvc.ListAll(ctx)
+	locations, _ := h.locSvc.ListAll(ctx)
+	statusesMap := statusMap(statuses)
+	d := templates.ProjectDetail{
+		ID:                   p.ID,
+		Name:                 p.Name,
+		Description:          p.Description,
+		CustomerID:           p.CustomerID,
+		StatusID:             projectStatusID(p),
+		StatusName:           statusesMap[projectStatusID(p)],
+		StatusColor:          statusColor(statuses, p.StatusID),
+		CompletionPercentage: p.CompletionPercentage,
+		Notes:                p.Notes,
+	}
+	if p.LocationID != nil {
+		d.LocationID = *p.LocationID
+	}
+	if p.StartTime != nil && !p.StartTime.IsZero() {
+		d.StartTime = p.StartTime.Format("2006-01-02")
+	}
+	if p.EndTime != nil && !p.EndTime.IsZero() {
+		d.EndTime = p.EndTime.Format("2006-01-02")
+	}
+	return templates.ProjectFormPageData{
+		Project:   &d,
+		IsNew:     false,
+		Customers: customerOptions(customers),
+		Statuses:  statusOptions(statuses),
+		Locations: locationOptions(locations),
+	}
+}
+
+func projectRow(p *ent.Project, statuses []*ent.Status, custMap map[int64]string) templates.ProjectRow {
+	return templates.ProjectRow{
+		ID:                   p.ID,
+		Name:                 p.Name,
+		Description:          p.Description,
+		CustomerID:           p.CustomerID,
+		CustomerName:         custMap[p.CustomerID],
+		StatusID:             projectStatusID(p),
+		StatusName:           statusName(statuses, p.StatusID),
+		StatusColor:          statusColor(statuses, p.StatusID),
+		CompletionPercentage: p.CompletionPercentage,
+		StartTime:            formatDate(p.StartTime),
+		EndTime:              formatDate(p.EndTime),
+	}
+}
+
+func projectStatusID(p *ent.Project) int64 {
+	if p.StatusID == nil {
+		return 0
+	}
+	return *p.StatusID
+}
+
+func parseDatePtr(v string) *time.Time {
+	v = strings.TrimSpace(v)
+	if v == "" {
+		return nil
+	}
+	t, _ := time.ParseInLocation("2006-01-02", v, time.Local)
+	return &t
+}
+
+func formatDate(t *time.Time) string {
+	if t == nil || t.IsZero() {
+		return ""
+	}
+	return t.Format("2006-01-02")
+}

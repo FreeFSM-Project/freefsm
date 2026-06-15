@@ -1,0 +1,76 @@
+package templates
+
+import "fmt"
+
+templ ProjectIndex(p ProjectListPageData) {
+	@Layout("Projects") {
+		<h1>Projects</h1>
+		<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+			<form hx-get="/projects" hx-target="#project-table-wrap" hx-swap="outerHTML" hx-push-url="true" style="display:flex;gap:0.5rem;align-items:center;flex:1">
+				<input type="search" name="search" placeholder="Search projects..."
+					value={ p.Search } style="max-width:300px"
+					hx-trigger="input changed delay:300ms"/>
+				<select name="status_id" hx-trigger="change">
+					<option value="0">All Statuses</option>
+					for _, s := range p.Statuses {
+						<option value={ fmt.Sprintf("%d", s.Value) } selected?={ p.StatusID == s.Value }>{ s.Label }</option>
+					}
+				</select>
+			</form>
+			<a href="/projects/new" role="button">New Project</a>
+		</div>
+		@ProjectTable(p)
+	}
+}
+
+templ ProjectTable(p ProjectListPageData) {
+	<div id="project-table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>Project</th>
+					<th>Customer</th>
+					<th>Status</th>
+					<th>Progress</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				if len(p.Projects) == 0 {
+					<tr><td colspan="5" style="text-align:center">No projects found.</td></tr>
+				}
+				for _, pr := range p.Projects {
+					<tr>
+						<td>
+							<a href={ templ.URL(fmt.Sprintf("/projects/%d", pr.ID)) }>
+								{ pr.Name }
+							</a>
+							if pr.Description != "" {
+								<br/><small>{ pr.Description }</small>
+							}
+						</td>
+						<td>{ pr.CustomerName }</td>
+						<td><span class="status-badge" style={ badgeStyle(pr.StatusColor) }>{ pr.StatusName }</span></td>
+						<td>
+							<progress value={ fmt.Sprintf("%.0f", pr.CompletionPercentage) } max="100"></progress>
+							<small>{ fmt.Sprintf("%.0f%%", pr.CompletionPercentage) }</small>
+						</td>
+						<td style="text-align:right">
+							<a href={ templ.URL(fmt.Sprintf("/projects/%d/edit", pr.ID)) } role="button" class="outline small">Edit</a>
+							<form action={ templ.URL(fmt.Sprintf("/projects/%d/delete", pr.ID)) } method="post" style="display:inline" onsubmit="return confirm('Delete this project?')">
+								<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+								<button class="outline contrast small">Del</button>
+							</form>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+		@Pagination(PaginationData{
+			CurrentPage: p.Page,
+			TotalPages:  p.TotalPages,
+			BaseURL:     "/projects",
+			Target:      "#project-table-wrap",
+		})
+	</div>
+}

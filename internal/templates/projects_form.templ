@@ -1,0 +1,73 @@
+package templates
+
+import "fmt"
+
+templ ProjectForm(p ProjectFormPageData) {
+	@Layout(projectFormTitle(p.IsNew)) {
+		<h1>{ projectFormTitle(p.IsNew) }</h1>
+		<form action={ templ.URL(projectFormAction(p.IsNew, p.Project.ID)) } method="post">
+			<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+			<fieldset>
+				<label>
+					Customer
+					<select name="customer_id" required>
+						<option value="">Select customer...</option>
+						for _, c := range p.Customers {
+							<option value={ fmt.Sprintf("%d", c.Value) } selected?={ p.Project.CustomerID == c.Value }>{ c.Label }</option>
+						}
+					</select>
+				</label>
+				<label>
+					Project Name
+					<input type="text" name="name" value={ p.Project.Name } required/>
+				</label>
+				<label>
+					Description
+					<input type="text" name="description" value={ p.Project.Description }/>
+				</label>
+				<div style="display:flex;gap:0.5rem">
+					<label style="flex:1">
+						Status
+						<select name="status_id">
+							<option value="0">No Status</option>
+							for _, s := range p.Statuses {
+								<option value={ fmt.Sprintf("%d", s.Value) } selected?={ p.Project.StatusID == s.Value }>{ s.Label }</option>
+							}
+						</select>
+					</label>
+					<label style="flex:1">
+						Location
+						<select name="location_id">
+							<option value="0">No Location</option>
+							for _, l := range p.Locations {
+								<option value={ fmt.Sprintf("%d", l.Value) } selected?={ p.Project.LocationID == l.Value }>{ l.Label }</option>
+							}
+						</select>
+					</label>
+				</div>
+				<label>
+					Completion (%)
+					<input type="number" name="completion_percentage" value={ fmt.Sprintf("%.0f", p.Project.CompletionPercentage) } min="0" max="100" step="1"/>
+				</label>
+				<div style="display:flex;gap:0.5rem">
+					<label style="flex:1">
+						Start Date
+						<input type="date" name="start_time" value={ p.Project.StartTime }/>
+					</label>
+					<label style="flex:1">
+						End Date
+						<input type="date" name="end_time" value={ p.Project.EndTime }/>
+					</label>
+				</div>
+				<label>
+					Notes
+					<textarea name="notes">{ p.Project.Notes }</textarea>
+				</label>
+			</fieldset>
+			<div style="display:flex;gap:0.5rem;justify-content:flex-end">
+				<a href="/projects" role="button" class="outline">Cancel</a>
+				<button type="submit">Save</button>
+			</div>
+		</form>
+	}
+}
