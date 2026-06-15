@@ -68,6 +68,13 @@ templ SettingsPage(p SettingsPageData) {
 				From Address
 				<input type="email" name="smtp_from" value={ p.Settings.SMTPFrom } placeholder="freefsm@example.com"/>
 			</label>
+			<div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem">
+				<form hx-post="/settings/test-email" hx-target="#test-email-result" hx-swap="innerHTML" style="display:inline">
+					<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+					<button type="submit" class="outline">Send Test Email</button>
+				</form>
+			</div>
+			<div id="test-email-result"></div>
 			<h3>Document Settings</h3>
 			<div class="grid">
 				<label>
@@ -91,5 +98,13 @@ templ SettingsPage(p SettingsPageData) {
 			</div>
 			<button type="submit">{ settingsButtonText(p.IsSetup) }</button>
 		</form>
+	}
+}
+
+templ TestEmailResult(success bool, message string) {
+	if success {
+		<p style="color:green;text-align:right">✓ Test email sent successfully</p>
+	} else {
+		<p style="color:var(--pico-del-color);text-align:right">✗ Test email failed: { message }</p>
 	}
 }

@@ -16,6 +16,32 @@ func NewEmailService(svc *CompanySettingsService) *EmailService {
 	return &EmailService{svc: svc}
 }
 
+func (s *EmailService) SendTestEmail(ctx context.Context, to, name string) error {
+	cs, err := s.svc.Get(ctx)
+	if err != nil || cs == nil || cs.SMTPHost == "" {
+		return fmt.Errorf("SMTP not configured")
+	}
+
+	subject := "Test Email — FreeFSM"
+	body := fmt.Sprintf(`Hi %s,
+
+This is a test email from FreeFSM. Your SMTP settings are working correctly.
+
+If you received this email, your email configuration is ready to use.
+
+- FreeFSM`, name)
+
+	msg := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n%s",
+		cs.SMTPFrom, to, subject, body)
+
+	addr := fmt.Sprintf("%s:%d", cs.SMTPHost, cs.SMTPPort)
+
+	if cs.SMTPPort == 587 {
+		return s.sendWithSTARTTLS(addr, cs.SMTPUser, cs.SMTPPassword, cs.SMTPFrom, to, msg)
+	}
+	return s.sendPlain(addr, cs.SMTPHost, cs.SMTPUser, cs.SMTPPassword, cs.SMTPFrom, to, msg)
+}
+
 func (s *EmailService) SendPasswordReset(ctx context.Context, to, name, link string) error {
 	cs, err := s.svc.Get(ctx)
 	if err != nil || cs == nil || cs.SMTPHost == "" {

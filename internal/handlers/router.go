@@ -40,33 +40,41 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	dashboardHandler := NewDashboardHandler(services.NewDashboardService(entClient))
 	customerHandler := NewCustomerHandler(customerService, contactSvc)
 	itemHandler := NewItemHandler(itemService)
-		jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc)
-		projectHandler := NewProjectHandler(projectSvc, customerService, statusService, locationSvc, jobService)
-		scheduleHandler := NewScheduleHandler(jobService, customerService, statusService)
+	jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc)
+	projectHandler := NewProjectHandler(projectSvc, customerService, statusService, locationSvc, jobService)
+	scheduleHandler := NewScheduleHandler(jobService, customerService, statusService)
 	invoiceService := services.NewInvoiceService(entClient)
 	estimateHandler := NewEstimateHandler(services.NewEstimateService(entClient), customerService, jobService, statusService, itemService, invoiceService)
 	invoiceHandler := NewInvoiceHandler(invoiceService, customerService, jobService, statusService, itemService)
 	companySettingsSvc := services.NewCompanySettingsService(entClient)
-	settingsHandler := NewSettingsHandler(companySettingsSvc)
+	emailSvc := services.NewEmailService(companySettingsSvc)
+	settingsHandler := NewSettingsHandler(companySettingsSvc, emailSvc)
 	userHandler := NewUserHandler(userService)
+	authHandler := NewAuthHandler(db, sessions, userService, emailSvc, services.NewPasswordResetService(entClient))
 
+	// Public routes
+	r.Get("/login", authHandler.ServeHTTP)
+	r.Post("/login", authHandler.ServeHTTP)
+	r.Get("/forgot-password", authHandler.ForgotPassword)
+	r.Post("/forgot-password", authHandler.ForgotPassword)
+	r.Get("/reset-password", authHandler.ResetPassword)
+	r.Post("/reset-password", authHandler.ResetPassword)
+
+	setupHandler := NewSetupHandler(db, sessions, cfg)
+	r.Get("/setup", setupHandler.ServeHTTP)
+	r.Post("/setup", setupHandler.ServeHTTP)
+	r.Get("/setup/company", settingsHandler.Show)
+	r.Post("/setup/company", settingsHandler.Save)
+
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"ok"}`))
+	})
+
+	// Authenticated routes
 	r.Group(func(r chi.Router) {
 		r.Use(authMW)
 		r.Get("/", dashboardHandler.Index)
-		r.Get("/settings", settingsHandler.Show)
-		r.Post("/settings", settingsHandler.Save)
-
-		r.Group(func(r chi.Router) {
-			r.Use(middleware.AdminOnly)
-			r.Get("/users", userHandler.List)
-			r.Get("/users/new", userHandler.Create)
-			r.Post("/users", userHandler.Create)
-			r.Get("/users/{id}", userHandler.Show)
-			r.Get("/users/{id}/edit", userHandler.Update)
-			r.Post("/users/{id}", userHandler.Update)
-			r.Post("/users/{id}/disable", userHandler.Disable)
-			r.Post("/users/{id}/reset-password", userHandler.ResetPassword)
-		})
 		r.Get("/schedule", scheduleHandler.Index)
 		r.Post("/logout", func(w http.ResponseWriter, r *http.Request) {
 			handleLogout(w, r, sessions)
@@ -133,27 +141,22 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Post("/invoices/{id}/delete", invoiceHandler.Delete)
 		r.Post("/invoices/{id}/payments", invoiceHandler.RecordPayment)
 		r.Get("/invoices/{id}/pdf", invoiceHandler.PDF)
-	})
 
-	emailSvc := services.NewEmailService(companySettingsSvc)
-	resetSvc := services.NewPasswordResetService(entClient)
-	authHandler := NewAuthHandler(db, sessions, userService, emailSvc, resetSvc)
-	r.Get("/login", authHandler.ServeHTTP)
-	r.Post("/login", authHandler.ServeHTTP)
-	r.Get("/forgot-password", authHandler.ForgotPassword)
-	r.Post("/forgot-password", authHandler.ForgotPassword)
-	r.Get("/reset-password", authHandler.ResetPassword)
-	r.Post("/reset-password", authHandler.ResetPassword)
-
-	setupHandler := NewSetupHandler(db, sessions, cfg)
-	r.Get("/setup", setupHandler.ServeHTTP)
-	r.Post("/setup", setupHandler.ServeHTTP)
-	r.Get("/setup/company", settingsHandler.Show)
-	r.Post("/setup/company", settingsHandler.Save)
-
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"status":"ok"}`))
+		// Admin-only routes
+		r.Group(func(r chi.Router) {
+			r.Use(middleware.AdminOnly)
+			r.Get("/settings", settingsHandler.Show)
+			r.Post("/settings", settingsHandler.Save)
+			r.Post("/settings/test-email", settingsHandler.TestEmail)
+			r.Get("/users", userHandler.List)
+			r.Get("/users/new", userHandler.Create)
+			r.Post("/users", userHandler.Create)
+			r.Get("/users/{id}", userHandler.Show)
+			r.Get("/users/{id}/edit", userHandler.Update)
+			r.Post("/users/{id}", userHandler.Update)
+			r.Post("/users/{id}/disable", userHandler.Disable)
+			r.Post("/users/{id}/reset-password", userHandler.ResetPassword)
+		})
 	})
 
 	return r

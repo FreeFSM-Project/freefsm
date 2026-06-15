@@ -5,16 +5,18 @@ import (
 	"strconv"
 
 	"github.com/MartialM1nd/freefsm/internal/ent"
+	"github.com/MartialM1nd/freefsm/internal/middleware"
 	"github.com/MartialM1nd/freefsm/internal/services"
 	"github.com/MartialM1nd/freefsm/internal/templates"
 )
 
 type SettingsHandler struct {
-	svc *services.CompanySettingsService
+	svc      *services.CompanySettingsService
+	emailSvc *services.EmailService
 }
 
-func NewSettingsHandler(svc *services.CompanySettingsService) *SettingsHandler {
-	return &SettingsHandler{svc: svc}
+func NewSettingsHandler(svc *services.CompanySettingsService, emailSvc *services.EmailService) *SettingsHandler {
+	return &SettingsHandler{svc: svc, emailSvc: emailSvc}
 }
 
 func (h *SettingsHandler) Show(w http.ResponseWriter, r *http.Request) {
@@ -53,6 +55,20 @@ func (h *SettingsHandler) Save(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/settings?flash=Settings+saved", http.StatusSeeOther)
+}
+
+func (h *SettingsHandler) TestEmail(w http.ResponseWriter, r *http.Request) {
+	u, ok := middleware.UserFromContext(r.Context())
+	if !ok || u == nil {
+		http.Error(w, "Unauthorized", 401)
+		return
+	}
+
+	if err := h.emailSvc.SendTestEmail(r.Context(), u.Email, u.Name); err != nil {
+		templates.TestEmailResult(false, err.Error()).Render(r.Context(), w)
+		return
+	}
+	templates.TestEmailResult(true, "").Render(r.Context(), w)
 }
 
 func companyName(cs *ent.CompanySettings) string {
