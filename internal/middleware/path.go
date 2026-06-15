@@ -24,5 +24,8 @@ func PathFromContext(ctx context.Context) string {
 
 func IsActivePath(ctx context.Context, prefix string) bool {
 	path := PathFromContext(ctx)
+	if prefix == "/" {
+		return path == "/"
+	}
 	return path == prefix || strings.HasPrefix(path, prefix+"/")
 }
