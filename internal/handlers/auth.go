@@ -104,7 +104,7 @@ func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	link := fmt.Sprintf("%s://%s/reset-password?token=%s", scheme, r.Host, tok)
 	var emailErr string
 	if err := h.emailSvc.SendPasswordReset(r.Context(), email, u.Name, link); err != nil {
-		emailErr = ""
+		emailErr = "Failed to send email. Please try again."
 	}
 	templates.ForgotPasswordPage(templates.ForgotPasswordData{
 		Success:  true,
@@ -132,7 +132,12 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid token", 400)
 		return
 	}
-	h.userSvc.SetPassword(r.Context(), uid, password)
+	if err := h.userSvc.SetPassword(r.Context(), uid, password); err != nil {
+		templates.ResetPasswordPage(templates.ResetPasswordData{
+			Token: token, Valid: true, Error: "Failed to reset password. Please try again.",
+		}).Render(r.Context(), w)
+		return
+	}
 	h.resetSvc.Consume(r.Context(), token)
 	http.Redirect(w, r, "/login?flash=Password+reset+successfully", http.StatusSeeOther)
 }

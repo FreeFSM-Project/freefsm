@@ -55,14 +55,14 @@ func Layout(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/img/favicon.svg\"><link rel=\"stylesheet\" href=\"/static/css/pico.min.css\"><link rel=\"stylesheet\" href=\"/static/css/app.css\"><script src=\"/static/js/htmx.min.js\"></script><script src=\"/static/js/alpine.min.js\" defer></script></head><body><button class=\"hamburger\" onclick=\"document.getElementById('sidebar').classList.toggle('open')\">&#9776;</button><aside class=\"sidebar\" id=\"sidebar\"><div class=\"sidebar-brand\"><img src=\"/static/img/favicon.svg\" alt=\"\"> <strong>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/img/favicon.svg\"><link rel=\"stylesheet\" href=\"/static/css/pico.min.css\"><link rel=\"stylesheet\" href=\"/static/css/app.css\"><script src=\"/static/js/htmx.min.js\"></script><script src=\"/static/js/alpine.min.js\" defer></script></head><body hx-boost=\"true\"><button class=\"hamburger\" onclick=\"document.getElementById('sidebar').classList.toggle('open')\">&#9776;</button><aside class=\"sidebar\" id=\"sidebar\"><div class=\"sidebar-brand\"><img src=\"/static/img/favicon.svg\" alt=\"\"> <strong>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(companyBrandName(companyFromCtx(ctx)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 21, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 21, Col: 51}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -246,7 +246,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</summary><ul><li><form action=\"/logout\" method=\"post\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</summary><ul><li><form action=\"/logout\" method=\"post\" hx-boost=\"false\"><input type=\"hidden\" name=\"csrf_token\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -264,7 +264,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</aside><div class=\"main-content\"><div id=\"loading-bar\"></div><script>\n\t\t\tlet loadingTimer;\n\t\t\tdocument.body.addEventListener('htmx:beforeRequest', () => {\n\t\t\t\tclearTimeout(loadingTimer);\n\t\t\t\tdocument.getElementById('loading-bar').style.display = 'block';\n\t\t\t});\n\t\t\tdocument.body.addEventListener('htmx:afterRequest', () => {\n\t\t\t\tloadingTimer = setTimeout(() => document.getElementById('loading-bar').style.display = 'none', 300);\n\t\t\t});\n\t\t\tdocument.body.addEventListener('htmx:responseError', () => {\n\t\t\t\tloadingTimer = setTimeout(() => document.getElementById('loading-bar').style.display = 'none', 300);\n\t\t\t});\n\t\t</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</aside><div class=\"main-content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -276,7 +276,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 			var templ_7745c5c3_Var21 string
 			templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(getFlash(ctx))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 75, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 61, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 			if templ_7745c5c3_Err != nil {

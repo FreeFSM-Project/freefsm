@@ -47,7 +47,7 @@ func (h *ItemHandler) List(w http.ResponseWriter, r *http.Request) {
 		Search:     search,
 	}
 
-	if r.Header.Get("HX-Request") == "true" {
+	if r.Header.Get("HX-Request") == "true" && r.Header.Get("HX-Boosted") != "true" {
 		templates.ItemsTable(data).Render(r.Context(), w)
 		return
 	}

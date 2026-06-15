@@ -295,6 +295,7 @@ func InvoicesTable(p InvoiceListPageData) templ.Component {
 			CurrentPage: p.Page,
 			TotalPages:  p.TotalPages,
 			BaseURL:     "/invoices",
+			Target:      "#invoice-table-wrap",
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

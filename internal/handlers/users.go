@@ -65,7 +65,11 @@ func (h *UserHandler) Show(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if r.Method == http.MethodGet {
-		u, _ := h.svc.GetByID(r.Context(), id)
+		u, err := h.svc.GetByID(r.Context(), id)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
 		templates.UserForm(templates.UserFormData{
 			IsNew: false, User: &templates.UserDetail{User: userToRow(u)},
 			Roles: []string{"admin", "dispatcher", "tech"},
@@ -87,7 +91,11 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 func (h *UserHandler) Disable(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	u, _ := h.svc.GetByID(r.Context(), id)
+	u, err := h.svc.GetByID(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
 	h.svc.SetActive(r.Context(), id, !u.IsActive)
 	http.Redirect(w, r, "/users?flash=User+toggled", http.StatusSeeOther)
 }

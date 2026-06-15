@@ -49,7 +49,7 @@ func (h *CustomerHandler) List(w http.ResponseWriter, r *http.Request) {
 		StatusFilter: status,
 	}
 
-	if r.Header.Get("HX-Request") == "true" {
+	if r.Header.Get("HX-Request") == "true" && r.Header.Get("HX-Boosted") != "true" {
 		templates.CustomerTable(data).Render(r.Context(), w)
 		return
 	}

@@ -282,6 +282,7 @@ func EstimatesTable(p EstimateListPageData) templ.Component {
 			CurrentPage: p.Page,
 			TotalPages:  p.TotalPages,
 			BaseURL:     "/estimates",
+			Target:      "#estimate-table-wrap",
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

@@ -13,15 +13,15 @@ templ Layout(title string, children ...templ.Component) {
 			<script src="/static/js/htmx.min.js"></script>
 			<script src="/static/js/alpine.min.js" defer></script>
 		</head>
-		<body>
+		<body hx-boost="true">
 			<button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">&#9776;</button>
 			<aside class="sidebar" id="sidebar">
-				<div class="sidebar-brand">
-					<img src="/static/img/favicon.svg" alt=""/>
-					<strong>{ companyBrandName(companyFromCtx(ctx)) }</strong>
-				</div>
-				<hr class="sidebar-divider"/>
-				<nav>
+			<div class="sidebar-brand">
+				<img src="/static/img/favicon.svg" alt=""/>
+				<strong>{ companyBrandName(companyFromCtx(ctx)) }</strong>
+			</div>
+			<hr class="sidebar-divider"/>
+			<nav>
 					<a href="/" class={ templ.KV("active", isActivePath(ctx, "/")) }>Dashboard</a>
 					<a href="/schedule" class={ templ.KV("active", isActivePath(ctx, "/schedule")) }>Schedule</a>
 					<a href="/customers" class={ templ.KV("active", isActivePath(ctx, "/customers")) }>Customers</a>
@@ -46,7 +46,7 @@ templ Layout(title string, children ...templ.Component) {
 							<summary>{ getUser(ctx).Name }</summary>
 							<ul>
 								<li>
-									<form action="/logout" method="post">
+									<form action="/logout" method="post" hx-boost="false">
 										<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
 										<button type="submit">Logout</button>
 									</form>
@@ -56,21 +56,7 @@ templ Layout(title string, children ...templ.Component) {
 					</div>
 				}
 			</aside>
-			<div class="main-content">
-				<div id="loading-bar"></div>
-				<script>
-			let loadingTimer;
-			document.body.addEventListener('htmx:beforeRequest', () => {
-				clearTimeout(loadingTimer);
-				document.getElementById('loading-bar').style.display = 'block';
-			});
-			document.body.addEventListener('htmx:afterRequest', () => {
-				loadingTimer = setTimeout(() => document.getElementById('loading-bar').style.display = 'none', 300);
-			});
-			document.body.addEventListener('htmx:responseError', () => {
-				loadingTimer = setTimeout(() => document.getElementById('loading-bar').style.display = 'none', 300);
-			});
-		</script>
+		<div class="main-content">
 				if getFlash(ctx) != "" {
 					<div class="flash-banner" role="alert">{ getFlash(ctx) }</div>
 				}

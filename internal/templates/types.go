@@ -110,6 +110,7 @@ type PaginationData struct {
 	CurrentPage int
 	TotalPages  int
 	BaseURL     string
+	Target      string
 }
 
 type ItemRow struct {

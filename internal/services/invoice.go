@@ -193,11 +193,17 @@ func (s *InvoiceService) CreateFromEstimate(ctx context.Context, estimateID int6
 	custID := e.CustomerID
 	jobID := e.JobID
 
-	if err := s.client.Estimate.DeleteOneID(estimateID).Exec(ctx); err != nil {
+	tx, err := s.client.Tx(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	if err := tx.Estimate.DeleteOneID(estimateID).Exec(ctx); err != nil {
 		return nil, fmt.Errorf("delete estimate %d: %w", estimateID, err)
 	}
 
-	return s.client.Invoice.Create().
+	i, err := tx.Invoice.Create().
 		SetID(estimateID).
 		SetTitle(e.Title).
 		SetNotes(e.Notes).
@@ -209,6 +215,15 @@ func (s *InvoiceService) CreateFromEstimate(ctx context.Context, estimateID int6
 		SetNillableCustomerID(custID).
 		SetNillableJobID(jobID).
 		Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("create invoice: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("commit transaction: %w", err)
+	}
+
+	return i, nil
 }
 
 func (s *InvoiceService) CreateFromJob(ctx context.Context, jobID int64, statusSvc *StatusService) (*ent.Invoice, error) {

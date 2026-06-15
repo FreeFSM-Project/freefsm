@@ -62,7 +62,7 @@ func (h *JobHandler) List(w http.ResponseWriter, r *http.Request) {
 		Statuses:   statusOptions(statuses),
 	}
 
-	if r.Header.Get("HX-Request") == "true" {
+	if r.Header.Get("HX-Request") == "true" && r.Header.Get("HX-Boosted") != "true" {
 		templates.JobsTable(data).Render(r.Context(), w)
 		return
 	}

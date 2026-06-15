@@ -11,7 +11,7 @@ templ Pagination(p PaginationData) {
 			<a href={ templ.URL(fmt.Sprintf("%s?page=%d", p.BaseURL, p.CurrentPage-1)) }
 				role="button" class="outline"
 				hx-get={ templ.URL(fmt.Sprintf("%s?page=%d", p.BaseURL, p.CurrentPage-1)) }
-				hx-target="#customer-table-wrap"
+				hx-target={ p.Target }
 				hx-swap="outerHTML"
 				hx-push-url="true"
 			>Previous</a>
@@ -21,7 +21,7 @@ templ Pagination(p PaginationData) {
 			<a href={ templ.URL(fmt.Sprintf("%s?page=%d", p.BaseURL, p.CurrentPage+1)) }
 				role="button" class="outline"
 				hx-get={ templ.URL(fmt.Sprintf("%s?page=%d", p.BaseURL, p.CurrentPage+1)) }
-				hx-target="#customer-table-wrap"
+				hx-target={ p.Target }
 				hx-swap="outerHTML"
 				hx-push-url="true"
 			>Next</a>

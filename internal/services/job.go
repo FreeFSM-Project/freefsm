@@ -119,13 +119,16 @@ func (s *JobService) Create(ctx context.Context, params JobCreateParams) (*ent.J
 		SetCustomerID(params.CustomerID).
 		SetJobType(params.JobType).
 		SetSubtitle(params.Subtitle).
-		SetStatusID(params.StatusID).
 		SetBillingType(params.BillingType).
 		SetNotes(params.Notes).
 		SetTechNotes(params.TechNotes).
 		SetLineItems(SerializeLineItems(params.LineItems)).
 		SetVisits(SerializeVisits(params.Visits)).
 		SetAssignments(SerializeAssignments(params.Assignments))
+
+	if params.StatusID > 0 {
+		b.SetStatusID(params.StatusID)
+	}
 
 	if params.ProjectID > 0 {
 		b.SetProjectID(params.ProjectID)
