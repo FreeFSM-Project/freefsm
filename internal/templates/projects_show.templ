@@ -13,6 +13,9 @@ templ ProjectShow(p ProjectShowPageData) {
 				</form>
 			</div>
 		</div>
+		if len(p.Tags) > 0 || true {
+			@TagWidget(TagWidgetData{BaseURL: fmt.Sprintf("/projects/%d", p.Project.ID), Tags: p.Tags, AllTags: p.AllTags})
+		}
 		if p.Project.Description != "" {
 			<p><em>{ p.Project.Description }</em></p>
 		}

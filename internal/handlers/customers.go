@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -13,10 +14,12 @@ import (
 type CustomerHandler struct {
 	svc        *services.CustomerService
 	contactSvc *services.CustomerContactService
+	tagSvc     *services.TagService
+	tagLinkSvc *services.TagLinkService
 }
 
-func NewCustomerHandler(svc *services.CustomerService, contactSvc *services.CustomerContactService) *CustomerHandler {
-	return &CustomerHandler{svc: svc, contactSvc: contactSvc}
+func NewCustomerHandler(svc *services.CustomerService, contactSvc *services.CustomerContactService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService) *CustomerHandler {
+	return &CustomerHandler{svc: svc, contactSvc: contactSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc}
 }
 
 func (h *CustomerHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -67,8 +70,12 @@ func (h *CustomerHandler) Show(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "customer", c.ID)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
 	templates.CustomerShow(templates.CustomerShowPageData{
 		Customer: customerToDetail(c),
+		Tags:     tagsToRows(tags),
+		AllTags:  tagsToRows(allTags),
 	}).Render(r.Context(), w)
 }
 
@@ -315,6 +322,39 @@ func (h *CustomerHandler) DeleteContact(w http.ResponseWriter, r *http.Request) 
 	cid, _ := strconv.ParseInt(chi.URLParam(r, "cid"), 10, 64)
 	h.contactSvc.Delete(r.Context(), cid)
 	h.ListContacts(w, r)
+}
+
+func (h *CustomerHandler) AttachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	_, err := h.tagLinkSvc.Attach(r.Context(), tagID, "customer", id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "customer", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	templates.TagWidget(templates.TagWidgetData{
+		BaseURL: fmt.Sprintf("/customers/%d", id),
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
+	}).Render(r.Context(), w)
+}
+
+func (h *CustomerHandler) DetachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	if err := h.tagLinkSvc.Detach(r.Context(), tagID, "customer", id); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "customer", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	templates.TagWidget(templates.TagWidgetData{
+		BaseURL: fmt.Sprintf("/customers/%d", id),
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
+	}).Render(r.Context(), w)
 }
 
 func newFormData() templates.CustomerFormPageData {

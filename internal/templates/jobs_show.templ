@@ -21,6 +21,9 @@ templ JobShow(p JobDetail) {
 				</form>
 			</div>
 		</div>
+		if len(p.Tags) > 0 || true {
+			@TagWidget(TagWidgetData{BaseURL: fmt.Sprintf("/jobs/%d", p.ID), Tags: p.Tags, AllTags: p.AllTags})
+		}
 		if p.Subtitle != "" {
 			<p><em>{ p.Subtitle }</em></p>
 		}

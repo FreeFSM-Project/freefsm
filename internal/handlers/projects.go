@@ -15,15 +15,17 @@ import (
 )
 
 type ProjectHandler struct {
-	svc       *services.ProjectService
-	custSvc   *services.CustomerService
-	statusSvc *services.StatusService
-	locSvc    *services.LocationService
-	jobSvc    *services.JobService
+	svc        *services.ProjectService
+	custSvc    *services.CustomerService
+	statusSvc  *services.StatusService
+	locSvc     *services.LocationService
+	jobSvc     *services.JobService
+	tagSvc     *services.TagService
+	tagLinkSvc *services.TagLinkService
 }
 
-func NewProjectHandler(svc *services.ProjectService, custSvc *services.CustomerService, statusSvc *services.StatusService, locSvc *services.LocationService, jobSvc *services.JobService) *ProjectHandler {
-	return &ProjectHandler{svc: svc, custSvc: custSvc, statusSvc: statusSvc, locSvc: locSvc, jobSvc: jobSvc}
+func NewProjectHandler(svc *services.ProjectService, custSvc *services.CustomerService, statusSvc *services.StatusService, locSvc *services.LocationService, jobSvc *services.JobService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService) *ProjectHandler {
+	return &ProjectHandler{svc: svc, custSvc: custSvc, statusSvc: statusSvc, locSvc: locSvc, jobSvc: jobSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc}
 }
 
 func (h *ProjectHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -120,9 +122,46 @@ func (h *ProjectHandler) Show(w http.ResponseWriter, r *http.Request) {
 		d.EndTime = p.EndTime.Format("2006-01-02")
 	}
 
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "project", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
 	templates.ProjectShow(templates.ProjectShowPageData{
 		Project: d,
 		Jobs:    jobRows,
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
+	}).Render(r.Context(), w)
+}
+
+func (h *ProjectHandler) AttachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	_, err := h.tagLinkSvc.Attach(r.Context(), tagID, "project", id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "project", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	templates.TagWidget(templates.TagWidgetData{
+		BaseURL: fmt.Sprintf("/projects/%d", id),
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
+	}).Render(r.Context(), w)
+}
+
+func (h *ProjectHandler) DetachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	if err := h.tagLinkSvc.Detach(r.Context(), tagID, "project", id); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "project", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	templates.TagWidget(templates.TagWidgetData{
+		BaseURL: fmt.Sprintf("/projects/%d", id),
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
 	}).Render(r.Context(), w)
 }
 

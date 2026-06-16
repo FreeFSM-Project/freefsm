@@ -402,6 +402,45 @@ var (
 		Columns:    StatusWorkflowsColumns,
 		PrimaryKey: []*schema.Column{StatusWorkflowsColumns[0]},
 	}
+	// TagsColumns holds the columns for the "tags" table.
+	TagsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "color", Type: field.TypeString, Default: "#3B82F6"},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// TagsTable holds the schema information for the "tags" table.
+	TagsTable = &schema.Table{
+		Name:       "tags",
+		Columns:    TagsColumns,
+		PrimaryKey: []*schema.Column{TagsColumns[0]},
+	}
+	// TagLinksColumns holds the columns for the "tag_links" table.
+	TagLinksColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "tag_id", Type: field.TypeInt64},
+		{Name: "object_type", Type: field.TypeString},
+		{Name: "object_id", Type: field.TypeInt64},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// TagLinksTable holds the schema information for the "tag_links" table.
+	TagLinksTable = &schema.Table{
+		Name:       "tag_links",
+		Columns:    TagLinksColumns,
+		PrimaryKey: []*schema.Column{TagLinksColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "taglink_object_type_object_id",
+				Unique:  false,
+				Columns: []*schema.Column{TagLinksColumns[2], TagLinksColumns[3]},
+			},
+			{
+				Name:    "taglink_tag_id_object_type_object_id",
+				Unique:  true,
+				Columns: []*schema.Column{TagLinksColumns[1], TagLinksColumns[2], TagLinksColumns[3]},
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -433,6 +472,8 @@ var (
 		ProjectsTable,
 		StatusesTable,
 		StatusWorkflowsTable,
+		TagsTable,
+		TagLinksTable,
 		UsersTable,
 	}
 )
@@ -474,6 +515,12 @@ func init() {
 	}
 	StatusWorkflowsTable.Annotation = &entsql.Annotation{
 		Table: "status_workflows",
+	}
+	TagsTable.Annotation = &entsql.Annotation{
+		Table: "tags",
+	}
+	TagLinksTable.Annotation = &entsql.Annotation{
+		Table: "tag_links",
 	}
 	UsersTable.Annotation = &entsql.Annotation{
 		Table: "users",

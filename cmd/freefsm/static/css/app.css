@@ -523,6 +523,31 @@ table:not(.calendar):not(.week-view):not(.day-view) tbody tr:hover {
   opacity: 0.6;
 }
 
+/* Tags */
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #fff;
+  gap: 0.25rem;
+}
+.tag-remove {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0;
+  margin-left: 0.25rem;
+  opacity: 0.7;
+}
+.tag-remove:hover {
+  opacity: 1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .sidebar {

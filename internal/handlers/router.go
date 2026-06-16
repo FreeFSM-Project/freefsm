@@ -37,15 +37,18 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	contactSvc := services.NewCustomerContactService(entClient)
 	projectSvc := services.NewProjectService(entClient)
 	locationSvc := services.NewLocationService(entClient)
+	tagSvc := services.NewTagService(entClient)
+	tagLinkSvc := services.NewTagLinkService(entClient)
 	dashboardHandler := NewDashboardHandler(services.NewDashboardService(entClient))
-	customerHandler := NewCustomerHandler(customerService, contactSvc)
+	customerHandler := NewCustomerHandler(customerService, contactSvc, tagSvc, tagLinkSvc)
 	itemHandler := NewItemHandler(itemService)
-	jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc)
-	projectHandler := NewProjectHandler(projectSvc, customerService, statusService, locationSvc, jobService)
+	jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc, tagSvc, tagLinkSvc)
+	projectHandler := NewProjectHandler(projectSvc, customerService, statusService, locationSvc, jobService, tagSvc, tagLinkSvc)
 	scheduleHandler := NewScheduleHandler(jobService, customerService, statusService)
 	invoiceService := services.NewInvoiceService(entClient)
-	estimateHandler := NewEstimateHandler(services.NewEstimateService(entClient), customerService, jobService, statusService, itemService, invoiceService)
-	invoiceHandler := NewInvoiceHandler(invoiceService, customerService, jobService, statusService, itemService)
+	estimateHandler := NewEstimateHandler(services.NewEstimateService(entClient), customerService, jobService, statusService, itemService, invoiceService, tagSvc, tagLinkSvc)
+	invoiceHandler := NewInvoiceHandler(invoiceService, customerService, jobService, statusService, itemService, tagSvc, tagLinkSvc)
+	tagHandler := NewTagHandler(tagSvc, tagLinkSvc)
 	companySettingsSvc := services.NewCompanySettingsService(entClient)
 	emailSvc := services.NewEmailService(companySettingsSvc)
 	settingsHandler := NewSettingsHandler(companySettingsSvc, emailSvc)
@@ -142,6 +145,29 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Post("/invoices/{id}/delete", invoiceHandler.Delete)
 		r.Post("/invoices/{id}/payments", invoiceHandler.RecordPayment)
 		r.Get("/invoices/{id}/pdf", invoiceHandler.PDF)
+
+		// Entity tagging
+		r.Post("/jobs/{id}/tags/{tag_id}/attach", jobHandler.AttachTag)
+		r.Post("/jobs/{id}/tags/{tag_id}/detach", jobHandler.DetachTag)
+		r.Post("/customers/{id}/tags/{tag_id}/attach", customerHandler.AttachTag)
+		r.Post("/customers/{id}/tags/{tag_id}/detach", customerHandler.DetachTag)
+		r.Post("/projects/{id}/tags/{tag_id}/attach", projectHandler.AttachTag)
+		r.Post("/projects/{id}/tags/{tag_id}/detach", projectHandler.DetachTag)
+		r.Post("/estimates/{id}/tags/{tag_id}/attach", estimateHandler.AttachTag)
+		r.Post("/estimates/{id}/tags/{tag_id}/detach", estimateHandler.DetachTag)
+		r.Post("/invoices/{id}/tags/{tag_id}/attach", invoiceHandler.AttachTag)
+		r.Post("/invoices/{id}/tags/{tag_id}/detach", invoiceHandler.DetachTag)
+
+		// Dispatcher or Admin routes
+		r.Group(func(r chi.Router) {
+			r.Use(middleware.DispatcherOrAdmin)
+			r.Get("/tags", tagHandler.List)
+			r.Get("/tags/new", tagHandler.Create)
+			r.Post("/tags", tagHandler.Create)
+			r.Get("/tags/{id}/edit", tagHandler.Update)
+			r.Post("/tags/{id}", tagHandler.Update)
+			r.Post("/tags/{id}/delete", tagHandler.Delete)
+		})
 
 		// Admin-only routes
 		r.Group(func(r chi.Router) {

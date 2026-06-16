@@ -1,0 +1,65 @@
+package templates
+
+import "fmt"
+
+templ TagsIndex(p TagListPageData) {
+	@Layout("Tags") {
+		<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+			<h2>Tags</h2>
+			<a href="/tags/new" role="button">New Tag</a>
+		</div>
+		@TagsTable(p)
+	}
+}
+
+templ TagsTable(p TagListPageData) {
+	<div id="tags-table-wrap">
+		if len(p.Tags) == 0 {
+			<p>No tags created yet.</p>
+		} else {
+			<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem">
+				for _, t := range p.Tags {
+					<div class="tag-card" style={ fmt.Sprintf("border:1px solid %s;border-radius:4px;padding:1rem", t.Color) }>
+						<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+							<span class="tag-badge" style={ badgeStyle(t.Color) }>{ t.Name }</span>
+							<div style="display:flex;gap:0.25rem">
+								<a href={ templ.URL(fmt.Sprintf("/tags/%d/edit", t.ID)) } role="button" class="outline small">Edit</a>
+								<form action={ templ.URL(fmt.Sprintf("/tags/%d/delete", t.ID)) } method="post" style="display:inline" onsubmit="return confirm('Delete this tag?')">
+									<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+									<button class="outline contrast small">Del</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		}
+	</div>
+}
+
+templ TagForm(p TagFormData) {
+	@Layout(func() string { if p.IsNew { return "New Tag" } else { return "Edit Tag" } }()) {
+		<form action={ templ.URL(func() string { if p.IsNew { return "/tags" } else { return fmt.Sprintf("/tags/%d", p.Tag.ID) } }()) } method="post" autocomplete="off">
+			<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+			<label>
+				Name
+				<input type="text" name="name" value={ p.Tag.Name } required/>
+				if p.Errors["name"] != "" {
+					<small class="error-msg">{ p.Errors["name"] }</small>
+				}
+			</label>
+			<label>
+				Color
+				<select name="color">
+					for _, c := range []string{"#3B82F6", "#EF4444", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899", "#06B6D4", "#84CC16", "#F97316", "#64748B"} {
+						<option value={ c } selected?={ p.Tag.Color == c } style={ fmt.Sprintf("background:%s;color:#fff", c) }>{ c }</option>
+					}
+				</select>
+			</label>
+			<div style="display:flex;gap:0.5rem;margin-top:1rem">
+				<button type="submit">Save</button>
+				<a href="/tags" role="button" class="outline">Cancel</a>
+			</div>
+		</form>
+	}
+}

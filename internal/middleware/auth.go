@@ -96,3 +96,14 @@ func AdminOnly(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func DispatcherOrAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		u, ok := UserFromContext(r.Context())
+		if !ok || u == nil || (u.Role != "admin" && u.Role != "dispatcher") {
+			http.Error(w, "Forbidden", 403)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}

@@ -42,5 +42,11 @@ type Status func(*sql.Selector)
 // StatusWorkflow is the predicate function for statusworkflow builders.
 type StatusWorkflow func(*sql.Selector)
 
+// Tag is the predicate function for tag builders.
+type Tag func(*sql.Selector)
+
+// TagLink is the predicate function for taglink builders.
+type TagLink func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

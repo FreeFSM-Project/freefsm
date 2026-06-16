@@ -14,15 +14,17 @@ import (
 )
 
 type InvoiceHandler struct {
-	svc       *services.InvoiceService
-	custSvc   *services.CustomerService
-	jobSvc    *services.JobService
-	statusSvc *services.StatusService
-	itemSvc   *services.ItemService
+	svc        *services.InvoiceService
+	custSvc    *services.CustomerService
+	jobSvc     *services.JobService
+	statusSvc  *services.StatusService
+	itemSvc    *services.ItemService
+	tagSvc     *services.TagService
+	tagLinkSvc *services.TagLinkService
 }
 
-func NewInvoiceHandler(svc *services.InvoiceService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService) *InvoiceHandler {
-	return &InvoiceHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc}
+func NewInvoiceHandler(svc *services.InvoiceService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService) *InvoiceHandler {
+	return &InvoiceHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc}
 }
 
 func (h *InvoiceHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +90,44 @@ func (h *InvoiceHandler) Show(w http.ResponseWriter, r *http.Request) {
 	}
 	d.LineItems = h.svc.LineItems(i)
 	d.Payments = h.svc.Payments(i)
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "invoice", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	d.Tags = tagsToRows(tags)
+	d.AllTags = tagsToRows(allTags)
 	templates.InvoiceShow(d).Render(r.Context(), w)
+}
+
+func (h *InvoiceHandler) AttachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	_, err := h.tagLinkSvc.Attach(r.Context(), tagID, "invoice", id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "invoice", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	templates.TagWidget(templates.TagWidgetData{
+		BaseURL: fmt.Sprintf("/invoices/%d", id),
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
+	}).Render(r.Context(), w)
+}
+
+func (h *InvoiceHandler) DetachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	if err := h.tagLinkSvc.Detach(r.Context(), tagID, "invoice", id); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "invoice", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	templates.TagWidget(templates.TagWidgetData{
+		BaseURL: fmt.Sprintf("/invoices/%d", id),
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
+	}).Render(r.Context(), w)
 }
 
 func (h *InvoiceHandler) Create(w http.ResponseWriter, r *http.Request) {

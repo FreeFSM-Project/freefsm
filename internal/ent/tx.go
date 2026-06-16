@@ -36,6 +36,10 @@ type Tx struct {
 	Status *StatusClient
 	// StatusWorkflow is the client for interacting with the StatusWorkflow builders.
 	StatusWorkflow *StatusWorkflowClient
+	// Tag is the client for interacting with the Tag builders.
+	Tag *TagClient
+	// TagLink is the client for interacting with the TagLink builders.
+	TagLink *TagLinkClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -181,6 +185,8 @@ func (tx *Tx) init() {
 	tx.Project = NewProjectClient(tx.config)
 	tx.Status = NewStatusClient(tx.config)
 	tx.StatusWorkflow = NewStatusWorkflowClient(tx.config)
+	tx.Tag = NewTagClient(tx.config)
+	tx.TagLink = NewTagLinkClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

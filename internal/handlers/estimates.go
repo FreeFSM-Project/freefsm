@@ -21,10 +21,12 @@ type EstimateHandler struct {
 	statusSvc  *services.StatusService
 	itemSvc    *services.ItemService
 	invoiceSvc *services.InvoiceService
+	tagSvc     *services.TagService
+	tagLinkSvc *services.TagLinkService
 }
 
-func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, invoiceSvc *services.InvoiceService) *EstimateHandler {
-	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, invoiceSvc: invoiceSvc}
+func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, invoiceSvc *services.InvoiceService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService) *EstimateHandler {
+	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, invoiceSvc: invoiceSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc}
 }
 
 func (h *EstimateHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +91,44 @@ func (h *EstimateHandler) Show(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	d.LineItems = h.svc.LineItems(e)
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "estimate", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	d.Tags = tagsToRows(tags)
+	d.AllTags = tagsToRows(allTags)
 	templates.EstimateShow(d).Render(r.Context(), w)
+}
+
+func (h *EstimateHandler) AttachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	_, err := h.tagLinkSvc.Attach(r.Context(), tagID, "estimate", id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "estimate", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	templates.TagWidget(templates.TagWidgetData{
+		BaseURL: fmt.Sprintf("/estimates/%d", id),
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
+	}).Render(r.Context(), w)
+}
+
+func (h *EstimateHandler) DetachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	if err := h.tagLinkSvc.Detach(r.Context(), tagID, "estimate", id); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "estimate", id)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	templates.TagWidget(templates.TagWidgetData{
+		BaseURL: fmt.Sprintf("/estimates/%d", id),
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
+	}).Render(r.Context(), w)
 }
 
 func (h *EstimateHandler) Create(w http.ResponseWriter, r *http.Request) {

@@ -99,6 +99,8 @@ type CustomerRow struct {
 
 type CustomerShowPageData struct {
 	Customer CustomerDetail
+	Tags     []TagRow
+	AllTags  []TagRow
 }
 
 type CustomerDetail struct {
@@ -184,6 +186,8 @@ type ProjectListPageData struct {
 type ProjectShowPageData struct {
 	Project ProjectDetail
 	Jobs    []JobRow
+	Tags    []TagRow
+	AllTags []TagRow
 }
 
 type ProjectFormPageData struct {
@@ -261,6 +265,8 @@ type JobDetail struct {
 	Visits          []services.JobVisit
 	Assignments     []services.JobAssignment
 	Subtasks        []services.JobSubtask
+	Tags            []TagRow
+	AllTags         []TagRow
 	JobType         string
 	Subtitle        string
 	StatusID        int64
@@ -341,6 +347,8 @@ type EstimateDetail struct {
 	Notes       string
 	TaxRate     string
 	LineItems   []services.LineItem
+	Tags        []TagRow
+	AllTags     []TagRow
 }
 
 type EstimateListPageData struct {
@@ -392,6 +400,8 @@ type InvoiceDetail struct {
 	TaxRate     string
 	LineItems   []services.LineItem
 	Payments    []services.Payment
+	Tags        []TagRow
+	AllTags     []TagRow
 }
 
 type InvoiceListPageData struct {
@@ -510,6 +520,15 @@ func subtaskCompletedCount(subtasks []services.JobSubtask) int {
 		}
 	}
 	return count
+}
+
+func tagInList(tagID int64, tags []TagRow) bool {
+	for _, t := range tags {
+		if t.ID == tagID {
+			return true
+		}
+	}
+	return false
 }
 
 func lineItemsTotal(items []services.LineItem) float64 {
@@ -790,4 +809,26 @@ type SchedulePageData struct {
 	IsMonth   bool
 	IsWeek    bool
 	IsDay     bool
+}
+
+type TagRow struct {
+	ID    int64
+	Name  string
+	Color string
+}
+
+type TagListPageData struct {
+	Tags []TagRow
+}
+
+type TagFormData struct {
+	Tag    TagRow
+	IsNew  bool
+	Errors map[string]string
+}
+
+type TagWidgetData struct {
+	BaseURL string
+	Tags    []TagRow
+	AllTags []TagRow
 }

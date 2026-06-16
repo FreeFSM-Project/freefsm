@@ -21,10 +21,12 @@ type JobHandler struct {
 	projectSvc *services.ProjectService
 	locSvc     *services.LocationService
 	contactSvc *services.CustomerContactService
+	tagSvc     *services.TagService
+	tagLinkSvc *services.TagLinkService
 }
 
-func NewJobHandler(svc *services.JobService, custSvc *services.CustomerService, statusSvc *services.StatusService, projectSvc *services.ProjectService, locSvc *services.LocationService, contactSvc *services.CustomerContactService) *JobHandler {
-	return &JobHandler{svc: svc, custSvc: custSvc, statusSvc: statusSvc, projectSvc: projectSvc, locSvc: locSvc, contactSvc: contactSvc}
+func NewJobHandler(svc *services.JobService, custSvc *services.CustomerService, statusSvc *services.StatusService, projectSvc *services.ProjectService, locSvc *services.LocationService, contactSvc *services.CustomerContactService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService) *JobHandler {
+	return &JobHandler{svc: svc, custSvc: custSvc, statusSvc: statusSvc, projectSvc: projectSvc, locSvc: locSvc, contactSvc: contactSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc}
 }
 
 func (h *JobHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -92,6 +94,10 @@ func (h *JobHandler) Show(w http.ResponseWriter, r *http.Request) {
 	d.Visits = services.ParseVisits(j.Visits)
 	d.Assignments = services.ParseAssignments(j.Assignments)
 	d.Subtasks = services.ParseSubtasks(j.Subtasks)
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "job", j.ID)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	d.Tags = tagsToRows(tags)
+	d.AllTags = tagsToRows(allTags)
 	projects, _ := h.projectSvc.ListAll(r.Context())
 	locations, _ := h.locSvc.ListAll(r.Context())
 	if j.CustomerID > 0 {
@@ -406,4 +412,48 @@ func statusID(j *ent.Job) int64 {
 		return 0
 	}
 	return *j.StatusID
+}
+
+func (h *JobHandler) AttachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	_, err := h.tagLinkSvc.Attach(r.Context(), tagID, "job", id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	h.loadTagWidget(w, r, id)
+}
+
+func (h *JobHandler) DetachTag(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	tagID, _ := strconv.ParseInt(chi.URLParam(r, "tag_id"), 10, 64)
+	if err := h.tagLinkSvc.Detach(r.Context(), tagID, "job", id); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	h.loadTagWidget(w, r, id)
+}
+
+func (h *JobHandler) loadTagWidget(w http.ResponseWriter, r *http.Request, jobID int64) {
+	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "job", jobID)
+	allTags, _ := h.tagSvc.ListAll(r.Context())
+	d := templates.TagWidgetData{
+		BaseURL: fmt.Sprintf("/jobs/%d", jobID),
+		Tags:    tagsToRows(tags),
+		AllTags: tagsToRows(allTags),
+	}
+	templates.TagWidget(d).Render(r.Context(), w)
+}
+
+func tagsToRows(tags []*ent.Tag) []templates.TagRow {
+	rows := make([]templates.TagRow, len(tags))
+	for i, t := range tags {
+		rows[i] = templates.TagRow{
+			ID:    t.ID,
+			Name:  t.Name,
+			Color: t.Color,
+		}
+	}
+	return rows
 }

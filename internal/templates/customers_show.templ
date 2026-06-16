@@ -13,6 +13,9 @@ templ CustomerShow(p CustomerShowPageData) {
 				</form>
 			</div>
 		</div>
+		if len(p.Tags) > 0 || true {
+			@TagWidget(TagWidgetData{BaseURL: fmt.Sprintf("/customers/%d", p.Customer.ID), Tags: p.Tags, AllTags: p.AllTags})
+		}
 		<table>
 			<tbody>
 				if p.Customer.CompanyName != "" {

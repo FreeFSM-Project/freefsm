@@ -27,6 +27,8 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent/project"
 	"github.com/MartialM1nd/freefsm/internal/ent/status"
 	"github.com/MartialM1nd/freefsm/internal/ent/statusworkflow"
+	"github.com/MartialM1nd/freefsm/internal/ent/tag"
+	"github.com/MartialM1nd/freefsm/internal/ent/taglink"
 	"github.com/MartialM1nd/freefsm/internal/ent/user"
 )
 
@@ -59,6 +61,10 @@ type Client struct {
 	Status *StatusClient
 	// StatusWorkflow is the client for interacting with the StatusWorkflow builders.
 	StatusWorkflow *StatusWorkflowClient
+	// Tag is the client for interacting with the Tag builders.
+	Tag *TagClient
+	// TagLink is the client for interacting with the TagLink builders.
+	TagLink *TagLinkClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -84,6 +90,8 @@ func (c *Client) init() {
 	c.Project = NewProjectClient(c.config)
 	c.Status = NewStatusClient(c.config)
 	c.StatusWorkflow = NewStatusWorkflowClient(c.config)
+	c.Tag = NewTagClient(c.config)
+	c.TagLink = NewTagLinkClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -189,6 +197,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Project:            NewProjectClient(cfg),
 		Status:             NewStatusClient(cfg),
 		StatusWorkflow:     NewStatusWorkflowClient(cfg),
+		Tag:                NewTagClient(cfg),
+		TagLink:            NewTagLinkClient(cfg),
 		User:               NewUserClient(cfg),
 	}, nil
 }
@@ -221,6 +231,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Project:            NewProjectClient(cfg),
 		Status:             NewStatusClient(cfg),
 		StatusWorkflow:     NewStatusWorkflowClient(cfg),
+		Tag:                NewTagClient(cfg),
+		TagLink:            NewTagLinkClient(cfg),
 		User:               NewUserClient(cfg),
 	}, nil
 }
@@ -253,7 +265,7 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.CompanySettings, c.Customer, c.CustomerContact, c.Estimate, c.Invoice, c.Item,
 		c.Job, c.Location, c.PasswordResetToken, c.Project, c.Status, c.StatusWorkflow,
-		c.User,
+		c.Tag, c.TagLink, c.User,
 	} {
 		n.Use(hooks...)
 	}
@@ -265,7 +277,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.CompanySettings, c.Customer, c.CustomerContact, c.Estimate, c.Invoice, c.Item,
 		c.Job, c.Location, c.PasswordResetToken, c.Project, c.Status, c.StatusWorkflow,
-		c.User,
+		c.Tag, c.TagLink, c.User,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -298,6 +310,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Status.mutate(ctx, m)
 	case *StatusWorkflowMutation:
 		return c.StatusWorkflow.mutate(ctx, m)
+	case *TagMutation:
+		return c.Tag.mutate(ctx, m)
+	case *TagLinkMutation:
+		return c.TagLink.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -1933,6 +1949,272 @@ func (c *StatusWorkflowClient) mutate(ctx context.Context, m *StatusWorkflowMuta
 	}
 }
 
+// TagClient is a client for the Tag schema.
+type TagClient struct {
+	config
+}
+
+// NewTagClient returns a client for the Tag from the given config.
+func NewTagClient(c config) *TagClient {
+	return &TagClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `tag.Hooks(f(g(h())))`.
+func (c *TagClient) Use(hooks ...Hook) {
+	c.hooks.Tag = append(c.hooks.Tag, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `tag.Intercept(f(g(h())))`.
+func (c *TagClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Tag = append(c.inters.Tag, interceptors...)
+}
+
+// Create returns a builder for creating a Tag entity.
+func (c *TagClient) Create() *TagCreate {
+	mutation := newTagMutation(c.config, OpCreate)
+	return &TagCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Tag entities.
+func (c *TagClient) CreateBulk(builders ...*TagCreate) *TagCreateBulk {
+	return &TagCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TagClient) MapCreateBulk(slice any, setFunc func(*TagCreate, int)) *TagCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TagCreateBulk{err: fmt.Errorf("calling to TagClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TagCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TagCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Tag.
+func (c *TagClient) Update() *TagUpdate {
+	mutation := newTagMutation(c.config, OpUpdate)
+	return &TagUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TagClient) UpdateOne(_m *Tag) *TagUpdateOne {
+	mutation := newTagMutation(c.config, OpUpdateOne, withTag(_m))
+	return &TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TagClient) UpdateOneID(id int64) *TagUpdateOne {
+	mutation := newTagMutation(c.config, OpUpdateOne, withTagID(id))
+	return &TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Tag.
+func (c *TagClient) Delete() *TagDelete {
+	mutation := newTagMutation(c.config, OpDelete)
+	return &TagDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TagClient) DeleteOne(_m *Tag) *TagDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TagClient) DeleteOneID(id int64) *TagDeleteOne {
+	builder := c.Delete().Where(tag.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TagDeleteOne{builder}
+}
+
+// Query returns a query builder for Tag.
+func (c *TagClient) Query() *TagQuery {
+	return &TagQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTag},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Tag entity by its id.
+func (c *TagClient) Get(ctx context.Context, id int64) (*Tag, error) {
+	return c.Query().Where(tag.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TagClient) GetX(ctx context.Context, id int64) *Tag {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TagClient) Hooks() []Hook {
+	return c.hooks.Tag
+}
+
+// Interceptors returns the client interceptors.
+func (c *TagClient) Interceptors() []Interceptor {
+	return c.inters.Tag
+}
+
+func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TagCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TagUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TagUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TagDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Tag mutation op: %q", m.Op())
+	}
+}
+
+// TagLinkClient is a client for the TagLink schema.
+type TagLinkClient struct {
+	config
+}
+
+// NewTagLinkClient returns a client for the TagLink from the given config.
+func NewTagLinkClient(c config) *TagLinkClient {
+	return &TagLinkClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `taglink.Hooks(f(g(h())))`.
+func (c *TagLinkClient) Use(hooks ...Hook) {
+	c.hooks.TagLink = append(c.hooks.TagLink, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `taglink.Intercept(f(g(h())))`.
+func (c *TagLinkClient) Intercept(interceptors ...Interceptor) {
+	c.inters.TagLink = append(c.inters.TagLink, interceptors...)
+}
+
+// Create returns a builder for creating a TagLink entity.
+func (c *TagLinkClient) Create() *TagLinkCreate {
+	mutation := newTagLinkMutation(c.config, OpCreate)
+	return &TagLinkCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TagLink entities.
+func (c *TagLinkClient) CreateBulk(builders ...*TagLinkCreate) *TagLinkCreateBulk {
+	return &TagLinkCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TagLinkClient) MapCreateBulk(slice any, setFunc func(*TagLinkCreate, int)) *TagLinkCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TagLinkCreateBulk{err: fmt.Errorf("calling to TagLinkClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TagLinkCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TagLinkCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TagLink.
+func (c *TagLinkClient) Update() *TagLinkUpdate {
+	mutation := newTagLinkMutation(c.config, OpUpdate)
+	return &TagLinkUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TagLinkClient) UpdateOne(_m *TagLink) *TagLinkUpdateOne {
+	mutation := newTagLinkMutation(c.config, OpUpdateOne, withTagLink(_m))
+	return &TagLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TagLinkClient) UpdateOneID(id int64) *TagLinkUpdateOne {
+	mutation := newTagLinkMutation(c.config, OpUpdateOne, withTagLinkID(id))
+	return &TagLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TagLink.
+func (c *TagLinkClient) Delete() *TagLinkDelete {
+	mutation := newTagLinkMutation(c.config, OpDelete)
+	return &TagLinkDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TagLinkClient) DeleteOne(_m *TagLink) *TagLinkDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TagLinkClient) DeleteOneID(id int64) *TagLinkDeleteOne {
+	builder := c.Delete().Where(taglink.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TagLinkDeleteOne{builder}
+}
+
+// Query returns a query builder for TagLink.
+func (c *TagLinkClient) Query() *TagLinkQuery {
+	return &TagLinkQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTagLink},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a TagLink entity by its id.
+func (c *TagLinkClient) Get(ctx context.Context, id int64) (*TagLink, error) {
+	return c.Query().Where(taglink.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TagLinkClient) GetX(ctx context.Context, id int64) *TagLink {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TagLinkClient) Hooks() []Hook {
+	return c.hooks.TagLink
+}
+
+// Interceptors returns the client interceptors.
+func (c *TagLinkClient) Interceptors() []Interceptor {
+	return c.inters.TagLink
+}
+
+func (c *TagLinkClient) mutate(ctx context.Context, m *TagLinkMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TagLinkCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TagLinkUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TagLinkUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TagLinkDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown TagLink mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -2070,11 +2352,12 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 type (
 	hooks struct {
 		CompanySettings, Customer, CustomerContact, Estimate, Invoice, Item, Job,
-		Location, PasswordResetToken, Project, Status, StatusWorkflow, User []ent.Hook
+		Location, PasswordResetToken, Project, Status, StatusWorkflow, Tag, TagLink,
+		User []ent.Hook
 	}
 	inters struct {
 		CompanySettings, Customer, CustomerContact, Estimate, Invoice, Item, Job,
-		Location, PasswordResetToken, Project, Status, StatusWorkflow,
+		Location, PasswordResetToken, Project, Status, StatusWorkflow, Tag, TagLink,
 		User []ent.Interceptor
 	}
 )

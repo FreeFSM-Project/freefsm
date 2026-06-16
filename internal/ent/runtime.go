@@ -18,6 +18,8 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent/schema"
 	"github.com/MartialM1nd/freefsm/internal/ent/status"
 	"github.com/MartialM1nd/freefsm/internal/ent/statusworkflow"
+	"github.com/MartialM1nd/freefsm/internal/ent/tag"
+	"github.com/MartialM1nd/freefsm/internal/ent/taglink"
 	"github.com/MartialM1nd/freefsm/internal/ent/user"
 )
 
@@ -511,6 +513,30 @@ func init() {
 	statusworkflowDescCreatedAt := statusworkflowFields[3].Descriptor()
 	// statusworkflow.DefaultCreatedAt holds the default value on creation for the created_at field.
 	statusworkflow.DefaultCreatedAt = statusworkflowDescCreatedAt.Default.(func() time.Time)
+	tagFields := schema.Tag{}.Fields()
+	_ = tagFields
+	// tagDescName is the schema descriptor for name field.
+	tagDescName := tagFields[1].Descriptor()
+	// tag.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	tag.NameValidator = tagDescName.Validators[0].(func(string) error)
+	// tagDescColor is the schema descriptor for color field.
+	tagDescColor := tagFields[2].Descriptor()
+	// tag.DefaultColor holds the default value on creation for the color field.
+	tag.DefaultColor = tagDescColor.Default.(string)
+	// tagDescCreatedAt is the schema descriptor for created_at field.
+	tagDescCreatedAt := tagFields[3].Descriptor()
+	// tag.DefaultCreatedAt holds the default value on creation for the created_at field.
+	tag.DefaultCreatedAt = tagDescCreatedAt.Default.(func() time.Time)
+	taglinkFields := schema.TagLink{}.Fields()
+	_ = taglinkFields
+	// taglinkDescObjectType is the schema descriptor for object_type field.
+	taglinkDescObjectType := taglinkFields[2].Descriptor()
+	// taglink.ObjectTypeValidator is a validator for the "object_type" field. It is called by the builders before save.
+	taglink.ObjectTypeValidator = taglinkDescObjectType.Validators[0].(func(string) error)
+	// taglinkDescCreatedAt is the schema descriptor for created_at field.
+	taglinkDescCreatedAt := taglinkFields[4].Descriptor()
+	// taglink.DefaultCreatedAt holds the default value on creation for the created_at field.
+	taglink.DefaultCreatedAt = taglinkDescCreatedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescEmail is the schema descriptor for email field.
