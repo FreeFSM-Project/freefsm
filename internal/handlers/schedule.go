@@ -142,6 +142,22 @@ func calendarJob(j *ent.Job, custMap map[int64]string, statuses []*ent.Status) t
 	if j.StartTime != nil && !j.StartTime.IsZero() {
 		cj.Time = j.StartTime.Format("3:04 PM")
 		cj.Day = j.StartTime.Day()
+		cj.Hour = j.StartTime.Hour()
+		
+		// Calculate duration, cap at end of day
+		if j.EndTime != nil && !j.EndTime.IsZero() {
+			duration := j.EndTime.Hour() - j.StartTime.Hour()
+			if duration < 1 {
+				duration = 1
+			}
+			maxDuration := 24 - cj.Hour
+			if duration > maxDuration {
+				duration = maxDuration
+			}
+			cj.Duration = duration
+		} else {
+			cj.Duration = 1
+		}
 	}
 	return cj
 }
