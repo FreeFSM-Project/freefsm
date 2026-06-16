@@ -81,14 +81,14 @@ func Layout(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/img/favicon.svg\"><link rel=\"stylesheet\" href=\"/static/css/pico.min.css\"><link rel=\"stylesheet\" href=\"/static/css/app.css\"><script src=\"/static/js/htmx.min.js\"></script><script>\n\t\t\t\tdocument.addEventListener('htmx:configRequest', function(evt) {\n\t\t\t\t\tvar csrf = document.querySelector('meta[name=\"csrf-token\"]');\n\t\t\t\t\tif (csrf) {\n\t\t\t\t\t\tevt.detail.headers['X-CSRF-Token'] = csrf.getAttribute('content');\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script><script src=\"/static/js/alpine.min.js\" defer></script><script>\n\t\t\t\tfunction toggleTheme() {\n\t\t\t\t\tvar html = document.documentElement;\n\t\t\t\t\tvar current = html.getAttribute('data-theme');\n\t\t\t\t\tvar next = current === 'dark' ? 'light' : 'dark';\n\t\t\t\t\thtml.setAttribute('data-theme', next);\n\t\t\t\t\tdocument.cookie = 'theme=' + next + ';path=/;max-age=31536000';\n\t\t\t\t}\n\t\t\t</script></head><body hx-boost=\"true\"><aside class=\"sidebar\" id=\"sidebar\"><button class=\"hamburger\" onclick=\"document.getElementById('sidebar').classList.toggle('open')\">&#9776;</button><div class=\"sidebar-brand\"><img src=\"/static/img/favicon.svg\" alt=\"\"> <strong>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/img/favicon.svg\"><link rel=\"stylesheet\" href=\"/static/css/pico.min.css\"><link rel=\"stylesheet\" href=\"/static/css/app.css\"><script src=\"/static/js/htmx.min.js\"></script><script>\n\t\t\t\tdocument.addEventListener('htmx:configRequest', function(evt) {\n\t\t\t\t\tvar csrf = document.querySelector('meta[name=\"csrf-token\"]');\n\t\t\t\t\tif (csrf) {\n\t\t\t\t\t\tevt.detail.headers['X-CSRF-Token'] = csrf.getAttribute('content');\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script><script src=\"/static/js/alpine.min.js\" defer></script><script>\n\t\t\t\tfunction toggleTheme() {\n\t\t\t\t\tvar html = document.documentElement;\n\t\t\t\t\tvar current = html.getAttribute('data-theme');\n\t\t\t\t\tvar next = current === 'dark' ? 'light' : 'dark';\n\t\t\t\t\thtml.setAttribute('data-theme', next);\n\t\t\t\t\tdocument.cookie = 'theme=' + next + ';path=/;max-age=31536000';\n\t\t\t\t}\n\t\t\t\tfunction closeSidebar() {\n\t\t\t\t\tdocument.getElementById('sidebar').classList.remove('open');\n\t\t\t\t}\n\t\t\t\t// Close sidebar when clicking a link inside it (mobile)\n\t\t\t\tdocument.addEventListener('click', function(e) {\n\t\t\t\t\tvar sidebar = document.getElementById('sidebar');\n\t\t\t\t\tif (sidebar && sidebar.classList.contains('open')) {\n\t\t\t\t\t\tvar link = e.target.closest('nav a, .dropdown a');\n\t\t\t\t\t\tif (link) {\n\t\t\t\t\t\t\tcloseSidebar();\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script></head><body hx-boost=\"true\"><aside class=\"sidebar\" id=\"sidebar\"><div class=\"sidebar-brand\"><img src=\"/static/img/favicon.svg\" alt=\"\"> <strong>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(companyBrandName(companyFromCtx(ctx)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 40, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 52, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -308,14 +308,14 @@ func Layout(title string, children ...templ.Component) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</aside><div class=\"main-content\"><header class=\"page-header\"><div class=\"header-left\"><span class=\"page-title\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</aside><div class=\"sidebar-overlay\" id=\"sidebar-overlay\" onclick=\"document.getElementById('sidebar').classList.remove('open')\"></div><div class=\"main-content\"><header class=\"page-header\"><div class=\"header-left\"><button class=\"hamburger\" onclick=\"document.getElementById('sidebar').classList.toggle('open')\" aria-label=\"Toggle menu\">&#9776;</button> <span class=\"page-title\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(pageTitleFromPath(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 73, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 87, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -348,7 +348,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 			var templ_7745c5c3_Var26 string
 			templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(getUser(ctx).Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 85, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 99, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 			if templ_7745c5c3_Err != nil {
@@ -361,7 +361,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 			var templ_7745c5c3_Var27 string
 			templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.ResolveAttributeValue(csrfToken(ctx))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 89, Col: 72}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 103, Col: 72}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var27)
 			if templ_7745c5c3_Err != nil {
@@ -384,7 +384,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 			var templ_7745c5c3_Var28 string
 			templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(getFlash(ctx))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 99, Col: 59}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 113, Col: 59}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 			if templ_7745c5c3_Err != nil {

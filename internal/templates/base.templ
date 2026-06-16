@@ -30,11 +30,23 @@ templ Layout(title string, children ...templ.Component) {
 					html.setAttribute('data-theme', next);
 					document.cookie = 'theme=' + next + ';path=/;max-age=31536000';
 				}
+				function closeSidebar() {
+					document.getElementById('sidebar').classList.remove('open');
+				}
+				// Close sidebar when clicking a link inside it (mobile)
+				document.addEventListener('click', function(e) {
+					var sidebar = document.getElementById('sidebar');
+					if (sidebar && sidebar.classList.contains('open')) {
+						var link = e.target.closest('nav a, .dropdown a');
+						if (link) {
+							closeSidebar();
+						}
+					}
+				});
 			</script>
 		</head>
 		<body hx-boost="true">
 			<aside class="sidebar" id="sidebar">
-				<button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">&#9776;</button>
 				<div class="sidebar-brand">
 					<img src="/static/img/favicon.svg" alt=""/>
 					<strong>{ companyBrandName(companyFromCtx(ctx)) }</strong>
@@ -67,11 +79,13 @@ templ Layout(title string, children ...templ.Component) {
 					</details>
 				}
 			</aside>
+			<div class="sidebar-overlay" id="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('open')"></div>
 			<div class="main-content">
-				<header class="page-header">
-				<div class="header-left">
-					<span class="page-title">{ pageTitleFromPath(ctx) }</span>
-				</div>
+			<header class="page-header">
+			<div class="header-left">
+				<button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Toggle menu">&#9776;</button>
+				<span class="page-title">{ pageTitleFromPath(ctx) }</span>
+			</div>
 				<div class="header-right">
 						<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
 							if themeFromCtx(ctx) == "dark" {

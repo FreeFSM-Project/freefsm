@@ -28,9 +28,9 @@ body {
   padding: 0.4rem 0.6rem;
   cursor: pointer;
   font-size: 1.2rem;
-  color: var(--pico-color);
+  color: var(--pico-primary-inverse);
   line-height: 1;
-  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 /* Page Header */
@@ -560,6 +560,10 @@ table:not(.calendar):not(.week-view):not(.day-view) tbody tr:hover {
   padding-left: 2.25rem;
 }
 
+.sidebar-overlay {
+  display: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .sidebar {
@@ -571,10 +575,23 @@ table:not(.calendar):not(.week-view):not(.day-view) tbody tr:hover {
     width: 0;
     padding: 0;
     overflow: hidden;
+    transition: width 0.2s, padding 0.2s;
   }
   .sidebar.open {
     width: 220px;
     padding: 1rem;
+  }
+  .sidebar.open + .sidebar-overlay {
+    display: block;
+  }
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 40;
   }
   .hamburger {
     display: block;
