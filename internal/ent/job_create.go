@@ -270,6 +270,20 @@ func (_c *JobCreate) SetNillableLineItems(v *string) *JobCreate {
 	return _c
 }
 
+// SetSubtasks sets the "subtasks" field.
+func (_c *JobCreate) SetSubtasks(v string) *JobCreate {
+	_c.mutation.SetSubtasks(v)
+	return _c
+}
+
+// SetNillableSubtasks sets the "subtasks" field if the given value is not nil.
+func (_c *JobCreate) SetNillableSubtasks(v *string) *JobCreate {
+	if v != nil {
+		_c.SetSubtasks(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *JobCreate) SetCreatedAt(v time.Time) *JobCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -371,6 +385,10 @@ func (_c *JobCreate) defaults() {
 		v := job.DefaultLineItems
 		_c.mutation.SetLineItems(v)
 	}
+	if _, ok := _c.mutation.Subtasks(); !ok {
+		v := job.DefaultSubtasks
+		_c.mutation.SetSubtasks(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := job.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -417,6 +435,9 @@ func (_c *JobCreate) check() error {
 	}
 	if _, ok := _c.mutation.LineItems(); !ok {
 		return &ValidationError{Name: "line_items", err: errors.New(`ent: missing required field "Job.line_items"`)}
+	}
+	if _, ok := _c.mutation.Subtasks(); !ok {
+		return &ValidationError{Name: "subtasks", err: errors.New(`ent: missing required field "Job.subtasks"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Job.created_at"`)}
@@ -531,6 +552,10 @@ func (_c *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.LineItems(); ok {
 		_spec.SetField(job.FieldLineItems, field.TypeString, value)
 		_node.LineItems = value
+	}
+	if value, ok := _c.mutation.Subtasks(); ok {
+		_spec.SetField(job.FieldSubtasks, field.TypeString, value)
+		_node.Subtasks = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(job.FieldCreatedAt, field.TypeTime, value)

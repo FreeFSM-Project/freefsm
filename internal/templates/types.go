@@ -260,6 +260,7 @@ type JobDetail struct {
 	LineItems       []services.LineItem
 	Visits          []services.JobVisit
 	Assignments     []services.JobAssignment
+	Subtasks        []services.JobSubtask
 	JobType         string
 	Subtitle        string
 	StatusID        int64
@@ -300,6 +301,7 @@ type JobFormPageData struct {
 	BillingTypes          []string
 	ExistingVisitsJSON    string
 	ExistingAssignmentsJSON string
+	ExistingSubtasksJSON    string
 }
 
 func customerFormTitle(isNew bool) string {
@@ -498,6 +500,16 @@ func lineItemTotal(li services.LineItem) float64 {
 	total -= li.Discount
 	total += li.Surcharge
 	return total
+}
+
+func subtaskCompletedCount(subtasks []services.JobSubtask) int {
+	var count int
+	for _, st := range subtasks {
+		if st.Completed {
+			count++
+		}
+	}
+	return count
 }
 
 func lineItemsTotal(items []services.LineItem) float64 {
@@ -736,6 +748,7 @@ type CalendarJob struct {
 	ID          int64
 	Day         int
 	Hour        int
+	Duration    int
 	JobType     string
 	Customer    string
 	Time        string

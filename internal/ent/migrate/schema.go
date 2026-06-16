@@ -244,6 +244,7 @@ var (
 		{Name: "assignments", Type: field.TypeString, Default: "[]"},
 		{Name: "custom_fields", Type: field.TypeString, Default: "[]"},
 		{Name: "line_items", Type: field.TypeString, Default: "[]"},
+		{Name: "subtasks", Type: field.TypeString, Default: "[]"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 	}

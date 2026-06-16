@@ -51,6 +51,8 @@ const (
 	FieldCustomFields = "custom_fields"
 	// FieldLineItems holds the string denoting the line_items field in the database.
 	FieldLineItems = "line_items"
+	// FieldSubtasks holds the string denoting the subtasks field in the database.
+	FieldSubtasks = "subtasks"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -81,6 +83,7 @@ var Columns = []string{
 	FieldAssignments,
 	FieldCustomFields,
 	FieldLineItems,
+	FieldSubtasks,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -114,6 +117,8 @@ var (
 	DefaultCustomFields string
 	// DefaultLineItems holds the default value on creation for the "line_items" field.
 	DefaultLineItems string
+	// DefaultSubtasks holds the default value on creation for the "subtasks" field.
+	DefaultSubtasks string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -223,6 +228,11 @@ func ByCustomFields(opts ...sql.OrderTermOption) OrderOption {
 // ByLineItems orders the results by the line_items field.
 func ByLineItems(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLineItems, opts...).ToFunc()
+}
+
+// BySubtasks orders the results by the subtasks field.
+func BySubtasks(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSubtasks, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

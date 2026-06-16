@@ -1,0 +1,548 @@
+html {
+  font-size: 14px;
+}
+
+/* Layout */
+body {
+  margin: 0;
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--pico-background-color);
+  border-right: 1px solid var(--pico-muted-border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow-y: auto;
+  transition: width 0.2s, padding 0.2s;
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--pico-color);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+/* Page Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.15rem 1.5rem;
+  background: var(--pico-primary);
+  color: var(--pico-primary-inverse);
+  flex-shrink: 0;
+  min-height: 24px;
+  position: relative;
+  z-index: 10;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.page-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.header-right .dropdown {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.header-right .dropdown summary {
+  list-style: none;
+  cursor: pointer;
+  color: var(--pico-primary-inverse);
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--pico-border-radius);
+  display: flex;
+  align-items: center;
+}
+
+.header-right .dropdown summary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.header-right .dropdown ul {
+  position: absolute;
+  top: 100%;
+  right: 0.5rem;
+  background: var(--pico-background-color);
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 0.5rem;
+  min-width: 180px;
+  z-index: 1000;
+  color: var(--pico-color);
+  margin-top: 0.25rem;
+  list-style: none;
+}
+
+.header-right .dropdown ul li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.header-right .dropdown ul button {
+  background: var(--pico-background-color);
+  border: 1px solid var(--pico-muted-border-color);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  color: var(--pico-color);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  border-radius: var(--pico-border-radius);
+  display: block;
+}
+
+.header-right .dropdown ul button:hover {
+  background: var(--pico-primary-hover);
+  color: var(--pico-primary-inverse);
+  border-color: var(--pico-primary-hover);
+}
+
+.header-right .dropdown ul form {
+  margin: 0;
+  padding: 0;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.15rem;
+  color: var(--pico-primary-inverse);
+  line-height: 1;
+  margin-right: 0.5rem;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.sidebar-brand img {
+  width: 24px;
+  height: 24px;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.sidebar nav a,
+.sidebar summary {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 4px 4px 0;
+  border-left: 3px solid transparent;
+  color: var(--pico-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.sidebar nav a:hover,
+.sidebar summary:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-left-color: var(--pico-primary);
+}
+
+.sidebar nav a.active {
+  background: var(--pico-primary);
+  color: var(--pico-primary-inverse);
+  border-left-color: var(--pico-primary);
+  font-weight: 500;
+  border-left: 3px solid var(--pico-primary);
+}
+
+.sidebar .dropdown summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.sidebar .dropdown summary::after {
+  content: " ▾";
+  float: right;
+  font-size: 0.7rem;
+}
+
+.sidebar .dropdown[open] summary::after {
+  content: " ▴";
+}
+
+.sidebar .dropdown ul {
+  margin: 0.25rem 0 0 0.75rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.sidebar .dropdown ul a,
+.sidebar .dropdown ul button {
+  display: block;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+  border-radius: var(--pico-border-radius);
+  color: inherit;
+  text-decoration: none;
+}
+
+.sidebar .dropdown ul button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.sidebar .dropdown ul a:hover,
+.sidebar .dropdown ul button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.sidebar .dropdown ul form {
+  margin: 0;
+}
+
+.sidebar-divider {
+  margin: 0.75rem 0;
+  border: none;
+  border-top: 1px solid var(--pico-muted-border-color);
+}
+
+.sidebar-footer {
+  display: none;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.page-body {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+/* Error & Flash */
+.error-msg {
+  background: var(--pico-del-color);
+  color: var(--pico-primary-inverse);
+  padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+  border-radius: var(--pico-border-radius);
+  margin-bottom: var(--pico-spacing);
+  font-size: 0.875rem;
+}
+
+.flash-banner {
+  background: var(--pico-ins-color);
+  color: var(--pico-primary-inverse);
+  padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+  border-radius: var(--pico-border-radius);
+  margin-bottom: var(--pico-spacing);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Calendar */
+table.calendar {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+table.calendar tr {
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+table.calendar td {
+  vertical-align: top;
+  padding: 0.25rem;
+  height: 90px;
+  border: none;
+}
+table.calendar td.empty {
+  background: var(--pico-muted-color);
+  opacity: 0.06;
+}
+table.calendar td.today {
+  background: rgba(37, 99, 235, 0.06);
+}
+table.calendar .day-num {
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-bottom: 0.25rem;
+}
+a.cal-job {
+  display: block;
+  padding: 0.2rem 0.35rem;
+  margin-bottom: 0.15rem;
+  border-radius: 3px;
+  background: var(--pico-primary);
+  color: var(--pico-primary-inverse);
+  text-decoration: none;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  opacity: 1;
+}
+a.cal-job mark {
+  margin: 0;
+  padding: 0 0.15rem;
+  font-size: 0.65rem;
+  float: right;
+}
+a.cal-job strong { display: block; }
+a.cal-job small { display: block; opacity: 0.85; }
+
+/* Compact job cards for week/day view */
+.cal-job-compact {
+  padding: 0.1rem 0.25rem;
+  margin-bottom: 0.1rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  min-height: auto;
+}
+
+.cal-job-compact .status-badge {
+  font-size: 0.6rem;
+  padding: 0.05rem 0.2rem;
+  float: right;
+}
+
+.cal-job-compact strong {
+  font-size: 0.75rem;
+}
+
+.cal-job-compact small {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+/* Schedule Grid */
+.schedule-grid {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  grid-template-rows: auto repeat(24, 1fr);
+  gap: 1px;
+  background: rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 4px;
+}
+
+.schedule-scroll-wrapper {
+  overflow: auto;
+  max-height: calc(100vh - 180px);
+  position: relative;
+}
+
+.schedule-grid.day-view {
+  grid-template-columns: 60px 1fr;
+}
+
+.schedule-grid.week-view,
+.schedule-grid.day-view {
+  grid-template-rows: auto repeat(24, minmax(50px, 1fr));
+}
+
+.grid-header {
+  background: var(--pico-muted-color);
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.grid-header-empty {
+  background: var(--pico-muted-color);
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 3;
+}
+
+.grid-header.today {
+  background: var(--pico-primary);
+  color: var(--pico-primary-inverse);
+}
+
+.grid-hour {
+  background: var(--pico-background-color);
+  padding: 0.25rem 0.5rem;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--pico-muted-color);
+  border-right: 1px solid rgba(0,0,0,0.08);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.grid-slot {
+  background: var(--pico-background-color);
+  min-height: 40px;
+}
+
+.grid-slot.today {
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.grid-job {
+  margin: 2px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0;
+}
+
+.grid-job .status-badge {
+  font-size: 0.65rem;
+  padding: 0.05rem 0.15rem;
+  align-self: flex-start;
+  margin-bottom: 2px;
+}
+
+.grid-job strong {
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.grid-job small {
+  font-size: 0.7rem;
+  opacity: 0.85;
+  line-height: 1.2;
+}
+
+/* Week/Day View Cell Heights */
+.schedule-grid.week-view .grid-slot,
+.schedule-grid.day-view .grid-slot {
+  min-height: 50px;
+}
+table.week-view th {
+  text-align: center;
+  font-size: 0.8rem;
+}
+table.week-view td.hour, table.day-view td.hour {
+  width: 60px;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--pico-muted-color);
+  padding-right: 0.5rem;
+}
+
+/* Table Polish */
+table:not(.calendar):not(.week-view):not(.day-view) tbody tr:nth-child(even) {
+  background: #f8f9fa;
+}
+table:not(.calendar):not(.week-view):not(.day-view) tbody tr:hover {
+  background: rgba(37, 99, 235, 0.08);
+}
+
+/* Dashboard Cards */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.dash-card {
+  background: var(--pico-muted-color);
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  padding: 1.25rem;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.1s;
+}
+.dash-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+.dash-card .dash-number {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.25rem 0;
+}
+.dash-card .dash-label {
+  color: var(--pico-muted-color);
+  font-size: 0.8rem;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+/* Subtasks */
+.subtask-completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    z-index: 50;
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .sidebar.open {
+    width: 220px;
+    padding: 1rem;
+  }
+  .hamburger {
+    display: block;
+  }
+  .page-body {
+    padding: 1rem;
+  }
+}

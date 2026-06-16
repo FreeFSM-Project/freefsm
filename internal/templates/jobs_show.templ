@@ -87,6 +87,9 @@ templ JobShow(p JobDetail) {
 			<h3>Tech Notes</h3>
 			<p>{ p.TechNotes }</p>
 		}
+		if len(p.Subtasks) > 0 {
+			@JobSubtasks(p)
+		}
 		if len(p.LineItems) > 0 {
 			<h3>Line Items</h3>
 			<table>

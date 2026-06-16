@@ -387,12 +387,16 @@ func init() {
 	jobDescLineItems := jobFields[19].Descriptor()
 	// job.DefaultLineItems holds the default value on creation for the line_items field.
 	job.DefaultLineItems = jobDescLineItems.Default.(string)
+	// jobDescSubtasks is the schema descriptor for subtasks field.
+	jobDescSubtasks := jobFields[20].Descriptor()
+	// job.DefaultSubtasks holds the default value on creation for the subtasks field.
+	job.DefaultSubtasks = jobDescSubtasks.Default.(string)
 	// jobDescCreatedAt is the schema descriptor for created_at field.
-	jobDescCreatedAt := jobFields[20].Descriptor()
+	jobDescCreatedAt := jobFields[21].Descriptor()
 	// job.DefaultCreatedAt holds the default value on creation for the created_at field.
 	job.DefaultCreatedAt = jobDescCreatedAt.Default.(func() time.Time)
 	// jobDescUpdatedAt is the schema descriptor for updated_at field.
-	jobDescUpdatedAt := jobFields[21].Descriptor()
+	jobDescUpdatedAt := jobFields[22].Descriptor()
 	// job.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	job.DefaultUpdatedAt = jobDescUpdatedAt.Default.(func() time.Time)
 	// job.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

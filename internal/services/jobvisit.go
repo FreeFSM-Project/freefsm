@@ -39,3 +39,22 @@ func SerializeAssignments(assignments []JobAssignment) string {
 	b, _ := json.Marshal(assignments)
 	return string(b)
 }
+
+type JobSubtask struct {
+	Title     string `json:"title"`
+	Completed bool   `json:"completed"`
+	SortOrder int    `json:"sort_order"`
+}
+
+func ParseSubtasks(s string) []JobSubtask {
+	if s == "" || s == "[]" { return nil }
+	var t []JobSubtask
+	json.Unmarshal([]byte(s), &t)
+	return t
+}
+
+func SerializeSubtasks(subtasks []JobSubtask) string {
+	if len(subtasks) == 0 { return "[]" }
+	b, _ := json.Marshal(subtasks)
+	return string(b)
+}

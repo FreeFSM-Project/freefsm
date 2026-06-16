@@ -7256,6 +7256,7 @@ type JobMutation struct {
 	assignments            *string
 	custom_fields          *string
 	line_items             *string
+	subtasks               *string
 	created_at             *time.Time
 	updated_at             *time.Time
 	clearedFields          map[string]struct{}
@@ -8273,6 +8274,42 @@ func (m *JobMutation) ResetLineItems() {
 	m.line_items = nil
 }
 
+// SetSubtasks sets the "subtasks" field.
+func (m *JobMutation) SetSubtasks(s string) {
+	m.subtasks = &s
+}
+
+// Subtasks returns the value of the "subtasks" field in the mutation.
+func (m *JobMutation) Subtasks() (r string, exists bool) {
+	v := m.subtasks
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubtasks returns the old "subtasks" field's value of the Job entity.
+// If the Job object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *JobMutation) OldSubtasks(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubtasks is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubtasks requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubtasks: %w", err)
+	}
+	return oldValue.Subtasks, nil
+}
+
+// ResetSubtasks resets all changes to the "subtasks" field.
+func (m *JobMutation) ResetSubtasks() {
+	m.subtasks = nil
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *JobMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -8379,7 +8416,7 @@ func (m *JobMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *JobMutation) Fields() []string {
-	fields := make([]string, 0, 21)
+	fields := make([]string, 0, 22)
 	if m.customer_id != nil {
 		fields = append(fields, job.FieldCustomerID)
 	}
@@ -8437,6 +8474,9 @@ func (m *JobMutation) Fields() []string {
 	if m.line_items != nil {
 		fields = append(fields, job.FieldLineItems)
 	}
+	if m.subtasks != nil {
+		fields = append(fields, job.FieldSubtasks)
+	}
 	if m.created_at != nil {
 		fields = append(fields, job.FieldCreatedAt)
 	}
@@ -8489,6 +8529,8 @@ func (m *JobMutation) Field(name string) (ent.Value, bool) {
 		return m.CustomFields()
 	case job.FieldLineItems:
 		return m.LineItems()
+	case job.FieldSubtasks:
+		return m.Subtasks()
 	case job.FieldCreatedAt:
 		return m.CreatedAt()
 	case job.FieldUpdatedAt:
@@ -8540,6 +8582,8 @@ func (m *JobMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldCustomFields(ctx)
 	case job.FieldLineItems:
 		return m.OldLineItems(ctx)
+	case job.FieldSubtasks:
+		return m.OldSubtasks(ctx)
 	case job.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case job.FieldUpdatedAt:
@@ -8685,6 +8729,13 @@ func (m *JobMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLineItems(v)
+		return nil
+	case job.FieldSubtasks:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubtasks(v)
 		return nil
 	case job.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -8925,6 +8976,9 @@ func (m *JobMutation) ResetField(name string) error {
 		return nil
 	case job.FieldLineItems:
 		m.ResetLineItems()
+		return nil
+	case job.FieldSubtasks:
+		m.ResetSubtasks()
 		return nil
 	case job.FieldCreatedAt:
 		m.ResetCreatedAt()

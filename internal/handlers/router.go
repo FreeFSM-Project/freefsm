@@ -123,6 +123,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Post("/jobs/{id}/delete", jobHandler.Delete)
 		r.Post("/jobs/{id}/create-invoice", invoiceHandler.CreateFromJob)
 		r.Post("/jobs/{id}/create-estimate", estimateHandler.CreateFromJob)
+		r.Post("/jobs/{id}/subtasks/{idx}/toggle", jobHandler.ToggleSubtask)
 		r.Get("/estimates", estimateHandler.List)
 		r.Get("/estimates/new", estimateHandler.Create)
 		r.Post("/estimates", estimateHandler.Create)

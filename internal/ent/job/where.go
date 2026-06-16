@@ -149,6 +149,11 @@ func LineItems(v string) predicate.Job {
 	return predicate.Job(sql.FieldEQ(FieldLineItems, v))
 }
 
+// Subtasks applies equality check predicate on the "subtasks" field. It's identical to SubtasksEQ.
+func Subtasks(v string) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldSubtasks, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Job {
 	return predicate.Job(sql.FieldEQ(FieldCreatedAt, v))
@@ -1232,6 +1237,71 @@ func LineItemsEqualFold(v string) predicate.Job {
 // LineItemsContainsFold applies the ContainsFold predicate on the "line_items" field.
 func LineItemsContainsFold(v string) predicate.Job {
 	return predicate.Job(sql.FieldContainsFold(FieldLineItems, v))
+}
+
+// SubtasksEQ applies the EQ predicate on the "subtasks" field.
+func SubtasksEQ(v string) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldSubtasks, v))
+}
+
+// SubtasksNEQ applies the NEQ predicate on the "subtasks" field.
+func SubtasksNEQ(v string) predicate.Job {
+	return predicate.Job(sql.FieldNEQ(FieldSubtasks, v))
+}
+
+// SubtasksIn applies the In predicate on the "subtasks" field.
+func SubtasksIn(vs ...string) predicate.Job {
+	return predicate.Job(sql.FieldIn(FieldSubtasks, vs...))
+}
+
+// SubtasksNotIn applies the NotIn predicate on the "subtasks" field.
+func SubtasksNotIn(vs ...string) predicate.Job {
+	return predicate.Job(sql.FieldNotIn(FieldSubtasks, vs...))
+}
+
+// SubtasksGT applies the GT predicate on the "subtasks" field.
+func SubtasksGT(v string) predicate.Job {
+	return predicate.Job(sql.FieldGT(FieldSubtasks, v))
+}
+
+// SubtasksGTE applies the GTE predicate on the "subtasks" field.
+func SubtasksGTE(v string) predicate.Job {
+	return predicate.Job(sql.FieldGTE(FieldSubtasks, v))
+}
+
+// SubtasksLT applies the LT predicate on the "subtasks" field.
+func SubtasksLT(v string) predicate.Job {
+	return predicate.Job(sql.FieldLT(FieldSubtasks, v))
+}
+
+// SubtasksLTE applies the LTE predicate on the "subtasks" field.
+func SubtasksLTE(v string) predicate.Job {
+	return predicate.Job(sql.FieldLTE(FieldSubtasks, v))
+}
+
+// SubtasksContains applies the Contains predicate on the "subtasks" field.
+func SubtasksContains(v string) predicate.Job {
+	return predicate.Job(sql.FieldContains(FieldSubtasks, v))
+}
+
+// SubtasksHasPrefix applies the HasPrefix predicate on the "subtasks" field.
+func SubtasksHasPrefix(v string) predicate.Job {
+	return predicate.Job(sql.FieldHasPrefix(FieldSubtasks, v))
+}
+
+// SubtasksHasSuffix applies the HasSuffix predicate on the "subtasks" field.
+func SubtasksHasSuffix(v string) predicate.Job {
+	return predicate.Job(sql.FieldHasSuffix(FieldSubtasks, v))
+}
+
+// SubtasksEqualFold applies the EqualFold predicate on the "subtasks" field.
+func SubtasksEqualFold(v string) predicate.Job {
+	return predicate.Job(sql.FieldEqualFold(FieldSubtasks, v))
+}
+
+// SubtasksContainsFold applies the ContainsFold predicate on the "subtasks" field.
+func SubtasksContainsFold(v string) predicate.Job {
+	return predicate.Job(sql.FieldContainsFold(FieldSubtasks, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
