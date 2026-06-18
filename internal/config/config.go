@@ -23,6 +23,7 @@ type Config struct {
 
 	Addr           string
 	LogLevel       string
+	LogFile        string
 	SessionSecret  string
 	SetupToken     string
 }
@@ -39,6 +40,7 @@ func Load() (*Config, error) {
 		DBSSLMode:     getEnv("FREEFSM_DB_SSLMODE", "disable"),
 		Addr:          getEnv("FREEFSM_ADDR", ":3000"),
 		LogLevel:      getEnv("FREEFSM_LOG_LEVEL", "info"),
+		LogFile:       getEnv("FREEFSM_LOG_FILE", ""),
 		SessionSecret: getEnv("FREEFSM_SESSION_SECRET", ""),
 		SetupToken:    getEnv("FREEFSM_SETUP_TOKEN", ""),
 	}

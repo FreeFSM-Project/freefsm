@@ -23,12 +23,14 @@ load_rc_config "$name"
 : ${freefsm_db_sslmode:="disable"}
 : ${freefsm_addr:=":3000"}
 : ${freefsm_log_level:="info"}
+: ${freefsm_log_file:="/var/log/freefsm/freefsm.log"}
 : ${freefsm_session_secret:=""}
 : ${freefsm_setup_token:=""}
 
 pidfile="/var/run/freefsm.pid"
-command="/usr/local/bin/freefsm"
-command_args=""
+command="/usr/sbin/daemon"
+command_args="-p ${pidfile} -u ${freefsm_user} /usr/local/bin/freefsm"
+procname="/usr/local/bin/freefsm"
 
 export FREEFSM_DB_HOST="${freefsm_db_host}"
 export FREEFSM_DB_PORT="${freefsm_db_port}"
@@ -38,6 +40,7 @@ export FREEFSM_DB_PASSWORD="${freefsm_db_password}"
 export FREEFSM_DB_SSLMODE="${freefsm_db_sslmode}"
 export FREEFSM_ADDR="${freefsm_addr}"
 export FREEFSM_LOG_LEVEL="${freefsm_log_level}"
+export FREEFSM_LOG_FILE="${freefsm_log_file}"
 export FREEFSM_SESSION_SECRET="${freefsm_session_secret}"
 export FREEFSM_SETUP_TOKEN="${freefsm_setup_token}"
 

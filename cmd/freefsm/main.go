@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 
 	"github.com/MartialM1nd/freefsm/internal/config"
@@ -43,7 +45,22 @@ func main() {
 		logLevel.Set(slog.LevelInfo)
 	}
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel}))
+	var logWriter io.Writer = os.Stdout
+	if cfg.LogFile != "" {
+		if err := os.MkdirAll(filepath.Dir(cfg.LogFile), 0755); err != nil {
+			slog.Error("create log directory", "error", err)
+			os.Exit(1)
+		}
+		f, err := os.OpenFile(cfg.LogFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			slog.Error("open log file", "error", err)
+			os.Exit(1)
+		}
+		defer f.Close()
+		logWriter = io.MultiWriter(os.Stdout, f)
+	}
+
+	logger := slog.New(slog.NewTextHandler(logWriter, &slog.HandlerOptions{Level: logLevel}))
 	slog.SetDefault(logger)
 
 	slog.Info("starting freefsm", "version", config.Version, "commit", config.Commit)
