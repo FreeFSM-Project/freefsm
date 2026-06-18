@@ -6,6 +6,12 @@ Deploy
 - PostgreSQL 16+
 - FreeFSM binary (build with `make build`)
 
+## Setup
+
+After first start, visit `/setup` on your server and enter the `SETUP_TOKEN`
+from your config to create the first admin account. After that, remove the
+token from the config and restart.
+
 ## Linux (systemd)
 
 1.  Create the `freefsm` user:

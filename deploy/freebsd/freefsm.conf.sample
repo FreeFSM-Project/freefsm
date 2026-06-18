@@ -12,3 +12,4 @@ freefsm_db_sslmode=disable
 freefsm_addr=:3000
 freefsm_log_level=info
 freefsm_session_secret=generate-a-random-secret-here
+freefsm_setup_token=set-this-then-delete-after-first-user
