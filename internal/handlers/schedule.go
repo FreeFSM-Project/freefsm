@@ -37,7 +37,7 @@ func (h *ScheduleHandler) Index(w http.ResponseWriter, r *http.Request) {
 func (h *ScheduleHandler) Month(w http.ResponseWriter, r *http.Request) {
 	loc := middleware.CompanyLocation(r.Context())
 	now := time.Now().In(loc)
-	year, month := now.Year(), now.Month()
+	year, month := parseYearMonth(r, now)
 	start, end := monthRange(year, month, loc)
 	jobs, _ := h.jobSvc.ListByDateRange(r.Context(), start, end)
 
