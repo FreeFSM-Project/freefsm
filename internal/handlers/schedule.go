@@ -93,7 +93,7 @@ func (h *ScheduleHandler) Week(w http.ResponseWriter, r *http.Request) {
 	prev := date.AddDate(0, 0, -7)
 	next := date.AddDate(0, 0, 7)
 	data := templates.SchedulePageData{
-		Title:   fmt.Sprintf("%s %d — %s %d, %d", start.Format("Jan 2"), start.Day(), end.Format("Jan 2"), end.Day(), end.Year()),
+		Title:   fmt.Sprintf("%s — %s, %d", start.Format("Jan 2"), end.Format("Jan 2"), end.Year()),
 		Days:    days,
 		PrevDate: prev.Format("2006-01-02"),
 		NextDate: next.Format("2006-01-02"),
