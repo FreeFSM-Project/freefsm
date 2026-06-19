@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
 	"io"
 	"log/slog"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/MartialM1nd/freefsm/internal/config"
 	"github.com/MartialM1nd/freefsm/internal/database"
+	"github.com/joho/godotenv"
 	"github.com/MartialM1nd/freefsm/internal/ent"
 	"github.com/MartialM1nd/freefsm/internal/handlers"
 	"github.com/MartialM1nd/freefsm/internal/middleware"
@@ -27,6 +29,16 @@ import (
 )
 
 func main() {
+	configFile := flag.String("config", "", "path to config file (optional)")
+	flag.Parse()
+
+	if *configFile != "" {
+		if err := godotenv.Load(*configFile); err != nil {
+			slog.Error("load config file", "error", err)
+			os.Exit(1)
+		}
+	}
+
 	cfg, err := config.Load()
 	if err != nil {
 		slog.Error("config", "error", err)

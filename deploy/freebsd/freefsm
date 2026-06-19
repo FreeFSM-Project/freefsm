@@ -9,39 +9,15 @@
 name="freefsm"
 rcvar="freefsm_enable"
 
-[ -f /usr/local/etc/freefsm.conf ] && . /usr/local/etc/freefsm.conf
 load_rc_config "$name"
 
 : ${freefsm_enable:="NO"}
 : ${freefsm_user:="freefsm"}
 : ${freefsm_group:="freefsm"}
-: ${freefsm_db_host:="localhost"}
-: ${freefsm_db_port:="5432"}
-: ${freefsm_db_name:="freefsm"}
-: ${freefsm_db_user:="freefsm"}
-: ${freefsm_db_password:=""}
-: ${freefsm_db_sslmode:="disable"}
-: ${freefsm_addr:=":3000"}
-: ${freefsm_log_level:="info"}
-: ${freefsm_log_file:="/var/log/freefsm/freefsm.log"}
-: ${freefsm_session_secret:=""}
-: ${freefsm_setup_token:=""}
 
-pidfile="/var/run/freefsm/freefsm.pid"
-command="/usr/sbin/daemon"
-command_args="-f -p ${pidfile} -u ${freefsm_user} /usr/local/bin/freefsm"
-procname="/usr/local/bin/freefsm"
-command_env="\
-FREEFSM_DB_HOST=${freefsm_db_host} \
-FREEFSM_DB_PORT=${freefsm_db_port} \
-FREEFSM_DB_NAME=${freefsm_db_name} \
-FREEFSM_DB_USER=${freefsm_db_user} \
-FREEFSM_DB_PASSWORD=${freefsm_db_password} \
-FREEFSM_DB_SSLMODE=${freefsm_db_sslmode} \
-FREEFSM_ADDR=${freefsm_addr} \
-FREEFSM_LOG_LEVEL=${freefsm_log_level} \
-FREEFSM_LOG_FILE=${freefsm_log_file} \
-FREEFSM_SESSION_SECRET=${freefsm_session_secret} \
-FREEFSM_SETUP_TOKEN=${freefsm_setup_token}"
+pidfile="/var/run/${name}.pid"
+command="/usr/local/bin/freefsm"
+command_args="-config /usr/local/etc/${name}.conf"
+freefsm_user="${freefsm_user}"
 
 run_rc_command "$1"
