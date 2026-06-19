@@ -16,6 +16,7 @@ load_rc_config "$name"
 : ${freefsm_group:="freefsm"}
 
 pidfile="/var/run/${name}.pid"
+rc_bg="YES"
 command="/usr/local/bin/freefsm"
 command_args="-config /usr/local/etc/${name}.conf"
 freefsm_user="${freefsm_user}"
