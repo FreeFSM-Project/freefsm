@@ -5,14 +5,24 @@ Single static Go binary, PostgreSQL backend, zero npm/NPM dependencies.
 
 ## Features
 
-- **Dashboard** — overview with quick access to all modules
-- **Customers** — full CRUD with search, status filter, HTMX pagination
-- **Jobs** — work orders with status workflow, scheduling, arrival windows
-- **Schedule Calendar** — month view with clickable job cards
-- **Estimates** — line items editor (Alpine.js), status workflow, tax calculation
-- **Invoices** — line items editor, payment recording, status workflow
+- **Dashboard** — KPI cards, calendar, quick actions, global search
+- **Customers** — full CRUD with locations, contacts, search, HTMX pagination
+- **Assets** — equipment tracking with types, statuses, service history
+- **Jobs** — work orders with status workflow, scheduling, arrival windows, subtasks
+- **Schedule** — calendar and list views with clickable job cards
+- **Projects** — nested jobs, progress tracking, customer linkage
+- **Estimates** — line items editor, tax calculation, PDF generation, convert to invoice
+- **Invoices** — line items, payment recording, PDF generation, status workflow
 - **Items / Pricebook** — service and product catalog with SKU and pricing
-- **Auth** — setup token for initial admin, bcrypt + HTTP-only session cookies
+- **Timesheets** — clock in/out, GPS coordinates, manual entry flag
+- **Tags** — color-coded labels on any object (customers, jobs, assets, etc.)
+- **Custom Fields** — user-defined fields per object type
+- **Comments** — threaded notes on any object
+- **User Management** — roles, welcome emails, password policies, force password change
+- **Company Settings** — branding, email config, timezone, document numbering, security policies
+- **Dark Mode** — persistent theme toggle
+- **Mobile Sidebar** — responsive navigation
+- **Auth** — setup token, bcrypt, HTTP-only session cookies, CSRF protection
 
 ## Tech Stack
 
@@ -68,6 +78,16 @@ make run
 3. Create an admin account (name, email, password)
 4. You're logged in and on the Dashboard
 
+### Demo Data
+
+Populate the database with sample HVAC-themed data (customers, jobs, assets, invoices, etc.) for testing:
+
+```bash
+./dist/freefsm -seed
+```
+
+This is idempotent — it skips if any customers already exist.
+
 ## Configuration
 
 | Variable | Default | Description |
@@ -92,16 +112,18 @@ freefsm/
 ├── internal/
 │   ├── config/            # Env loading + DSN builder
 │   ├── database/          # pgxpool connection + SQL migration runner
-│   │   └── migrations/    # 7 SQL migration files
+│   │   └── migrations/    # SQL migration files
 │   ├── ent/
-│   │   └── schema/        # 11 ent schema definitions
+│   │   └── schema/        # ent schema definitions
 │   ├── handlers/          # HTTP handlers (chi routes)
-│   ├── middleware/         # Auth, Flash, user context
+│   ├── middleware/         # Auth, Flash, user context, CSRF
 │   ├── services/          # Business logic (ent queries)
-│   └── templates/         # 22 Templ files (pages + partials)
+│   └── templates/         # Templ files (pages + partials)
 ├── deploy/
 │   ├── freebsd/           # rc.d service script
-│   └── linux/             # systemd unit + config sample
+│   ├── linux/             # systemd unit + config sample
+│   └── README.md          # Detailed deployment guide
+├── AGENTS.md              # Agent guidelines (this project)
 ├── Makefile               # build, install, fmt, lint, test
 ├── PLAN.md                # Full roadmap + architecture
 └── go.mod
@@ -110,12 +132,20 @@ freefsm/
 ## Development
 
 ```bash
-make build       # ent generate → templ generate → go build → dist/freefsm
-make run         # build + run
-make fmt         # go fmt ./...
-make lint        # go vet ./...
-make clean       # remove dist/
-make install     # install to /usr/local/bin
+make build            # ent generate → templ generate → go build → dist/freefsm
+make run              # build + run
+make fmt              # go fmt ./...
+make lint             # go vet ./...
+make clean            # remove dist/
+make checksum         # SHA256 of the binary
+make install-linux    # install binary + systemd unit
+make install-freebsd  # install binary + rc.d script
+```
+
+Run with a custom config file:
+
+```bash
+./dist/freefsm -config /usr/local/etc/freefsm.conf
 ```
 
 ### Adding a New Entity
@@ -130,17 +160,26 @@ make install     # install to /usr/local/bin
 
 ## Deployment
 
+See [`deploy/README.md`](deploy/README.md) for detailed platform-specific instructions including:
+- User creation and permissions
+- Binary installation
+- Config file setup
+- Nginx reverse proxy
+- Cross-platform checksum verification
+
+Quick commands:
+
 ### Linux (systemd)
 
 ```bash
-make install-linux   # installs binary + systemd unit
-systemctl start freefsm
+make install-linux
+systemctl enable --now freefsm
 ```
 
 ### FreeBSD (rc.d)
 
 ```bash
-make install-freebsd # installs binary + rc.d script
+gmake install-freebsd
 service freefsm start
 ```
 

@@ -79,6 +79,11 @@ func CustomerContactID(v int64) predicate.Job {
 	return predicate.Job(sql.FieldEQ(FieldCustomerContactID, v))
 }
 
+// AssetID applies equality check predicate on the "asset_id" field. It's identical to AssetIDEQ.
+func AssetID(v int64) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldAssetID, v))
+}
+
 // JobType applies equality check predicate on the "job_type" field. It's identical to JobTypeEQ.
 func JobType(v string) predicate.Job {
 	return predicate.Job(sql.FieldEQ(FieldJobType, v))
@@ -407,6 +412,56 @@ func CustomerContactIDIsNil() predicate.Job {
 // CustomerContactIDNotNil applies the NotNil predicate on the "customer_contact_id" field.
 func CustomerContactIDNotNil() predicate.Job {
 	return predicate.Job(sql.FieldNotNull(FieldCustomerContactID))
+}
+
+// AssetIDEQ applies the EQ predicate on the "asset_id" field.
+func AssetIDEQ(v int64) predicate.Job {
+	return predicate.Job(sql.FieldEQ(FieldAssetID, v))
+}
+
+// AssetIDNEQ applies the NEQ predicate on the "asset_id" field.
+func AssetIDNEQ(v int64) predicate.Job {
+	return predicate.Job(sql.FieldNEQ(FieldAssetID, v))
+}
+
+// AssetIDIn applies the In predicate on the "asset_id" field.
+func AssetIDIn(vs ...int64) predicate.Job {
+	return predicate.Job(sql.FieldIn(FieldAssetID, vs...))
+}
+
+// AssetIDNotIn applies the NotIn predicate on the "asset_id" field.
+func AssetIDNotIn(vs ...int64) predicate.Job {
+	return predicate.Job(sql.FieldNotIn(FieldAssetID, vs...))
+}
+
+// AssetIDGT applies the GT predicate on the "asset_id" field.
+func AssetIDGT(v int64) predicate.Job {
+	return predicate.Job(sql.FieldGT(FieldAssetID, v))
+}
+
+// AssetIDGTE applies the GTE predicate on the "asset_id" field.
+func AssetIDGTE(v int64) predicate.Job {
+	return predicate.Job(sql.FieldGTE(FieldAssetID, v))
+}
+
+// AssetIDLT applies the LT predicate on the "asset_id" field.
+func AssetIDLT(v int64) predicate.Job {
+	return predicate.Job(sql.FieldLT(FieldAssetID, v))
+}
+
+// AssetIDLTE applies the LTE predicate on the "asset_id" field.
+func AssetIDLTE(v int64) predicate.Job {
+	return predicate.Job(sql.FieldLTE(FieldAssetID, v))
+}
+
+// AssetIDIsNil applies the IsNil predicate on the "asset_id" field.
+func AssetIDIsNil() predicate.Job {
+	return predicate.Job(sql.FieldIsNull(FieldAssetID))
+}
+
+// AssetIDNotNil applies the NotNil predicate on the "asset_id" field.
+func AssetIDNotNil() predicate.Job {
+	return predicate.Job(sql.FieldNotNull(FieldAssetID))
 }
 
 // JobTypeEQ applies the EQ predicate on the "job_type" field.

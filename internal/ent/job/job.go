@@ -23,6 +23,8 @@ const (
 	FieldLocationID = "location_id"
 	// FieldCustomerContactID holds the string denoting the customer_contact_id field in the database.
 	FieldCustomerContactID = "customer_contact_id"
+	// FieldAssetID holds the string denoting the asset_id field in the database.
+	FieldAssetID = "asset_id"
 	// FieldJobType holds the string denoting the job_type field in the database.
 	FieldJobType = "job_type"
 	// FieldSubtitle holds the string denoting the subtitle field in the database.
@@ -71,6 +73,7 @@ var Columns = []string{
 	FieldProjectID,
 	FieldLocationID,
 	FieldCustomerContactID,
+	FieldAssetID,
 	FieldJobType,
 	FieldSubtitle,
 	FieldStatusID,
@@ -161,6 +164,11 @@ func ByLocationID(opts ...sql.OrderTermOption) OrderOption {
 // ByCustomerContactID orders the results by the customer_contact_id field.
 func ByCustomerContactID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCustomerContactID, opts...).ToFunc()
+}
+
+// ByAssetID orders the results by the asset_id field.
+func ByAssetID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAssetID, opts...).ToFunc()
 }
 
 // ByJobType orders the results by the job_type field.

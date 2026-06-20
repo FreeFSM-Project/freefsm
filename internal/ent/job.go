@@ -27,6 +27,8 @@ type Job struct {
 	LocationID *int64 `json:"location_id,omitempty"`
 	// CustomerContactID holds the value of the "customer_contact_id" field.
 	CustomerContactID *int64 `json:"customer_contact_id,omitempty"`
+	// AssetID holds the value of the "asset_id" field.
+	AssetID *int64 `json:"asset_id,omitempty"`
 	// JobType holds the value of the "job_type" field.
 	JobType string `json:"job_type,omitempty"`
 	// Subtitle holds the value of the "subtitle" field.
@@ -71,7 +73,7 @@ func (*Job) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case job.FieldID, job.FieldCompanyID, job.FieldCustomerID, job.FieldProjectID, job.FieldLocationID, job.FieldCustomerContactID, job.FieldStatusID:
+		case job.FieldID, job.FieldCompanyID, job.FieldCustomerID, job.FieldProjectID, job.FieldLocationID, job.FieldCustomerContactID, job.FieldAssetID, job.FieldStatusID:
 			values[i] = new(sql.NullInt64)
 		case job.FieldJobType, job.FieldSubtitle, job.FieldNotes, job.FieldTechNotes, job.FieldBillingType, job.FieldVisits, job.FieldAssignments, job.FieldCustomFields, job.FieldLineItems, job.FieldSubtasks:
 			values[i] = new(sql.NullString)
@@ -131,6 +133,13 @@ func (_m *Job) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.CustomerContactID = new(int64)
 				*_m.CustomerContactID = value.Int64
+			}
+		case job.FieldAssetID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field asset_id", values[i])
+			} else if value.Valid {
+				_m.AssetID = new(int64)
+				*_m.AssetID = value.Int64
 			}
 		case job.FieldJobType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -302,6 +311,11 @@ func (_m *Job) String() string {
 	builder.WriteString(", ")
 	if v := _m.CustomerContactID; v != nil {
 		builder.WriteString("customer_contact_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.AssetID; v != nil {
+		builder.WriteString("asset_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

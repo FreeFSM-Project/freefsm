@@ -82,6 +82,20 @@ func (_c *JobCreate) SetNillableCustomerContactID(v *int64) *JobCreate {
 	return _c
 }
 
+// SetAssetID sets the "asset_id" field.
+func (_c *JobCreate) SetAssetID(v int64) *JobCreate {
+	_c.mutation.SetAssetID(v)
+	return _c
+}
+
+// SetNillableAssetID sets the "asset_id" field if the given value is not nil.
+func (_c *JobCreate) SetNillableAssetID(v *int64) *JobCreate {
+	if v != nil {
+		_c.SetAssetID(*v)
+	}
+	return _c
+}
+
 // SetJobType sets the "job_type" field.
 func (_c *JobCreate) SetJobType(v string) *JobCreate {
 	_c.mutation.SetJobType(v)
@@ -510,6 +524,10 @@ func (_c *JobCreate) createSpec() (*Job, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.CustomerContactID(); ok {
 		_spec.SetField(job.FieldCustomerContactID, field.TypeInt64, value)
 		_node.CustomerContactID = &value
+	}
+	if value, ok := _c.mutation.AssetID(); ok {
+		_spec.SetField(job.FieldAssetID, field.TypeInt64, value)
+		_node.AssetID = &value
 	}
 	if value, ok := _c.mutation.JobType(); ok {
 		_spec.SetField(job.FieldJobType, field.TypeString, value)

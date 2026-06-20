@@ -1,0 +1,93 @@
+package templates
+
+import "fmt"
+
+templ AssetIndex(p AssetListPageData) {
+	@Layout("Assets") {
+		<div class="list-toolbar">
+			<form hx-get="/assets" hx-target="#asset-table-wrap" hx-swap="outerHTML" hx-push-url="true" hx-indicator="#search-spinner" style="display:flex;gap:0.5rem;align-items:center;flex:1">
+				<input type="search" name="search" placeholder="Search assets..."
+					value={ p.Search } style="max-width:300px"
+					hx-trigger="input changed delay:300ms"/>
+				<select name="asset_type_id" hx-trigger="change">
+					<option value="0">All Types</option>
+					for _, t := range p.AssetTypes {
+						<option value={ fmt.Sprintf("%d", t.Value) } selected?={ p.AssetTypeID == t.Value }>{ t.Label }</option>
+					}
+				</select>
+				<select name="asset_status_id" hx-trigger="change">
+					<option value="0">All Statuses</option>
+					for _, s := range p.AssetStatuses {
+						<option value={ fmt.Sprintf("%d", s.Value) } selected?={ p.AssetStatusID == s.Value }>{ s.Label }</option>
+					}
+				</select>
+				<span id="search-spinner" class="spinner htmx-indicator"></span>
+			</form>
+			<a href="/assets/new" role="button">New Asset</a>
+		</div>
+		@AssetTable(p)
+	}
+}
+
+templ AssetTable(p AssetListPageData) {
+	<div id="asset-table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Serial</th>
+					<th>Model</th>
+					<th>Type</th>
+					<th>Status</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				if len(p.Assets) == 0 {
+					<tr><td colspan="6" style="text-align:center">
+						<p>No assets found.</p>
+						<a href="/assets/new" role="button" class="outline" style="font-size:0.85rem">Create your first asset</a>
+					</td></tr>
+				}
+				for _, a := range p.Assets {
+					<tr>
+						<td>
+							<a href={ templ.URL(fmt.Sprintf("/assets/%d", a.ID)) }>
+								{ a.Name }
+							</a>
+						</td>
+						<td>{ a.SerialNumber }</td>
+						<td>{ a.Model }</td>
+						<td>
+							for _, t := range p.AssetTypes {
+								if t.Value == a.AssetTypeID {
+									{ t.Label }
+								}
+							}
+						</td>
+						<td>
+							for _, s := range p.AssetStatuses {
+								if a.AssetStatusID != nil && s.Value == *a.AssetStatusID {
+									<span class="status-badge" style={ badgeStyle(s.Label) }>{ s.Label }</span>
+								}
+							}
+						</td>
+						<td style="text-align:right">
+							<a href={ templ.URL(fmt.Sprintf("/assets/%d/edit", a.ID)) } role="button" class="outline small" aria-label={ fmt.Sprintf("Edit %s", a.Name) }>Edit</a>
+							<form action={ templ.URL(fmt.Sprintf("/assets/%d/delete", a.ID)) } method="post" style="display:inline" onsubmit="return confirm('Delete this asset?')">
+								<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+								<button class="outline contrast small" aria-label={ fmt.Sprintf("Delete %s", a.Name) }>Del</button>
+							</form>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+		@Pagination(PaginationData{
+			CurrentPage: p.Page,
+			TotalPages:  p.TotalPages,
+			BaseURL:     "/assets",
+			Target:      "#asset-table-wrap",
+		})
+	</div>
+}

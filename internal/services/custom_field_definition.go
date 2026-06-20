@@ -100,5 +100,5 @@ func (s *CustomFieldDefinitionService) Delete(ctx context.Context, id int64) err
 	return nil
 }
 
-var CustomFieldObjectTypes = []string{"customer", "job", "project", "estimate", "invoice"}
+var CustomFieldObjectTypes = []string{"customer", "job", "project", "estimate", "invoice", "asset"}
 var CustomFieldTypes = []string{"text", "number", "date", "textarea", "select", "checkbox"}

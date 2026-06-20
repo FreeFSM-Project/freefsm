@@ -1,0 +1,109 @@
+package templates
+
+import "fmt"
+
+templ AssetShow(p AssetShowPageData) {
+	@Layout(p.Asset.Name) {
+		<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+			<h2 style="margin:0">{ p.Asset.Name }</h2>
+			<div>
+				<a href={ templ.URL(fmt.Sprintf("/assets/%d/edit", p.Asset.ID)) } role="button" class="outline">Edit</a>
+				<form action={ templ.URL(fmt.Sprintf("/assets/%d/delete", p.Asset.ID)) } method="post" style="display:inline" onsubmit="return confirm('Delete this asset?')">
+					<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+					<button class="outline contrast">Delete</button>
+				</form>
+			</div>
+		</div>
+
+		<div class="grid">
+			<article>
+				<h3>Details</h3>
+				<p><strong>Type:</strong> { p.Asset.AssetTypeName }</p>
+				<p><strong>Status:</strong>
+					if p.Asset.AssetStatusName != "" {
+						<span class="status-badge" style={ badgeStyle(p.Asset.AssetStatusColor) }>{ p.Asset.AssetStatusName }</span>
+					} else {
+						<span class="status-badge">No Status</span>
+					}
+				</p>
+				<p><strong>Serial:</strong> { p.Asset.SerialNumber }</p>
+				<p><strong>Model:</strong> { p.Asset.Model }</p>
+				<p><strong>Manufacturer:</strong> { p.Asset.Manufacturer }</p>
+				if p.Asset.InstalledAt != nil {
+					<p><strong>Installed:</strong> { p.Asset.InstalledAt.Format("2006-01-02") }</p>
+				}
+				if p.Asset.WarrantyExpires != nil {
+					<p><strong>Warranty:</strong> { p.Asset.WarrantyExpires.Format("2006-01-02") }</p>
+				}
+			</article>
+			<article>
+				<h3>Notes</h3>
+				if p.Asset.Notes != "" {
+					<p>{ p.Asset.Notes }</p>
+				} else {
+					<p style="color:var(--pico-muted-color)">No notes.</p>
+				}
+			</article>
+		</div>
+
+		<h3>Service History</h3>
+		if len(p.ServiceHistory) == 0 {
+			<p style="color:var(--pico-muted-color)">No service history yet.</p>
+		} else {
+			<table>
+				<thead>
+					<tr>
+						<th>Job</th>
+						<th>Date</th>
+						<th>Status</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					for _, j := range p.ServiceHistory {
+						<tr>
+							<td>
+								<a href={ templ.URL(fmt.Sprintf("/jobs/%d", j.ID)) }>
+									{ j.JobType }
+									<small>{ j.DisplayName }</small>
+								</a>
+							</td>
+							<td>
+								if j.StartTime != "" {
+									{ j.StartTime }
+								} else {
+									<span style="color:var(--pico-muted-color)">Not scheduled</span>
+								}
+							</td>
+							<td>
+								if j.StatusName != "" {
+									<span class="status-badge" style={ badgeStyle(j.StatusColor) }>{ j.StatusName }</span>
+								} else {
+									<span class="status-badge">No Status</span>
+								}
+							</td>
+							<td style="text-align:right">
+								<a href={ templ.URL(fmt.Sprintf("/jobs/%d", j.ID)) } role="button" class="outline small">View</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+
+		<h3>Tags</h3>
+		@TagWidget(TagWidgetData{
+			BaseURL: fmt.Sprintf("/assets/%d", p.Asset.ID),
+			Tags:    p.Tags,
+			AllTags: p.AllTags,
+		})
+
+		<h3>Custom Fields</h3>
+		@CustomFieldsWidget(CustomFieldsWidgetData{
+			Fields:   p.CustomFields,
+			EditMode: false,
+		})
+
+		<div hx-get={ fmt.Sprintf("/assets/%d/comments", p.Asset.ID) } hx-trigger="load"></div>
+	}
+}

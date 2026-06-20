@@ -157,6 +157,33 @@ func (_u *JobUpdate) ClearCustomerContactID() *JobUpdate {
 	return _u
 }
 
+// SetAssetID sets the "asset_id" field.
+func (_u *JobUpdate) SetAssetID(v int64) *JobUpdate {
+	_u.mutation.ResetAssetID()
+	_u.mutation.SetAssetID(v)
+	return _u
+}
+
+// SetNillableAssetID sets the "asset_id" field if the given value is not nil.
+func (_u *JobUpdate) SetNillableAssetID(v *int64) *JobUpdate {
+	if v != nil {
+		_u.SetAssetID(*v)
+	}
+	return _u
+}
+
+// AddAssetID adds value to the "asset_id" field.
+func (_u *JobUpdate) AddAssetID(v int64) *JobUpdate {
+	_u.mutation.AddAssetID(v)
+	return _u
+}
+
+// ClearAssetID clears the value of the "asset_id" field.
+func (_u *JobUpdate) ClearAssetID() *JobUpdate {
+	_u.mutation.ClearAssetID()
+	return _u
+}
+
 // SetJobType sets the "job_type" field.
 func (_u *JobUpdate) SetJobType(v string) *JobUpdate {
 	_u.mutation.SetJobType(v)
@@ -535,6 +562,15 @@ func (_u *JobUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.CustomerContactIDCleared() {
 		_spec.ClearField(job.FieldCustomerContactID, field.TypeInt64)
 	}
+	if value, ok := _u.mutation.AssetID(); ok {
+		_spec.SetField(job.FieldAssetID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedAssetID(); ok {
+		_spec.AddField(job.FieldAssetID, field.TypeInt64, value)
+	}
+	if _u.mutation.AssetIDCleared() {
+		_spec.ClearField(job.FieldAssetID, field.TypeInt64)
+	}
 	if value, ok := _u.mutation.JobType(); ok {
 		_spec.SetField(job.FieldJobType, field.TypeString, value)
 	}
@@ -753,6 +789,33 @@ func (_u *JobUpdateOne) AddCustomerContactID(v int64) *JobUpdateOne {
 // ClearCustomerContactID clears the value of the "customer_contact_id" field.
 func (_u *JobUpdateOne) ClearCustomerContactID() *JobUpdateOne {
 	_u.mutation.ClearCustomerContactID()
+	return _u
+}
+
+// SetAssetID sets the "asset_id" field.
+func (_u *JobUpdateOne) SetAssetID(v int64) *JobUpdateOne {
+	_u.mutation.ResetAssetID()
+	_u.mutation.SetAssetID(v)
+	return _u
+}
+
+// SetNillableAssetID sets the "asset_id" field if the given value is not nil.
+func (_u *JobUpdateOne) SetNillableAssetID(v *int64) *JobUpdateOne {
+	if v != nil {
+		_u.SetAssetID(*v)
+	}
+	return _u
+}
+
+// AddAssetID adds value to the "asset_id" field.
+func (_u *JobUpdateOne) AddAssetID(v int64) *JobUpdateOne {
+	_u.mutation.AddAssetID(v)
+	return _u
+}
+
+// ClearAssetID clears the value of the "asset_id" field.
+func (_u *JobUpdateOne) ClearAssetID() *JobUpdateOne {
+	_u.mutation.ClearAssetID()
 	return _u
 }
 
@@ -1163,6 +1226,15 @@ func (_u *JobUpdateOne) sqlSave(ctx context.Context) (_node *Job, err error) {
 	}
 	if _u.mutation.CustomerContactIDCleared() {
 		_spec.ClearField(job.FieldCustomerContactID, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.AssetID(); ok {
+		_spec.SetField(job.FieldAssetID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedAssetID(); ok {
+		_spec.AddField(job.FieldAssetID, field.TypeInt64, value)
+	}
+	if _u.mutation.AssetIDCleared() {
+		_spec.ClearField(job.FieldAssetID, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.JobType(); ok {
 		_spec.SetField(job.FieldJobType, field.TypeString, value)

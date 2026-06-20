@@ -5,6 +5,9 @@ package ent
 import (
 	"time"
 
+	"github.com/MartialM1nd/freefsm/internal/ent/asset"
+	"github.com/MartialM1nd/freefsm/internal/ent/assetstatus"
+	"github.com/MartialM1nd/freefsm/internal/ent/assettype"
 	"github.com/MartialM1nd/freefsm/internal/ent/comment"
 	"github.com/MartialM1nd/freefsm/internal/ent/companysettings"
 	"github.com/MartialM1nd/freefsm/internal/ent/customer"
@@ -30,6 +33,74 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	assetFields := schema.Asset{}.Fields()
+	_ = assetFields
+	// assetDescName is the schema descriptor for name field.
+	assetDescName := assetFields[6].Descriptor()
+	// asset.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	asset.NameValidator = assetDescName.Validators[0].(func(string) error)
+	// assetDescSerialNumber is the schema descriptor for serial_number field.
+	assetDescSerialNumber := assetFields[7].Descriptor()
+	// asset.DefaultSerialNumber holds the default value on creation for the serial_number field.
+	asset.DefaultSerialNumber = assetDescSerialNumber.Default.(string)
+	// assetDescModel is the schema descriptor for model field.
+	assetDescModel := assetFields[8].Descriptor()
+	// asset.DefaultModel holds the default value on creation for the model field.
+	asset.DefaultModel = assetDescModel.Default.(string)
+	// assetDescManufacturer is the schema descriptor for manufacturer field.
+	assetDescManufacturer := assetFields[9].Descriptor()
+	// asset.DefaultManufacturer holds the default value on creation for the manufacturer field.
+	asset.DefaultManufacturer = assetDescManufacturer.Default.(string)
+	// assetDescNotes is the schema descriptor for notes field.
+	assetDescNotes := assetFields[10].Descriptor()
+	// asset.DefaultNotes holds the default value on creation for the notes field.
+	asset.DefaultNotes = assetDescNotes.Default.(string)
+	// assetDescCustomFields is the schema descriptor for custom_fields field.
+	assetDescCustomFields := assetFields[13].Descriptor()
+	// asset.DefaultCustomFields holds the default value on creation for the custom_fields field.
+	asset.DefaultCustomFields = assetDescCustomFields.Default.(string)
+	// assetDescCreatedAt is the schema descriptor for created_at field.
+	assetDescCreatedAt := assetFields[14].Descriptor()
+	// asset.DefaultCreatedAt holds the default value on creation for the created_at field.
+	asset.DefaultCreatedAt = assetDescCreatedAt.Default.(func() time.Time)
+	// assetDescUpdatedAt is the schema descriptor for updated_at field.
+	assetDescUpdatedAt := assetFields[15].Descriptor()
+	// asset.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	asset.DefaultUpdatedAt = assetDescUpdatedAt.Default.(func() time.Time)
+	// asset.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	asset.UpdateDefaultUpdatedAt = assetDescUpdatedAt.UpdateDefault.(func() time.Time)
+	assetstatusFields := schema.AssetStatus{}.Fields()
+	_ = assetstatusFields
+	// assetstatusDescName is the schema descriptor for name field.
+	assetstatusDescName := assetstatusFields[2].Descriptor()
+	// assetstatus.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	assetstatus.NameValidator = assetstatusDescName.Validators[0].(func(string) error)
+	// assetstatusDescColor is the schema descriptor for color field.
+	assetstatusDescColor := assetstatusFields[3].Descriptor()
+	// assetstatus.DefaultColor holds the default value on creation for the color field.
+	assetstatus.DefaultColor = assetstatusDescColor.Default.(string)
+	// assetstatusDescSortOrder is the schema descriptor for sort_order field.
+	assetstatusDescSortOrder := assetstatusFields[4].Descriptor()
+	// assetstatus.DefaultSortOrder holds the default value on creation for the sort_order field.
+	assetstatus.DefaultSortOrder = assetstatusDescSortOrder.Default.(int)
+	// assetstatusDescCreatedAt is the schema descriptor for created_at field.
+	assetstatusDescCreatedAt := assetstatusFields[5].Descriptor()
+	// assetstatus.DefaultCreatedAt holds the default value on creation for the created_at field.
+	assetstatus.DefaultCreatedAt = assetstatusDescCreatedAt.Default.(func() time.Time)
+	assettypeFields := schema.AssetType{}.Fields()
+	_ = assettypeFields
+	// assettypeDescName is the schema descriptor for name field.
+	assettypeDescName := assettypeFields[2].Descriptor()
+	// assettype.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	assettype.NameValidator = assettypeDescName.Validators[0].(func(string) error)
+	// assettypeDescSortOrder is the schema descriptor for sort_order field.
+	assettypeDescSortOrder := assettypeFields[3].Descriptor()
+	// assettype.DefaultSortOrder holds the default value on creation for the sort_order field.
+	assettype.DefaultSortOrder = assettypeDescSortOrder.Default.(int)
+	// assettypeDescCreatedAt is the schema descriptor for created_at field.
+	assettypeDescCreatedAt := assettypeFields[4].Descriptor()
+	// assettype.DefaultCreatedAt holds the default value on creation for the created_at field.
+	assettype.DefaultCreatedAt = assettypeDescCreatedAt.Default.(func() time.Time)
 	commentFields := schema.Comment{}.Fields()
 	_ = commentFields
 	// commentDescObjectType is the schema descriptor for object_type field.
@@ -445,51 +516,51 @@ func init() {
 	jobFields := schema.Job{}.Fields()
 	_ = jobFields
 	// jobDescJobType is the schema descriptor for job_type field.
-	jobDescJobType := jobFields[6].Descriptor()
+	jobDescJobType := jobFields[7].Descriptor()
 	// job.JobTypeValidator is a validator for the "job_type" field. It is called by the builders before save.
 	job.JobTypeValidator = jobDescJobType.Validators[0].(func(string) error)
 	// jobDescSubtitle is the schema descriptor for subtitle field.
-	jobDescSubtitle := jobFields[7].Descriptor()
+	jobDescSubtitle := jobFields[8].Descriptor()
 	// job.DefaultSubtitle holds the default value on creation for the subtitle field.
 	job.DefaultSubtitle = jobDescSubtitle.Default.(string)
 	// jobDescNotes is the schema descriptor for notes field.
-	jobDescNotes := jobFields[14].Descriptor()
+	jobDescNotes := jobFields[15].Descriptor()
 	// job.DefaultNotes holds the default value on creation for the notes field.
 	job.DefaultNotes = jobDescNotes.Default.(string)
 	// jobDescTechNotes is the schema descriptor for tech_notes field.
-	jobDescTechNotes := jobFields[15].Descriptor()
+	jobDescTechNotes := jobFields[16].Descriptor()
 	// job.DefaultTechNotes holds the default value on creation for the tech_notes field.
 	job.DefaultTechNotes = jobDescTechNotes.Default.(string)
 	// jobDescBillingType is the schema descriptor for billing_type field.
-	jobDescBillingType := jobFields[16].Descriptor()
+	jobDescBillingType := jobFields[17].Descriptor()
 	// job.DefaultBillingType holds the default value on creation for the billing_type field.
 	job.DefaultBillingType = jobDescBillingType.Default.(string)
 	// jobDescVisits is the schema descriptor for visits field.
-	jobDescVisits := jobFields[17].Descriptor()
+	jobDescVisits := jobFields[18].Descriptor()
 	// job.DefaultVisits holds the default value on creation for the visits field.
 	job.DefaultVisits = jobDescVisits.Default.(string)
 	// jobDescAssignments is the schema descriptor for assignments field.
-	jobDescAssignments := jobFields[18].Descriptor()
+	jobDescAssignments := jobFields[19].Descriptor()
 	// job.DefaultAssignments holds the default value on creation for the assignments field.
 	job.DefaultAssignments = jobDescAssignments.Default.(string)
 	// jobDescCustomFields is the schema descriptor for custom_fields field.
-	jobDescCustomFields := jobFields[19].Descriptor()
+	jobDescCustomFields := jobFields[20].Descriptor()
 	// job.DefaultCustomFields holds the default value on creation for the custom_fields field.
 	job.DefaultCustomFields = jobDescCustomFields.Default.(string)
 	// jobDescLineItems is the schema descriptor for line_items field.
-	jobDescLineItems := jobFields[20].Descriptor()
+	jobDescLineItems := jobFields[21].Descriptor()
 	// job.DefaultLineItems holds the default value on creation for the line_items field.
 	job.DefaultLineItems = jobDescLineItems.Default.(string)
 	// jobDescSubtasks is the schema descriptor for subtasks field.
-	jobDescSubtasks := jobFields[21].Descriptor()
+	jobDescSubtasks := jobFields[22].Descriptor()
 	// job.DefaultSubtasks holds the default value on creation for the subtasks field.
 	job.DefaultSubtasks = jobDescSubtasks.Default.(string)
 	// jobDescCreatedAt is the schema descriptor for created_at field.
-	jobDescCreatedAt := jobFields[22].Descriptor()
+	jobDescCreatedAt := jobFields[23].Descriptor()
 	// job.DefaultCreatedAt holds the default value on creation for the created_at field.
 	job.DefaultCreatedAt = jobDescCreatedAt.Default.(func() time.Time)
 	// jobDescUpdatedAt is the schema descriptor for updated_at field.
-	jobDescUpdatedAt := jobFields[23].Descriptor()
+	jobDescUpdatedAt := jobFields[24].Descriptor()
 	// job.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	job.DefaultUpdatedAt = jobDescUpdatedAt.Default.(func() time.Time)
 	// job.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

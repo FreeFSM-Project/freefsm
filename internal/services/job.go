@@ -23,6 +23,7 @@ type JobCreateParams struct {
 	ProjectID         int64
 	LocationID        int64
 	CustomerContactID int64
+	AssetID           int64
 	JobType           string
 	Subtitle          string
 	StatusID          int64
@@ -46,6 +47,7 @@ type JobUpdateParams struct {
 	ProjectID         *int64
 	LocationID        *int64
 	CustomerContactID *int64
+	AssetID           *int64
 	JobType           *string
 	Subtitle          *string
 	StatusID          *int64
@@ -152,6 +154,9 @@ func (s *JobService) Create(ctx context.Context, params JobCreateParams) (*ent.J
 	if params.CustomerContactID > 0 {
 		b.SetCustomerContactID(params.CustomerContactID)
 	}
+	if params.AssetID > 0 {
+		b.SetAssetID(params.AssetID)
+	}
 	if !params.StartTime.IsZero() {
 		b.SetStartTime(params.StartTime)
 	}
@@ -210,6 +215,9 @@ func (s *JobService) Update(ctx context.Context, id int64, params JobUpdateParam
 	}
 	if params.CustomerContactID != nil {
 		u.SetCustomerContactID(*params.CustomerContactID)
+	}
+	if params.AssetID != nil {
+		u.SetAssetID(*params.AssetID)
 	}
 	if params.ArrivalStart != nil {
 		u.SetArrivalWindowStart(*params.ArrivalStart)

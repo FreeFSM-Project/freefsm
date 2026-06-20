@@ -9,6 +9,101 @@ import (
 )
 
 var (
+	// AssetsColumns holds the columns for the "assets" table.
+	AssetsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "company_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "customer_id", Type: field.TypeInt64},
+		{Name: "location_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "asset_type_id", Type: field.TypeInt64},
+		{Name: "asset_status_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "serial_number", Type: field.TypeString, Default: ""},
+		{Name: "model", Type: field.TypeString, Default: ""},
+		{Name: "manufacturer", Type: field.TypeString, Default: ""},
+		{Name: "notes", Type: field.TypeString, Default: ""},
+		{Name: "installed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "warranty_expires", Type: field.TypeTime, Nullable: true},
+		{Name: "custom_fields", Type: field.TypeString, Default: "[]"},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+	}
+	// AssetsTable holds the schema information for the "assets" table.
+	AssetsTable = &schema.Table{
+		Name:       "assets",
+		Columns:    AssetsColumns,
+		PrimaryKey: []*schema.Column{AssetsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "asset_customer_id",
+				Unique:  false,
+				Columns: []*schema.Column{AssetsColumns[2]},
+			},
+			{
+				Name:    "asset_location_id",
+				Unique:  false,
+				Columns: []*schema.Column{AssetsColumns[3]},
+			},
+			{
+				Name:    "asset_asset_type_id",
+				Unique:  false,
+				Columns: []*schema.Column{AssetsColumns[4]},
+			},
+			{
+				Name:    "asset_asset_status_id",
+				Unique:  false,
+				Columns: []*schema.Column{AssetsColumns[5]},
+			},
+			{
+				Name:    "asset_company_id",
+				Unique:  false,
+				Columns: []*schema.Column{AssetsColumns[1]},
+			},
+		},
+	}
+	// AssetStatusesColumns holds the columns for the "asset_statuses" table.
+	AssetStatusesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "company_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "color", Type: field.TypeString, Default: "#6B7280"},
+		{Name: "sort_order", Type: field.TypeInt, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// AssetStatusesTable holds the schema information for the "asset_statuses" table.
+	AssetStatusesTable = &schema.Table{
+		Name:       "asset_statuses",
+		Columns:    AssetStatusesColumns,
+		PrimaryKey: []*schema.Column{AssetStatusesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "assetstatus_company_id",
+				Unique:  false,
+				Columns: []*schema.Column{AssetStatusesColumns[1]},
+			},
+		},
+	}
+	// AssetTypesColumns holds the columns for the "asset_types" table.
+	AssetTypesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "company_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "sort_order", Type: field.TypeInt, Default: 0},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// AssetTypesTable holds the schema information for the "asset_types" table.
+	AssetTypesTable = &schema.Table{
+		Name:       "asset_types",
+		Columns:    AssetTypesColumns,
+		PrimaryKey: []*schema.Column{AssetTypesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "assettype_company_id",
+				Unique:  false,
+				Columns: []*schema.Column{AssetTypesColumns[1]},
+			},
+		},
+	}
 	// CommentsColumns holds the columns for the "comments" table.
 	CommentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -294,6 +389,7 @@ var (
 		{Name: "project_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "location_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "customer_contact_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "asset_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "job_type", Type: field.TypeString},
 		{Name: "subtitle", Type: field.TypeString, Default: ""},
 		{Name: "status_id", Type: field.TypeInt64, Nullable: true},
@@ -330,14 +426,19 @@ var (
 				Columns: []*schema.Column{JobsColumns[3]},
 			},
 			{
+				Name:    "job_asset_id",
+				Unique:  false,
+				Columns: []*schema.Column{JobsColumns[6]},
+			},
+			{
 				Name:    "job_status_id",
 				Unique:  false,
-				Columns: []*schema.Column{JobsColumns[8]},
+				Columns: []*schema.Column{JobsColumns[9]},
 			},
 			{
 				Name:    "job_start_time",
 				Unique:  false,
-				Columns: []*schema.Column{JobsColumns[9]},
+				Columns: []*schema.Column{JobsColumns[10]},
 			},
 		},
 	}
@@ -568,6 +669,9 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AssetsTable,
+		AssetStatusesTable,
+		AssetTypesTable,
 		CommentsTable,
 		CompanySettingsTable,
 		CustomFieldDefinitionsTable,
@@ -590,6 +694,15 @@ var (
 )
 
 func init() {
+	AssetsTable.Annotation = &entsql.Annotation{
+		Table: "assets",
+	}
+	AssetStatusesTable.Annotation = &entsql.Annotation{
+		Table: "asset_statuses",
+	}
+	AssetTypesTable.Annotation = &entsql.Annotation{
+		Table: "asset_types",
+	}
 	CommentsTable.Annotation = &entsql.Annotation{
 		Table: "comments",
 	}

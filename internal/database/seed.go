@@ -56,6 +56,50 @@ func Seed(ctx context.Context, client *ent.Client) error {
 		customers[i] = c
 	}
 
+	// --- Assets (8) ---
+	assets := make([]*ent.Asset, 8)
+	assetData := []struct {
+		Name          string
+		SerialNumber  string
+		Model         string
+		Manufacturer  string
+		AssetTypeID   int64
+		AssetStatusID int64
+		CustIdx       int
+		Notes         string
+		InstalledYr   int
+		WarrantyYr    int
+	}{
+		{"Rooftop Unit RTU-1", "SN-ACME-001", "Trane Voyager 12.5T", "Trane", 1, 1, 0, "Primary rooftop unit for Building A", 2019, 2029},
+		{"Rooftop Unit RTU-2", "SN-ACME-002", "Trane Voyager 12.5T", "Trane", 1, 1, 0, "Secondary rooftop unit for Building B", 2019, 2029},
+		{"Backup Generator G1", "SN-METRO-001", "Cummins C150D6", "Cummins", 2, 1, 1, "Emergency backup generator for mall common areas", 2021, 2031},
+		{"Chiller Unit CH-01", "SN-TOWER-001", "Carrier 30XA 200T", "Carrier", 1, 3, 2, "Primary chiller showing bearing wear — scheduled rebuild", 2018, 2028},
+		{"Walk-in Cooler W1", "SN-HOSP-001", "Norlake KLB7788-C", "Norlake", 4, 1, 3, "Pharmacy walk-in cooler, temp verified weekly", 2020, 2030},
+		{"Hot Water Heater H1", "SN-HOSP-002", "A.O. Smith BTX-100", "A.O. Smith", 3, 1, 3, "Domestic hot water for east wing", 2022, 2032},
+		{"Server Room CRAC", "SN-TECH-001", "Liebert CRV 040", "Liebert", 1, 1, 4, "In-row cooling for server rack cluster", 2023, 2033},
+		{"Portable Heater P1", "SN-TECH-002", "Modine HSB 47", "Modine", 5, 4, 4, "Retired portable unit, kept for parts", 2015, 2020},
+	}
+	for i, d := range assetData {
+		installed := time.Date(d.InstalledYr, 1, 15, 0, 0, 0, 0, time.UTC)
+		warranty := time.Date(d.WarrantyYr, 1, 15, 0, 0, 0, 0, time.UTC)
+		a, err := client.Asset.Create().
+			SetName(d.Name).
+			SetSerialNumber(d.SerialNumber).
+			SetModel(d.Model).
+			SetManufacturer(d.Manufacturer).
+			SetAssetTypeID(d.AssetTypeID).
+			SetAssetStatusID(d.AssetStatusID).
+			SetCustomerID(customers[d.CustIdx].ID).
+			SetNotes(d.Notes).
+			SetInstalledAt(installed).
+			SetWarrantyExpires(warranty).
+			Save(ctx)
+		if err != nil {
+			return fmt.Errorf("create asset %d: %w", i, err)
+		}
+		assets[i] = a
+	}
+
 	// --- Items (5) ---
 	items := make([]*ent.Item, 5)
 	itemData := []struct {
@@ -141,20 +185,21 @@ func Seed(ctx context.Context, client *ent.Client) error {
 		Subtitle   string
 		CustIdx    int
 		ProjIdx    int
+		AssetIdx   int
 		StatusID   int64
 		StartOff   time.Duration
 		EndOff     time.Duration
 		Notes      string
 		TechNotes  string
 	}{
-		{"AC Repair", "Building 2 Unit B3", 0, 0, 1, -24 * time.Hour, -2 * time.Hour, "Unit not cooling, low refrigerant suspected", "Found leak at evaporator coil, recharged system"},
-		{"Chiller Maintenance", "Primary chiller Q2 service", 4, 4, 4, -72 * time.Hour, -48 * time.Hour, "Scheduled quarterly maintenance", "Replaced worn bearings, checked compressor amp draw"},
-		{"Thermostat Install", "Admin wing smart thermostats", 1, 0, 2, -168 * time.Hour, -144 * time.Hour, "Install 24 smart thermostats with centralized control", "All units online, programming complete"},
-		{"Duct Cleaning", "Main distribution ducts", 2, 2, 3, -96 * time.Hour, -80 * time.Hour, "Annual duct cleaning per maintenance contract", "Removed 18 lbs of debris, sanitized all runs"},
-		{"Compressor Replacement", "Unit C7 rooftop", 3, 3, 4, -48 * time.Hour, -24 * time.Hour, "Compressor seized, emergency replacement", "New unit online, pressures nominal, customer approved"},
+		{"AC Repair", "Building 2 Unit B3", 0, 0, 0, 1, -24 * time.Hour, -2 * time.Hour, "Unit not cooling, low refrigerant suspected", "Found leak at evaporator coil, recharged system"},
+		{"Chiller Maintenance", "Primary chiller Q2 service", 4, 4, 3, 4, -72 * time.Hour, -48 * time.Hour, "Scheduled quarterly maintenance", "Replaced worn bearings, checked compressor amp draw"},
+		{"Thermostat Install", "Admin wing smart thermostats", 1, 0, -1, 2, -168 * time.Hour, -144 * time.Hour, "Install 24 smart thermostats with centralized control", "All units online, programming complete"},
+		{"Duct Cleaning", "Main distribution ducts", 2, 2, -1, 3, -96 * time.Hour, -80 * time.Hour, "Annual duct cleaning per maintenance contract", "Removed 18 lbs of debris, sanitized all runs"},
+		{"Compressor Replacement", "Unit C7 rooftop", 3, 3, -1, 4, -48 * time.Hour, -24 * time.Hour, "Compressor seized, emergency replacement", "New unit online, pressures nominal, customer approved"},
 	}
 	for i, d := range jobData {
-		j, err := client.Job.Create().
+		b := client.Job.Create().
 			SetJobType(d.JobType).
 			SetSubtitle(d.Subtitle).
 			SetCustomerID(customers[d.CustIdx].ID).
@@ -164,8 +209,11 @@ func Seed(ctx context.Context, client *ent.Client) error {
 			SetEndTime(now.Add(d.EndOff)).
 			SetNotes(d.Notes).
 			SetTechNotes(d.TechNotes).
-			SetBillingType("flat_rate").
-			Save(ctx)
+			SetBillingType("flat_rate")
+		if d.AssetIdx >= 0 {
+			b.SetAssetID(assets[d.AssetIdx].ID)
+		}
+		j, err := b.Save(ctx)
 		if err != nil {
 			return fmt.Errorf("create job %d: %w", i, err)
 		}

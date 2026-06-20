@@ -28,6 +28,7 @@ func (Job) Fields() []ent.Field {
 		field.Int64("project_id").Optional().Nillable(),
 		field.Int64("location_id").Optional().Nillable(),
 		field.Int64("customer_contact_id").Optional().Nillable(),
+		field.Int64("asset_id").Optional().Nillable(),
 		field.String("job_type").NotEmpty(),
 		field.String("subtitle").Default(""),
 		field.Int64("status_id").Optional().Nillable(),
@@ -53,6 +54,7 @@ func (Job) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("customer_id"),
 		index.Fields("project_id"),
+		index.Fields("asset_id"),
 		index.Fields("status_id"),
 		index.Fields("start_time"),
 	}

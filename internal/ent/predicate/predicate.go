@@ -6,6 +6,15 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Asset is the predicate function for asset builders.
+type Asset func(*sql.Selector)
+
+// AssetStatus is the predicate function for assetstatus builders.
+type AssetStatus func(*sql.Selector)
+
+// AssetType is the predicate function for assettype builders.
+type AssetType func(*sql.Selector)
+
 // Comment is the predicate function for comment builders.
 type Comment func(*sql.Selector)
 

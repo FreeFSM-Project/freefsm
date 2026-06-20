@@ -47,7 +47,12 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	dashboardHandler := NewDashboardHandler(services.NewDashboardService(entClient), timeEntrySvc)
 	customerHandler := NewCustomerHandler(customerService, contactSvc, tagSvc, tagLinkSvc, defSvc)
 	itemHandler := NewItemHandler(itemService)
-	jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc, tagSvc, tagLinkSvc, defSvc)
+	// Asset services
+	assetTypeSvc := services.NewAssetTypeService(entClient)
+	assetStatusSvc := services.NewAssetStatusService(entClient)
+	assetSvc := services.NewAssetService(entClient)
+
+	jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc, tagSvc, tagLinkSvc, defSvc, assetSvc)
 	projectHandler := NewProjectHandler(projectSvc, customerService, statusService, locationSvc, jobService, tagSvc, tagLinkSvc, defSvc)
 	scheduleHandler := NewScheduleHandler(jobService, customerService, statusService)
 	invoiceService := services.NewInvoiceService(entClient)
@@ -61,6 +66,11 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	timeEntryHandler := NewTimeEntryHandler(timeEntrySvc, userService)
 	authHandler := NewAuthHandler(db, sessions, userService, emailSvc, services.NewPasswordResetService(entClient))
 	passwordHandler := NewPasswordHandler(userService, companySettingsSvc)
+
+	// Asset handlers
+	assetHandler := NewAssetHandler(assetSvc, assetTypeSvc, assetStatusSvc, customerService, tagSvc, tagLinkSvc, defSvc)
+	assetTypeHandler := NewAssetTypeHandler(assetTypeSvc, assetStatusSvc)
+	assetStatusHandler := NewAssetStatusHandler(assetStatusSvc)
 
 	// Public routes
 	r.Get("/login", authHandler.ServeHTTP)
@@ -146,6 +156,14 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Post("/jobs/{id}/create-invoice", invoiceHandler.CreateFromJob)
 		r.Post("/jobs/{id}/create-estimate", estimateHandler.CreateFromJob)
 		r.Post("/jobs/{id}/subtasks/{idx}/toggle", jobHandler.ToggleSubtask)
+		r.Get("/assets", assetHandler.List)
+		r.Get("/assets/new", assetHandler.Create)
+		r.Post("/assets", assetHandler.Create)
+		r.Get("/assets/{id}", assetHandler.Show)
+		r.Get("/assets/{id}/edit", assetHandler.Update)
+		r.Post("/assets/{id}", assetHandler.Update)
+		r.Post("/assets/{id}/delete", assetHandler.Delete)
+		r.Get("/assets/locations", assetHandler.GetLocations)
 		r.Get("/estimates", estimateHandler.List)
 		r.Get("/estimates/new", estimateHandler.Create)
 		r.Post("/estimates", estimateHandler.Create)
@@ -176,6 +194,8 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Post("/estimates/{id}/tags/{tag_id}/detach", estimateHandler.DetachTag)
 		r.Post("/invoices/{id}/tags/{tag_id}/attach", invoiceHandler.AttachTag)
 		r.Post("/invoices/{id}/tags/{tag_id}/detach", invoiceHandler.DetachTag)
+		r.Post("/assets/{id}/tags/{tag_id}/attach", assetHandler.AttachTag)
+		r.Post("/assets/{id}/tags/{tag_id}/detach", assetHandler.DetachTag)
 
 		// Entity comments (list, create, delete)
 		for _, e := range []struct{ prefix, objType string }{
@@ -184,6 +204,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 			{"/projects", "project"},
 			{"/estimates", "estimate"},
 			{"/invoices", "invoice"},
+			{"/assets", "asset"},
 		} {
 			r.Get(e.prefix+"/{id}/comments", commentHandler.List(e.objType))
 			r.Post(e.prefix+"/{id}/comments", commentHandler.Create(e.objType))
@@ -213,6 +234,11 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 			r.Get("/settings/custom-fields/{id}/edit", cfHandler.Update)
 			r.Post("/settings/custom-fields/{id}", cfHandler.Update)
 			r.Post("/settings/custom-fields/{id}/delete", cfHandler.Delete)
+			r.Get("/settings/assets", assetTypeHandler.Show)
+			r.Post("/settings/asset-types", assetTypeHandler.Create)
+			r.Post("/settings/asset-types/{id}/delete", assetTypeHandler.Delete)
+			r.Post("/settings/asset-statuses", assetStatusHandler.Create)
+			r.Post("/settings/asset-statuses/{id}/delete", assetStatusHandler.Delete)
 			r.Get("/users", userHandler.List)
 			r.Get("/users/new", userHandler.Create)
 			r.Post("/users", userHandler.Create)

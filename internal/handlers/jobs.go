@@ -25,10 +25,11 @@ type JobHandler struct {
 	tagSvc     *services.TagService
 	tagLinkSvc *services.TagLinkService
 	defSvc     *services.CustomFieldDefinitionService
+	assetSvc   *services.AssetService
 }
 
-func NewJobHandler(svc *services.JobService, custSvc *services.CustomerService, statusSvc *services.StatusService, projectSvc *services.ProjectService, locSvc *services.LocationService, contactSvc *services.CustomerContactService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService) *JobHandler {
-	return &JobHandler{svc: svc, custSvc: custSvc, statusSvc: statusSvc, projectSvc: projectSvc, locSvc: locSvc, contactSvc: contactSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc}
+func NewJobHandler(svc *services.JobService, custSvc *services.CustomerService, statusSvc *services.StatusService, projectSvc *services.ProjectService, locSvc *services.LocationService, contactSvc *services.CustomerContactService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, assetSvc *services.AssetService) *JobHandler {
+	return &JobHandler{svc: svc, custSvc: custSvc, statusSvc: statusSvc, projectSvc: projectSvc, locSvc: locSvc, contactSvc: contactSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, assetSvc: assetSvc}
 }
 
 func (h *JobHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -120,6 +121,12 @@ func (h *JobHandler) Show(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	if j.AssetID != nil && *j.AssetID > 0 {
+		asset, _ := h.assetSvc.GetByID(r.Context(), *j.AssetID)
+		if asset != nil {
+			d.AssetName = asset.Name
+		}
+	}
 	defs, _ := h.defSvc.ListForObjectType(r.Context(), "job")
 	d.CustomFields = buildCustomFieldDisplay(defs, j.CustomFields)
 	ctx := middleware.WithPageHeaderTitle(r.Context(), j.JobType)
@@ -140,12 +147,14 @@ func (h *JobHandler) Create(w http.ResponseWriter, r *http.Request) {
 	projectID, _ := strconv.ParseInt(r.FormValue("project_id"), 10, 64)
 	locationID, _ := strconv.ParseInt(r.FormValue("location_id"), 10, 64)
 	contactID, _ := strconv.ParseInt(r.FormValue("customer_contact_id"), 10, 64)
+	assetID, _ := strconv.ParseInt(r.FormValue("asset_id"), 10, 64)
 	loc := middleware.CompanyLocation(r.Context())
 	params := services.JobCreateParams{
 		CustomerID:        custID,
 		ProjectID:         projectID,
 		LocationID:        locationID,
 		CustomerContactID: contactID,
+		AssetID:           assetID,
 		JobType:           r.FormValue("job_type"),
 		Subtitle:          r.FormValue("subtitle"),
 		StatusID:          statusID,
@@ -197,11 +206,13 @@ func (h *JobHandler) Update(w http.ResponseWriter, r *http.Request) {
 	projectID, _ := strconv.ParseInt(r.FormValue("project_id"), 10, 64)
 	locationID, _ := strconv.ParseInt(r.FormValue("location_id"), 10, 64)
 	contactID, _ := strconv.ParseInt(r.FormValue("customer_contact_id"), 10, 64)
+	assetID, _ := strconv.ParseInt(r.FormValue("asset_id"), 10, 64)
 	params := services.JobUpdateParams{
 		CustomerID:        int64Ptr(custID),
 		ProjectID:         int64Ptr(projectID),
 		LocationID:        int64Ptr(locationID),
 		CustomerContactID: int64Ptr(contactID),
+		AssetID:           int64Ptr(assetID),
 		JobType:           formPtr(r.FormValue("job_type")),
 		Subtitle:          formPtr(r.FormValue("subtitle")),
 		StatusID:          int64Ptr(statusID),
@@ -300,6 +311,7 @@ func (h *JobHandler) newJobForm(ctx context.Context) templates.JobFormPageData {
 	customers, _ := h.custSvc.ListAll(ctx)
 	projects, _ := h.projectSvc.ListAll(ctx)
 	locations, _ := h.locSvc.ListAll(ctx)
+	assets, _ := h.assetSvc.ListAll(ctx)
 	defs, _ := h.defSvc.ListForObjectType(ctx, "job")
 	return templates.JobFormPageData{
 		Job: &templates.JobDetail{
@@ -310,6 +322,7 @@ func (h *JobHandler) newJobForm(ctx context.Context) templates.JobFormPageData {
 		Customers:    customerOptions(customers),
 		Projects:     projectOptions(projects),
 		Locations:    locationOptions(locations),
+		Assets:       assetOptions(assets),
 		Statuses:     statusOptions(statuses),
 		BillingTypes: services.JobBillingTypes,
 		ExistingVisitsJSON:    "[]",
@@ -323,6 +336,7 @@ func (h *JobHandler) formDataFromJob(ctx context.Context, j *ent.Job, statuses [
 	customers, _ := h.custSvc.ListAll(ctx)
 	projects, _ := h.projectSvc.ListAll(ctx)
 	locations, _ := h.locSvc.ListAll(ctx)
+	assets, _ := h.assetSvc.ListAll(ctx)
 	defs, _ := h.defSvc.ListForObjectType(ctx, "job")
 	d := jobToDetail(j, statuses)
 	return templates.JobFormPageData{
@@ -331,6 +345,7 @@ func (h *JobHandler) formDataFromJob(ctx context.Context, j *ent.Job, statuses [
 		Customers:    customerOptions(customers),
 		Projects:     projectOptions(projects),
 		Locations:    locationOptions(locations),
+		Assets:       assetOptions(assets),
 		Statuses:     statusOptions(statuses),
 		BillingTypes: services.JobBillingTypes,
 		ExistingVisitsJSON:    services.SerializeVisits(services.ParseVisits(j.Visits)),
@@ -356,6 +371,14 @@ func locationOptions(locations []*ent.Location) []templates.SelectOption {
 	return opts
 }
 
+func assetOptions(assets []*ent.Asset) []templates.SelectOption {
+	opts := make([]templates.SelectOption, len(assets))
+	for i, a := range assets {
+		opts[i] = templates.SelectOption{Value: a.ID, Label: a.Name}
+	}
+	return opts
+}
+
 func jobToDetail(j *ent.Job, statuses []*ent.Status) templates.JobDetail {
 	d := templates.JobDetail{
 		ID:          j.ID,
@@ -377,6 +400,9 @@ func jobToDetail(j *ent.Job, statuses []*ent.Status) templates.JobDetail {
 	}
 	if j.CustomerContactID != nil {
 		d.ContactID = *j.CustomerContactID
+	}
+	if j.AssetID != nil {
+		d.AssetID = *j.AssetID
 	}
 	if j.StartTime != nil && !j.StartTime.IsZero() {
 		d.StartTime = j.StartTime.Format("2006-01-02T15:04")

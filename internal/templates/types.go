@@ -266,6 +266,8 @@ type JobDetail struct {
 	LocationName    string
 	ContactID       int64
 	ContactName     string
+	AssetID         int64
+	AssetName       string
 	LineItems       []services.LineItem
 	Visits          []services.JobVisit
 	Assignments     []services.JobAssignment
@@ -309,6 +311,7 @@ type JobFormPageData struct {
 	Customers             []SelectOption
 	Projects              []SelectOption
 	Locations             []SelectOption
+	Assets                []SelectOption
 	Statuses              []SelectOption
 	BillingTypes          []string
 	ExistingVisitsJSON     string
@@ -1050,4 +1053,91 @@ func commonTimezones() []string {
 		"Pacific/Auckland",
 		"Pacific/Fiji",
 	}
+}
+
+// Asset types
+type AssetListPageData struct {
+	Assets        []AssetRow
+	AssetTypes    []SelectOption
+	AssetStatuses []SelectOption
+	Page          int
+	PerPage       int
+	Total         int
+	TotalPages    int
+	Search        string
+	CustomerID    int64
+	AssetTypeID   int64
+	AssetStatusID int64
+}
+
+type AssetRow struct {
+	ID            int64
+	Name          string
+	SerialNumber  string
+	Model         string
+	Manufacturer  string
+	CustomerID    int64
+	LocationID    *int64
+	AssetTypeID   int64
+	AssetStatusID *int64
+}
+
+type AssetShowPageData struct {
+	Asset           AssetDetail
+	ServiceHistory  []JobRow
+	Tags            []TagRow
+	AllTags         []TagRow
+	CustomFields    []CustomFieldDisplay
+}
+
+type AssetDetail struct {
+	ID               int64
+	CustomerID       int64
+	LocationID       *int64
+	AssetTypeID      int64
+	AssetStatusID    *int64
+	Name             string
+	SerialNumber     string
+	Model            string
+	Manufacturer     string
+	Notes            string
+	InstalledAt      *time.Time
+	WarrantyExpires  *time.Time
+	CustomFields     string
+	AssetTypeName    string
+	AssetStatusName  string
+	AssetStatusColor string
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
+}
+
+type AssetFormPageData struct {
+	IsNew         bool
+	Asset         *AssetDetail
+	Customers     []SelectOption
+	Locations     []SelectOption
+	AssetTypes    []SelectOption
+	AssetStatuses []SelectOption
+	Errors        map[string]string
+}
+
+type AssetTypeListPageData struct {
+	Types []AssetTypeRow
+}
+
+type AssetTypeRow struct {
+	ID        int64
+	Name      string
+	SortOrder int
+}
+
+type AssetStatusListPageData struct {
+	Statuses []AssetStatusRow
+}
+
+type AssetStatusRow struct {
+	ID        int64
+	Name      string
+	Color     string
+	SortOrder int
 }

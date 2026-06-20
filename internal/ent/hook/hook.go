@@ -9,6 +9,42 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent"
 )
 
+// The AssetFunc type is an adapter to allow the use of ordinary
+// function as Asset mutator.
+type AssetFunc func(context.Context, *ent.AssetMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AssetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AssetMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AssetMutation", m)
+}
+
+// The AssetStatusFunc type is an adapter to allow the use of ordinary
+// function as AssetStatus mutator.
+type AssetStatusFunc func(context.Context, *ent.AssetStatusMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AssetStatusFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AssetStatusMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AssetStatusMutation", m)
+}
+
+// The AssetTypeFunc type is an adapter to allow the use of ordinary
+// function as AssetType mutator.
+type AssetTypeFunc func(context.Context, *ent.AssetTypeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AssetTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AssetTypeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AssetTypeMutation", m)
+}
+
 // The CommentFunc type is an adapter to allow the use of ordinary
 // function as Comment mutator.
 type CommentFunc func(context.Context, *ent.CommentMutation) (ent.Value, error)

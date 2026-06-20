@@ -37,27 +37,38 @@ templ JobForm(p JobFormPageData) {
 							<option value={ fmt.Sprintf("%d", l.Value) } selected?={ p.Job.LocationID == l.Value }>{ l.Label }</option>
 						}
 					</select>
-				</label>
-			</div>
-			<label>
-				Contact (optional)
-				<select name="customer_contact_id" id="contact-select" data-selected={ fmt.Sprintf("%d", p.Job.ContactID) }>
-					<option value="0">No contact</option>
-				</select>
-			</label>
-			<div class="grid">
-				<label>
-					Job Type <small style="color:var(--pico-primary)">*</small>
-					<input type="text" name="job_type" value={ p.Job.JobType } placeholder="e.g. Installation, Repair" required/>
-					if p.Errors["job_type"] != "" {
-						<small class="error-msg">{ p.Errors["job_type"] }</small>
-					}
-				</label>
-				<label>
-					Subtitle
-					<input type="text" name="subtitle" value={ p.Job.Subtitle } placeholder="Optional"/>
-				</label>
-			</div>
+		</label>
+	</div>
+	<div class="grid">
+		<label>
+			Asset (optional)
+			<select name="asset_id">
+				<option value="0">No asset</option>
+				for _, a := range p.Assets {
+					<option value={ fmt.Sprintf("%d", a.Value) } selected?={ p.Job.AssetID == a.Value }>{ a.Label }</option>
+				}
+			</select>
+		</label>
+		<label>
+			Contact (optional)
+			<select name="customer_contact_id" id="contact-select" data-selected={ fmt.Sprintf("%d", p.Job.ContactID) }>
+				<option value="0">No contact</option>
+			</select>
+		</label>
+	</div>
+	<div class="grid">
+		<label>
+			Job Type <small style="color:var(--pico-primary)">*</small>
+			<input type="text" name="job_type" value={ p.Job.JobType } placeholder="e.g. Installation, Repair" required/>
+			if p.Errors["job_type"] != "" {
+				<small class="error-msg">{ p.Errors["job_type"] }</small>
+			}
+		</label>
+		<label>
+			Subtitle
+			<input type="text" name="subtitle" value={ p.Job.Subtitle } placeholder="Optional"/>
+		</label>
+	</div>
 			<div class="grid">
 				<label>
 					Status
