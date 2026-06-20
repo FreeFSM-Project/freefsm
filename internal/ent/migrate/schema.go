@@ -308,6 +308,38 @@ var (
 			},
 		},
 	}
+	// FilesColumns holds the columns for the "files" table.
+	FilesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "company_id", Type: field.TypeInt64, Nullable: true},
+		{Name: "object_type", Type: field.TypeString},
+		{Name: "object_id", Type: field.TypeInt64},
+		{Name: "original_name", Type: field.TypeString},
+		{Name: "stored_name", Type: field.TypeString},
+		{Name: "mime_type", Type: field.TypeString},
+		{Name: "file_size", Type: field.TypeInt64},
+		{Name: "file_path", Type: field.TypeString},
+		{Name: "uploaded_by", Type: field.TypeInt64},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// FilesTable holds the schema information for the "files" table.
+	FilesTable = &schema.Table{
+		Name:       "files",
+		Columns:    FilesColumns,
+		PrimaryKey: []*schema.Column{FilesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "file_object_type_object_id",
+				Unique:  false,
+				Columns: []*schema.Column{FilesColumns[2], FilesColumns[3]},
+			},
+			{
+				Name:    "file_company_id",
+				Unique:  false,
+				Columns: []*schema.Column{FilesColumns[1]},
+			},
+		},
+	}
 	// InvoicesColumns holds the columns for the "invoices" table.
 	InvoicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -678,6 +710,7 @@ var (
 		CustomersTable,
 		CustomerContactsTable,
 		EstimatesTable,
+		FilesTable,
 		InvoicesTable,
 		ItemsTable,
 		JobsTable,
@@ -720,6 +753,9 @@ func init() {
 	}
 	EstimatesTable.Annotation = &entsql.Annotation{
 		Table: "estimates",
+	}
+	FilesTable.Annotation = &entsql.Annotation{
+		Table: "files",
 	}
 	InvoicesTable.Annotation = &entsql.Annotation{
 		Table: "invoices",

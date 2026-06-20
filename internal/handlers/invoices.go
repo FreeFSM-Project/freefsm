@@ -22,10 +22,11 @@ type InvoiceHandler struct {
 	tagSvc     *services.TagService
 	tagLinkSvc *services.TagLinkService
 	defSvc     *services.CustomFieldDefinitionService
+	fileSvc    *services.FileService
 }
 
-func NewInvoiceHandler(svc *services.InvoiceService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService) *InvoiceHandler {
-	return &InvoiceHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc}
+func NewInvoiceHandler(svc *services.InvoiceService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, fileSvc *services.FileService) *InvoiceHandler {
+	return &InvoiceHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, fileSvc: fileSvc}
 }
 
 func (h *InvoiceHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -97,6 +98,8 @@ func (h *InvoiceHandler) Show(w http.ResponseWriter, r *http.Request) {
 	d.AllTags = tagsToRows(allTags)
 	defs, _ := h.defSvc.ListForObjectType(r.Context(), "invoice")
 	d.CustomFields = buildCustomFieldDisplay(defs, i.CustomFields)
+	files, _ := h.fileSvc.List(r.Context(), "invoice", id)
+	d.FileList = templates.FileListPageData{Files: filesToRows(files), ObjectID: id, ObjectType: "invoice"}
 	ctx := middleware.WithPageHeaderTitle(r.Context(), i.Title)
 	templates.InvoiceShow(d).Render(ctx, w)
 }

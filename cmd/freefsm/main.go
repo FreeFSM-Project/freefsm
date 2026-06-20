@@ -78,6 +78,16 @@ func main() {
 
 	slog.Info("starting freefsm", "version", config.Version, "commit", config.Commit)
 
+	if err := os.MkdirAll(cfg.UploadDir, 0750); err != nil {
+		slog.Error("create upload directory", "dir", cfg.UploadDir, "error", err)
+		os.Exit(1)
+	}
+	if stat, err := os.Stat(cfg.UploadDir); err != nil || !stat.IsDir() {
+		slog.Error("upload directory not accessible", "dir", cfg.UploadDir, "error", err)
+		os.Exit(1)
+	}
+	slog.Info("upload directory ready", "dir", cfg.UploadDir)
+
 	db, err := database.Connect(context.Background(), cfg.DSN())
 	if err != nil {
 		slog.Error("database connect", "error", err)

@@ -26,6 +26,9 @@ type Config struct {
 	LogFile        string
 	SessionSecret  string
 	SetupToken     string
+
+	UploadDir      string
+	MaxUploadSize  int64
 }
 
 func Load() (*Config, error) {
@@ -43,6 +46,8 @@ func Load() (*Config, error) {
 		LogFile:       getEnv("FREEFSM_LOG_FILE", ""),
 		SessionSecret: getEnv("FREEFSM_SESSION_SECRET", ""),
 		SetupToken:    getEnv("FREEFSM_SETUP_TOKEN", ""),
+		UploadDir:     getEnv("FREEFSM_UPLOAD_DIR", "/var/lib/freefsm/uploads"),
+		MaxUploadSize: getEnvInt64("FREEFSM_MAX_UPLOAD_SIZE", 26214400),
 	}
 
 	if cfg.SessionSecret == "" {
@@ -73,6 +78,16 @@ func getEnv(key, def string) string {
 func getEnvInt(key string, def int) int {
 	if v := os.Getenv(key); v != "" {
 		n, err := strconv.Atoi(v)
+		if err == nil {
+			return n
+		}
+	}
+	return def
+}
+
+func getEnvInt64(key string, def int64) int64 {
+	if v := os.Getenv(key); v != "" {
+		n, err := strconv.ParseInt(v, 10, 64)
 		if err == nil {
 			return n
 		}

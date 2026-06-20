@@ -14,6 +14,7 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent/customercontact"
 	"github.com/MartialM1nd/freefsm/internal/ent/customfielddefinition"
 	"github.com/MartialM1nd/freefsm/internal/ent/estimate"
+	"github.com/MartialM1nd/freefsm/internal/ent/file"
 	"github.com/MartialM1nd/freefsm/internal/ent/invoice"
 	"github.com/MartialM1nd/freefsm/internal/ent/item"
 	"github.com/MartialM1nd/freefsm/internal/ent/job"
@@ -421,6 +422,32 @@ func init() {
 	estimate.DefaultUpdatedAt = estimateDescUpdatedAt.Default.(func() time.Time)
 	// estimate.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	estimate.UpdateDefaultUpdatedAt = estimateDescUpdatedAt.UpdateDefault.(func() time.Time)
+	fileFields := schema.File{}.Fields()
+	_ = fileFields
+	// fileDescObjectType is the schema descriptor for object_type field.
+	fileDescObjectType := fileFields[2].Descriptor()
+	// file.ObjectTypeValidator is a validator for the "object_type" field. It is called by the builders before save.
+	file.ObjectTypeValidator = fileDescObjectType.Validators[0].(func(string) error)
+	// fileDescOriginalName is the schema descriptor for original_name field.
+	fileDescOriginalName := fileFields[4].Descriptor()
+	// file.OriginalNameValidator is a validator for the "original_name" field. It is called by the builders before save.
+	file.OriginalNameValidator = fileDescOriginalName.Validators[0].(func(string) error)
+	// fileDescStoredName is the schema descriptor for stored_name field.
+	fileDescStoredName := fileFields[5].Descriptor()
+	// file.StoredNameValidator is a validator for the "stored_name" field. It is called by the builders before save.
+	file.StoredNameValidator = fileDescStoredName.Validators[0].(func(string) error)
+	// fileDescMimeType is the schema descriptor for mime_type field.
+	fileDescMimeType := fileFields[6].Descriptor()
+	// file.MimeTypeValidator is a validator for the "mime_type" field. It is called by the builders before save.
+	file.MimeTypeValidator = fileDescMimeType.Validators[0].(func(string) error)
+	// fileDescFilePath is the schema descriptor for file_path field.
+	fileDescFilePath := fileFields[8].Descriptor()
+	// file.FilePathValidator is a validator for the "file_path" field. It is called by the builders before save.
+	file.FilePathValidator = fileDescFilePath.Validators[0].(func(string) error)
+	// fileDescCreatedAt is the schema descriptor for created_at field.
+	fileDescCreatedAt := fileFields[10].Descriptor()
+	// file.DefaultCreatedAt holds the default value on creation for the created_at field.
+	file.DefaultCreatedAt = fileDescCreatedAt.Default.(func() time.Time)
 	invoiceFields := schema.Invoice{}.Fields()
 	_ = invoiceFields
 	// invoiceDescTitle is the schema descriptor for title field.

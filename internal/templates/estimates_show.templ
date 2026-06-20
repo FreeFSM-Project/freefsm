@@ -76,6 +76,8 @@ templ EstimateShow(p EstimateDetail) {
 		<div hx-get={ templ.URL(fmt.Sprintf("/estimates/%d/comments", p.ID)) } hx-trigger="load" hx-swap="innerHTML">
 			<p>Loading comments...</p>
 		</div>
+		@FileUploadWidget("estimate", p.ID, fmt.Sprintf("/estimates/%d", p.ID))
+		@FileList(p.FileList)
 		<p><a href="/estimates">&larr; Back to Estimates</a></p>
 	}
 }

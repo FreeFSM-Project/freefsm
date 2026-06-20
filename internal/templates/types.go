@@ -103,6 +103,7 @@ type CustomerShowPageData struct {
 	Tags         []TagRow
 	AllTags      []TagRow
 	CustomFields []CustomFieldDisplay
+	FileList     FileListPageData
 }
 
 type CustomerDetail struct {
@@ -189,9 +190,10 @@ type ProjectListPageData struct {
 type ProjectShowPageData struct {
 	Project      ProjectDetail
 	Jobs         []JobRow
-	Tags         []TagRow
-	AllTags      []TagRow
+	Tags        []TagRow
+	AllTags     []TagRow
 	CustomFields []CustomFieldDisplay
+	FileList    FileListPageData
 }
 
 type ProjectFormPageData struct {
@@ -286,6 +288,7 @@ type JobDetail struct {
 	DueDate         string
 	Notes           string
 	TechNotes       string
+	FileList        FileListPageData
 }
 
 type SelectOption struct {
@@ -360,6 +363,7 @@ type EstimateDetail struct {
 	Tags        []TagRow
 	AllTags     []TagRow
 	CustomFields []CustomFieldDisplay
+	FileList    FileListPageData
 }
 
 type EstimateListPageData struct {
@@ -415,6 +419,7 @@ type InvoiceDetail struct {
 	Tags        []TagRow
 	AllTags     []TagRow
 	CustomFields []CustomFieldDisplay
+	FileList    FileListPageData
 }
 
 type InvoiceListPageData struct {
@@ -1088,6 +1093,7 @@ type AssetShowPageData struct {
 	Tags            []TagRow
 	AllTags         []TagRow
 	CustomFields    []CustomFieldDisplay
+	FileList        FileListPageData
 }
 
 type AssetDetail struct {

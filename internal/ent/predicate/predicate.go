@@ -33,6 +33,9 @@ type CustomerContact func(*sql.Selector)
 // Estimate is the predicate function for estimate builders.
 type Estimate func(*sql.Selector)
 
+// File is the predicate function for file builders.
+type File func(*sql.Selector)
+
 // Invoice is the predicate function for invoice builders.
 type Invoice func(*sql.Selector)
 

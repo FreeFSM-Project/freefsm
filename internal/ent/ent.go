@@ -21,6 +21,7 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent/customercontact"
 	"github.com/MartialM1nd/freefsm/internal/ent/customfielddefinition"
 	"github.com/MartialM1nd/freefsm/internal/ent/estimate"
+	"github.com/MartialM1nd/freefsm/internal/ent/file"
 	"github.com/MartialM1nd/freefsm/internal/ent/invoice"
 	"github.com/MartialM1nd/freefsm/internal/ent/item"
 	"github.com/MartialM1nd/freefsm/internal/ent/job"
@@ -102,6 +103,7 @@ func checkColumn(t, c string) error {
 			customer.Table:              customer.ValidColumn,
 			customercontact.Table:       customercontact.ValidColumn,
 			estimate.Table:              estimate.ValidColumn,
+			file.Table:                  file.ValidColumn,
 			invoice.Table:               invoice.ValidColumn,
 			item.Table:                  item.ValidColumn,
 			job.Table:                   job.ValidColumn,

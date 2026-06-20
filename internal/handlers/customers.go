@@ -18,10 +18,11 @@ type CustomerHandler struct {
 	tagSvc     *services.TagService
 	tagLinkSvc *services.TagLinkService
 	defSvc     *services.CustomFieldDefinitionService
+	fileSvc    *services.FileService
 }
 
-func NewCustomerHandler(svc *services.CustomerService, contactSvc *services.CustomerContactService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService) *CustomerHandler {
-	return &CustomerHandler{svc: svc, contactSvc: contactSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc}
+func NewCustomerHandler(svc *services.CustomerService, contactSvc *services.CustomerContactService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, fileSvc *services.FileService) *CustomerHandler {
+	return &CustomerHandler{svc: svc, contactSvc: contactSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, fileSvc: fileSvc}
 }
 
 func (h *CustomerHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -75,12 +76,14 @@ func (h *CustomerHandler) Show(w http.ResponseWriter, r *http.Request) {
 	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "customer", c.ID)
 	allTags, _ := h.tagSvc.ListAll(r.Context())
 	defs, _ := h.defSvc.ListForObjectType(r.Context(), "customer")
+	files, _ := h.fileSvc.List(r.Context(), "customer", c.ID)
 	ctx := middleware.WithPageHeaderTitle(r.Context(), c.DisplayName)
 	templates.CustomerShow(templates.CustomerShowPageData{
 		Customer:     customerToDetail(c),
 		Tags:         tagsToRows(tags),
 		AllTags:      tagsToRows(allTags),
 		CustomFields: buildCustomFieldDisplay(defs, c.CustomFields),
+		FileList:     templates.FileListPageData{Files: filesToRows(files), ObjectID: c.ID, ObjectType: "customer"},
 	}).Render(ctx, w)
 }
 
@@ -380,4 +383,18 @@ func newFormData() templates.CustomerFormPageData {
 		Statuses:     services.CustomerStatuses,
 		AccountTypes: services.CustomerAccountTypes,
 	}
+}
+
+func filesToRows(files []*ent.File) []templates.FileRow {
+	rows := make([]templates.FileRow, len(files))
+	for i, f := range files {
+		rows[i] = templates.FileRow{
+			ID:           f.ID,
+			OriginalName: f.OriginalName,
+			MimeType:     f.MimeType,
+			FileSize:     services.FormatFileSize(f.FileSize),
+			CreatedAt:    f.CreatedAt.Format("2006-01-02 15:04"),
+		}
+	}
+	return rows
 }

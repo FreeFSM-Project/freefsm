@@ -59,6 +59,8 @@ templ CustomerShow(p CustomerShowPageData) {
 	<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/comments", p.Customer.ID)) } hx-trigger="load" hx-swap="innerHTML">
 		<p>Loading comments...</p>
 	</div>
+	@FileUploadWidget("customer", p.Customer.ID, fmt.Sprintf("/customers/%d", p.Customer.ID))
+	@FileList(p.FileList)
 	<p><a href="/customers">&larr; Back to Customers</a></p>
 	}
 }

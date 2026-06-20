@@ -30,6 +30,8 @@ type Tx struct {
 	CustomerContact *CustomerContactClient
 	// Estimate is the client for interacting with the Estimate builders.
 	Estimate *EstimateClient
+	// File is the client for interacting with the File builders.
+	File *FileClient
 	// Invoice is the client for interacting with the Invoice builders.
 	Invoice *InvoiceClient
 	// Item is the client for interacting with the Item builders.
@@ -194,6 +196,7 @@ func (tx *Tx) init() {
 	tx.Customer = NewCustomerClient(tx.config)
 	tx.CustomerContact = NewCustomerContactClient(tx.config)
 	tx.Estimate = NewEstimateClient(tx.config)
+	tx.File = NewFileClient(tx.config)
 	tx.Invoice = NewInvoiceClient(tx.config)
 	tx.Item = NewItemClient(tx.config)
 	tx.Job = NewJobClient(tx.config)

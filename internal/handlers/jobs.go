@@ -26,10 +26,11 @@ type JobHandler struct {
 	tagLinkSvc *services.TagLinkService
 	defSvc     *services.CustomFieldDefinitionService
 	assetSvc   *services.AssetService
+	fileSvc    *services.FileService
 }
 
-func NewJobHandler(svc *services.JobService, custSvc *services.CustomerService, statusSvc *services.StatusService, projectSvc *services.ProjectService, locSvc *services.LocationService, contactSvc *services.CustomerContactService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, assetSvc *services.AssetService) *JobHandler {
-	return &JobHandler{svc: svc, custSvc: custSvc, statusSvc: statusSvc, projectSvc: projectSvc, locSvc: locSvc, contactSvc: contactSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, assetSvc: assetSvc}
+func NewJobHandler(svc *services.JobService, custSvc *services.CustomerService, statusSvc *services.StatusService, projectSvc *services.ProjectService, locSvc *services.LocationService, contactSvc *services.CustomerContactService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, assetSvc *services.AssetService, fileSvc *services.FileService) *JobHandler {
+	return &JobHandler{svc: svc, custSvc: custSvc, statusSvc: statusSvc, projectSvc: projectSvc, locSvc: locSvc, contactSvc: contactSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, assetSvc: assetSvc, fileSvc: fileSvc}
 }
 
 func (h *JobHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -129,6 +130,8 @@ func (h *JobHandler) Show(w http.ResponseWriter, r *http.Request) {
 	}
 	defs, _ := h.defSvc.ListForObjectType(r.Context(), "job")
 	d.CustomFields = buildCustomFieldDisplay(defs, j.CustomFields)
+	files, _ := h.fileSvc.List(r.Context(), "job", j.ID)
+	d.FileList = templates.FileListPageData{Files: filesToRows(files), ObjectID: j.ID, ObjectType: "job"}
 	ctx := middleware.WithPageHeaderTitle(r.Context(), j.JobType)
 	templates.JobShow(d).Render(ctx, w)
 }

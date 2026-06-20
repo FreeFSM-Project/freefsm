@@ -45,19 +45,23 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	cfHandler := NewCustomFieldHandler(defSvc)
 	timeEntrySvc := services.NewTimeEntryService(entClient)
 	dashboardHandler := NewDashboardHandler(services.NewDashboardService(entClient), timeEntrySvc)
-	customerHandler := NewCustomerHandler(customerService, contactSvc, tagSvc, tagLinkSvc, defSvc)
+	// File service
+	fileSvc := services.NewFileService(entClient, cfg.UploadDir, cfg.MaxUploadSize)
+	fileHandler := NewFileHandler(fileSvc)
+
+	customerHandler := NewCustomerHandler(customerService, contactSvc, tagSvc, tagLinkSvc, defSvc, fileSvc)
 	itemHandler := NewItemHandler(itemService)
 	// Asset services
 	assetTypeSvc := services.NewAssetTypeService(entClient)
 	assetStatusSvc := services.NewAssetStatusService(entClient)
 	assetSvc := services.NewAssetService(entClient)
 
-	jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc, tagSvc, tagLinkSvc, defSvc, assetSvc)
+	jobHandler := NewJobHandler(jobService, customerService, statusService, projectSvc, locationSvc, contactSvc, tagSvc, tagLinkSvc, defSvc, assetSvc, fileSvc)
 	projectHandler := NewProjectHandler(projectSvc, customerService, statusService, locationSvc, jobService, tagSvc, tagLinkSvc, defSvc)
 	scheduleHandler := NewScheduleHandler(jobService, customerService, statusService)
 	invoiceService := services.NewInvoiceService(entClient)
-	estimateHandler := NewEstimateHandler(services.NewEstimateService(entClient), customerService, jobService, statusService, itemService, invoiceService, tagSvc, tagLinkSvc, defSvc)
-	invoiceHandler := NewInvoiceHandler(invoiceService, customerService, jobService, statusService, itemService, tagSvc, tagLinkSvc, defSvc)
+	estimateHandler := NewEstimateHandler(services.NewEstimateService(entClient), customerService, jobService, statusService, itemService, invoiceService, tagSvc, tagLinkSvc, defSvc, fileSvc)
+	invoiceHandler := NewInvoiceHandler(invoiceService, customerService, jobService, statusService, itemService, tagSvc, tagLinkSvc, defSvc, fileSvc)
 	tagHandler := NewTagHandler(tagSvc, tagLinkSvc)
 	companySettingsSvc := services.NewCompanySettingsService(entClient)
 	emailSvc := services.NewEmailService(companySettingsSvc)
@@ -68,7 +72,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	passwordHandler := NewPasswordHandler(userService, companySettingsSvc)
 
 	// Asset handlers
-	assetHandler := NewAssetHandler(assetSvc, assetTypeSvc, assetStatusSvc, customerService, tagSvc, tagLinkSvc, defSvc)
+	assetHandler := NewAssetHandler(assetSvc, assetTypeSvc, assetStatusSvc, customerService, tagSvc, tagLinkSvc, defSvc, fileSvc)
 	assetTypeHandler := NewAssetTypeHandler(assetTypeSvc, assetStatusSvc)
 	assetStatusHandler := NewAssetStatusHandler(assetStatusSvc)
 
@@ -210,6 +214,11 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 			r.Post(e.prefix+"/{id}/comments", commentHandler.Create(e.objType))
 			r.Post(e.prefix+"/{id}/comments/{cid}/delete", commentHandler.Delete(e.objType))
 		}
+
+		// File uploads
+		r.Post("/files", fileHandler.Upload)
+		r.Get("/files/{id}", fileHandler.Download)
+		r.Post("/files/{id}/delete", fileHandler.Delete)
 
 		// Dispatcher or Admin routes
 		r.Group(func(r chi.Router) {

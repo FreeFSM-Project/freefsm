@@ -55,6 +55,7 @@ install-freebsd: install
 		echo "Created /usr/local/etc/freefsm.conf — edit it with your secrets"; \
 	fi
 	@install -d -o freefsm -g freefsm -m 755 /var/log/freefsm
+	@install -d -o freefsm -g freefsm -m 755 /var/db/freefsm/uploads
 
 install-linux: install
 	@install -m 644 deploy/linux/freefsm.service /etc/systemd/system/freefsm.service
@@ -63,6 +64,7 @@ install-linux: install
 		echo "Created /etc/freefsm.conf — edit it with your secrets"; \
 	fi
 	@install -d -m 755 /var/log/freefsm
+	@install -d -o freefsm -g freefsm -m 755 /var/lib/freefsm/uploads
 	@systemctl daemon-reload
 
 clean:

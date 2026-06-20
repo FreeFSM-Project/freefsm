@@ -19,6 +19,7 @@ type AssetHandler struct {
 	tagSvc         *services.TagService
 	tagLinkSvc     *services.TagLinkService
 	cfSvc          *services.CustomFieldDefinitionService
+	fileSvc        *services.FileService
 }
 
 func NewAssetHandler(
@@ -29,6 +30,7 @@ func NewAssetHandler(
 	tagSvc *services.TagService,
 	tagLinkSvc *services.TagLinkService,
 	cfSvc *services.CustomFieldDefinitionService,
+	fileSvc *services.FileService,
 ) *AssetHandler {
 	return &AssetHandler{
 		svc:            svc,
@@ -38,6 +40,7 @@ func NewAssetHandler(
 		tagSvc:         tagSvc,
 		tagLinkSvc:     tagLinkSvc,
 		cfSvc:          cfSvc,
+		fileSvc:        fileSvc,
 	}
 }
 
@@ -143,12 +146,14 @@ func (h *AssetHandler) Show(w http.ResponseWriter, r *http.Request) {
 	cfDisplay := buildCustomFieldDisplay(defs, asset.CustomFields)
 
 	assetDetail := assetToDetail(asset, assetTypes, assetStatuses)
+	files, _ := h.fileSvc.List(r.Context(), "asset", id)
 	data := templates.AssetShowPageData{
 		Asset:          *assetDetail,
 		ServiceHistory: jobRows,
 		Tags:           assignedTags,
 		AllTags:        availableTags,
 		CustomFields:   cfDisplay,
+		FileList:       templates.FileListPageData{Files: filesToRows(files), ObjectID: id, ObjectType: "asset"},
 	}
 
 	templates.AssetShow(data).Render(r.Context(), w)

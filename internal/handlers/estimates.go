@@ -24,10 +24,11 @@ type EstimateHandler struct {
 	tagSvc     *services.TagService
 	tagLinkSvc *services.TagLinkService
 	defSvc     *services.CustomFieldDefinitionService
+	fileSvc    *services.FileService
 }
 
-func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, invoiceSvc *services.InvoiceService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService) *EstimateHandler {
-	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, invoiceSvc: invoiceSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc}
+func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, invoiceSvc *services.InvoiceService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, fileSvc *services.FileService) *EstimateHandler {
+	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, invoiceSvc: invoiceSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, fileSvc: fileSvc}
 }
 
 func (h *EstimateHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -98,6 +99,8 @@ func (h *EstimateHandler) Show(w http.ResponseWriter, r *http.Request) {
 	d.AllTags = tagsToRows(allTags)
 	defs, _ := h.defSvc.ListForObjectType(r.Context(), "estimate")
 	d.CustomFields = buildCustomFieldDisplay(defs, e.CustomFields)
+	files, _ := h.fileSvc.List(r.Context(), "estimate", id)
+	d.FileList = templates.FileListPageData{Files: filesToRows(files), ObjectID: id, ObjectType: "estimate"}
 	ctx := middleware.WithPageHeaderTitle(r.Context(), e.Title)
 	templates.EstimateShow(d).Render(ctx, w)
 }
