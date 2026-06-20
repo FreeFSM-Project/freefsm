@@ -5,7 +5,7 @@ import "fmt"
 templ ItemsIndex(p ItemListPageData) {
 	@Layout("Items") {
 
-		<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+		<div class="list-toolbar">
 			<form hx-get="/items" hx-target="#item-table-wrap" hx-swap="outerHTML" hx-push-url="true" hx-indicator="#search-spinner" style="display:flex;gap:0.5rem;align-items:center;flex:1">
 				<input type="search" name="search" placeholder="Search by name or SKU..."
 					value={ p.Search } style="max-width:300px"

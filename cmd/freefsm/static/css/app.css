@@ -274,6 +274,17 @@ body {
   overflow-y: auto;
 }
 
+/* List Toolbar */
+.list-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.list-toolbar a[role="button"] {
+  padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+}
+
 /* Error & Flash */
 .error-msg {
   background: var(--pico-del-color);
