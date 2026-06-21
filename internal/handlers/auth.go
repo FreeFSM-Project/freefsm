@@ -16,10 +16,11 @@ type AuthHandler struct {
 	userSvc     *services.UserService
 	emailSvc    *services.EmailService
 	resetSvc    *services.PasswordResetService
+	activitySvc *services.ActivityService
 }
 
-func NewAuthHandler(db *pgxpool.Pool, sessions *services.SessionService, userSvc *services.UserService, emailSvc *services.EmailService, resetSvc *services.PasswordResetService) *AuthHandler {
-	return &AuthHandler{db: db, sessions: sessions, userSvc: userSvc, emailSvc: emailSvc, resetSvc: resetSvc}
+func NewAuthHandler(db *pgxpool.Pool, sessions *services.SessionService, userSvc *services.UserService, emailSvc *services.EmailService, resetSvc *services.PasswordResetService, activitySvc *services.ActivityService) *AuthHandler {
+	return &AuthHandler{db: db, sessions: sessions, userSvc: userSvc, emailSvc: emailSvc, resetSvc: resetSvc, activitySvc: activitySvc}
 }
 
 func (h *AuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -53,11 +54,12 @@ func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 
 	var id int64
+	var name string
 	var hash string
 	var forceChange bool
 	err := h.db.QueryRow(r.Context(),
-		"SELECT id, password_hash, force_password_change FROM users WHERE email = $1 AND is_active = true", email,
-	).Scan(&id, &hash, &forceChange)
+		"SELECT id, name, password_hash, force_password_change FROM users WHERE email = $1 AND is_active = true", email,
+	).Scan(&id, &name, &hash, &forceChange)
 	if err != nil {
 		http.Redirect(w, r, "/login?error=invalid+credentials", http.StatusSeeOther)
 		return
@@ -78,6 +80,11 @@ func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
 		Name: "session", Value: token, Path: "/",
 		HttpOnly: true, SameSite: http.SameSiteLaxMode,
 		MaxAge: 604800,
+	})
+
+	h.activitySvc.Record(r.Context(), id, "logged_in", "user", id, map[string]interface{}{
+		"entity_name": name,
+		"actor_name":  name,
 	})
 
 	if forceChange {

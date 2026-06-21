@@ -71,7 +71,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	settingsHandler := NewSettingsHandler(companySettingsSvc, emailSvc, activitySvc)
 	userHandler := NewUserHandler(userService, emailSvc, companySettingsSvc, activitySvc)
 	timeEntryHandler := NewTimeEntryHandler(timeEntrySvc, userService, activitySvc)
-	authHandler := NewAuthHandler(db, sessions, userService, emailSvc, services.NewPasswordResetService(entClient))
+	authHandler := NewAuthHandler(db, sessions, userService, emailSvc, services.NewPasswordResetService(entClient), activitySvc)
 	passwordHandler := NewPasswordHandler(userService, companySettingsSvc, activitySvc)
 
 	// Asset handlers
@@ -110,7 +110,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Get("/search", searchHandler.Search)
 		r.Get("/schedule", scheduleHandler.Index)
 		r.Post("/logout", func(w http.ResponseWriter, r *http.Request) {
-			handleLogout(w, r, sessions)
+			handleLogout(w, r, sessions, activitySvc)
 		})
 		r.Get("/projects", projectHandler.List)
 		r.Get("/projects/new", projectHandler.Create)

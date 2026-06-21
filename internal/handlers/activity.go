@@ -244,6 +244,10 @@ func activityIcon(action string) string {
 		return "☑"
 	case "subtask_uncompleted":
 		return "☐"
+	case "logged_in":
+		return "🔑"
+	case "logged_out":
+		return "🚪"
 	case "restored":
 		return "↩"
 	case "contact_created", "contact_updated":

@@ -93,6 +93,10 @@ func activityVerb(action string) string {
 		return "completed a subtask on"
 	case "subtask_uncompleted":
 		return "uncompleted a subtask on"
+	case "logged_in":
+		return "logged in"
+	case "logged_out":
+		return "logged out"
 	case "restored":
 		return "restored"
 	default:
@@ -132,6 +136,10 @@ func activityActionClass(action string) string {
 		return "activity-email"
 	case "subtask_completed", "subtask_uncompleted":
 		return "activity-subtask"
+	case "logged_in":
+		return "activity-created"
+	case "logged_out":
+		return "activity-deleted"
 	case "restored":
 		return "activity-created"
 	default:
