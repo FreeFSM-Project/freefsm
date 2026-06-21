@@ -21,6 +21,10 @@ Single static Go binary, PostgreSQL backend, zero npm/NPM dependencies.
 - **User Management** — roles, welcome emails, password policies, force password change
 - **Company Settings** — branding, email config, timezone, document numbering, security policies
 - **Dark Mode** — persistent theme toggle
+- **Activity / Audit Log** — every mutation tracked across all entities; per-entity widgets on show pages, admin-only admin activity, recent activity panels on every list page
+- **File Attachments** — polymorphic uploads on customers, jobs, estimates, invoices, and assets; MIME whitelist, inline preview for images/PDFs, disk storage
+- **Soft-Delete / Archive** — business entities archived instead of hard-deleted; admin restore from show page banner
+- **Dependency Protection** — prevents deletion of configuration items (tags, asset types, statuses) when referenced by other records
 - **Mobile Sidebar** — responsive navigation
 - **Auth** — setup token, bcrypt, HTTP-only session cookies, CSRF protection
 
@@ -102,6 +106,8 @@ This is idempotent — it skips if any customers already exist.
 | `FREEFSM_LOG_LEVEL` | `info` | `debug` / `info` / `warn` / `error` |
 | `FREEFSM_SESSION_SECRET` | *(required)* | Cookie encryption key |
 | `FREEFSM_SETUP_TOKEN` | *(required)* | Initial admin registration token |
+| `FREEFSM_UPLOAD_DIR` | `/var/lib/freefsm/uploads` (Linux) / `/var/db/freefsm/uploads` (FreeBSD) | File upload storage directory |
+| `FREEFSM_MAX_UPLOAD_SIZE` | `26214400` (25 MB) | Maximum upload file size in bytes |
 
 ## Project Structure
 
