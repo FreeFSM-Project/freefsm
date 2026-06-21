@@ -84,15 +84,23 @@ func (s *InvoiceService) GetByID(ctx context.Context, id int64) (*ent.Invoice, e
 }
 
 func (s *InvoiceService) Create(ctx context.Context, params InvoiceCreateParams) (*ent.Invoice, error) {
+	taxRate := params.TaxRate
+	if taxRate == "" {
+		taxRate = "0"
+	}
+	customFields := params.CustomFields
+	if customFields == "" {
+		customFields = "[]"
+	}
 	b := s.client.Invoice.Create().
 		SetCustomerID(params.CustomerID).
 		SetTitle(params.Title).
 		SetNotes(params.Notes).
 		SetInvoiceDate(params.InvoiceDate).
 		SetDueDate(params.DueDate).
-		SetTaxRate(params.TaxRate).
+		SetTaxRate(taxRate).
 		SetLineItems(SerializeLineItems(params.LineItems)).
-		SetCustomFields(params.CustomFields)
+		SetCustomFields(customFields)
 
 	if params.JobID > 0 {
 		b.SetJobID(params.JobID)
@@ -205,9 +213,10 @@ func (s *InvoiceService) CreateFromEstimate(ctx context.Context, estimateID int6
 		return nil, fmt.Errorf("get estimate %d: %w", estimateID, err)
 	}
 
-	draftStatus, err := statusSvc.FindByName(ctx, "invoice", "Draft")
-	if err != nil {
-		return nil, fmt.Errorf("find status: %w", err)
+	draftStatus, _ := statusSvc.FindByName(ctx, "invoice", "Draft")
+	var statusID int64
+	if draftStatus != nil {
+		statusID = draftStatus.ID
 	}
 
 	items, _ := ParseLineItems(e.LineItems)
@@ -232,7 +241,7 @@ func (s *InvoiceService) CreateFromEstimate(ctx context.Context, estimateID int6
 		SetNotes(e.Notes).
 		SetTaxRate(e.TaxRate).
 		SetLineItems(SerializeLineItems(items)).
-		SetStatusID(draftStatus.ID).
+		SetStatusID(statusID).
 		SetInvoiceDate(now).
 		SetDueDate(now.AddDate(0, 0, 30)).
 		SetNillableCustomerID(custID).
@@ -255,9 +264,10 @@ func (s *InvoiceService) CreateFromJob(ctx context.Context, jobID int64, statusS
 		return nil, fmt.Errorf("get job %d: %w", jobID, err)
 	}
 
-	newStatus, err := statusSvc.FindByName(ctx, "invoice", "Draft")
-	if err != nil {
-		return nil, fmt.Errorf("find status: %w", err)
+	newStatus, _ := statusSvc.FindByName(ctx, "invoice", "Draft")
+	var statusID int64
+	if newStatus != nil {
+		statusID = newStatus.ID
 	}
 
 	items, _ := ParseLineItems(j.LineItems)
@@ -266,12 +276,14 @@ func (s *InvoiceService) CreateFromJob(ctx context.Context, jobID int64, statusS
 	return s.Create(ctx, InvoiceCreateParams{
 		CustomerID:  j.CustomerID,
 		JobID:       j.ID,
-		StatusID:    newStatus.ID,
+		StatusID:    statusID,
 		Title:       j.JobType,
 		Notes:       j.Notes,
 		InvoiceDate: now,
 		DueDate:     now.AddDate(0, 0, 30),
-		LineItems:   items,
+		TaxRate:      "0",
+		CustomFields: "[]",
+		LineItems:    items,
 	})
 }
 

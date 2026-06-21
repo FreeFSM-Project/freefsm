@@ -67,7 +67,7 @@ templ InvoiceForm(p InvoiceFormPageData) {
 			@templ.Raw(`<script type="application/json" id="items-catalog">` + p.ItemsJSON + `</script>`)
 			@templ.Raw(`<script type="application/json" id="existing-items">` + p.ExistingItemsJSON + `</script>`)
 			<script>
-				document.addEventListener('alpine:init', () => {
+				function registerLineItemEditor() {
 					Alpine.data('lineItemEditor', () => {
 						const catalog = JSON.parse(document.getElementById('items-catalog').textContent || '[]');
 						const existing = JSON.parse(document.getElementById('existing-items').textContent || '[]');
@@ -89,7 +89,8 @@ templ InvoiceForm(p InvoiceFormPageData) {
 							get json() { return JSON.stringify(this.items.filter(i => i.item_id > 0 || i.title).map(i => ({ item_id: Number(i.item_id) || 0, title: i.title, description: i.description, unit_price: Number(i.unit_price) || 0, quantity: Number(i.quantity) || 1, taxable: Boolean(i.taxable), tax_rate: i.tax_rate, discount: Number(i.discount) || 0, surcharge: Number(i.surcharge) || 0 }))); },
 						};
 					});
-				});
+				}
+				if (window.Alpine) { registerLineItemEditor(); } else { document.addEventListener('alpine:init', registerLineItemEditor); }
 			</script>
 			<fieldset x-data="lineItemEditor()">
 				<legend>Line Items</legend>

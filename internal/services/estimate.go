@@ -78,13 +78,21 @@ func (s *EstimateService) GetByID(ctx context.Context, id int64) (*ent.Estimate,
 }
 
 func (s *EstimateService) Create(ctx context.Context, params EstimateCreateParams) (*ent.Estimate, error) {
+	taxRate := params.TaxRate
+	if taxRate == "" {
+		taxRate = "0"
+	}
+	customFields := params.CustomFields
+	if customFields == "" {
+		customFields = "[]"
+	}
 	b := s.client.Estimate.Create().
 		SetCustomerID(params.CustomerID).
 		SetTitle(params.Title).
 		SetNotes(params.Notes).
-		SetTaxRate(params.TaxRate).
+		SetTaxRate(taxRate).
 		SetLineItems(SerializeLineItems(params.LineItems)).
-		SetCustomFields(params.CustomFields)
+		SetCustomFields(customFields)
 
 	if params.JobID > 0 {
 		b.SetJobID(params.JobID)
@@ -169,21 +177,23 @@ func (s *EstimateService) CreateFromJob(ctx context.Context, jobID int64, status
 		return nil, fmt.Errorf("get job %d: %w", jobID, err)
 	}
 
-	draftStatus, err := statusSvc.FindByName(ctx, "estimate", "Draft")
-	if err != nil {
-		return nil, fmt.Errorf("find status: %w", err)
+	draftStatus, _ := statusSvc.FindByName(ctx, "estimate", "Draft")
+	var statusID int64
+	if draftStatus != nil {
+		statusID = draftStatus.ID
 	}
 
 	items, _ := ParseLineItems(j.LineItems)
 
 	return s.Create(ctx, EstimateCreateParams{
-		CustomerID: j.CustomerID,
-		JobID:      j.ID,
-		StatusID:   draftStatus.ID,
-		Title:      j.JobType,
-		Notes:      j.Notes,
-		TaxRate:    "0",
-		LineItems:  items,
+		CustomerID:   j.CustomerID,
+		JobID:        j.ID,
+		StatusID:     statusID,
+		Title:        j.JobType,
+		Notes:        j.Notes,
+		TaxRate:      "0",
+		CustomFields: "[]",
+		LineItems:    items,
 	})
 }
 
