@@ -556,18 +556,22 @@ func JobForm(p JobFormPageData) templ.Component {
 					.then(r => r.text())
 					.then(html => contactSelect.innerHTML = html);
 			}
-			jobCustomer.addEventListener('change', function() { loadContacts(this.value); });
-			if (jobCustomer.value) loadContacts(jobCustomer.value);
+			if (jobCustomer && contactSelect) {
+				jobCustomer.addEventListener('change', function() { loadContacts(this.value); });
+				if (jobCustomer.value) loadContacts(jobCustomer.value);
+			}
 			const startEl = document.querySelector('[name=start_time]');
 			const endEl = document.querySelector('[name=end_time]');
 			const pad = n => String(n).padStart(2, '0');
-			startEl.addEventListener('change', function() {
-				if (!this.value) return;
-				const st = new Date(this.value);
-				st.setHours(st.getHours()+1);
-				endEl.value = st.getFullYear() + '-' + pad(st.getMonth()+1) + '-' + pad(st.getDate()) + 'T' + pad(st.getHours()) + ':' + pad(st.getMinutes());
-			});
-			document.addEventListener('alpine:init', () => {
+			if (startEl && endEl) {
+				startEl.addEventListener('change', function() {
+					if (!this.value) return;
+					const st = new Date(this.value);
+					st.setHours(st.getHours()+1);
+					endEl.value = st.getFullYear() + '-' + pad(st.getMonth()+1) + '-' + pad(st.getDate()) + 'T' + pad(st.getHours()) + ':' + pad(st.getMinutes());
+				});
+			}
+			function registerJobEditors() {
 				Alpine.data('visitsEditor', () => ({
 					items: [],
 					init() { try { this.items = JSON.parse(this.$el.dataset.existing || '[]'); } catch(e) {} },
@@ -589,7 +593,8 @@ func JobForm(p JobFormPageData) templ.Component {
 					remove(idx) { this.items.splice(idx, 1); },
 					get json() { return JSON.stringify(this.items); },
 				}));
-			});
+			}
+			if (window.Alpine) { registerJobEditors(); } else { document.addEventListener('alpine:init', registerJobEditors); }
 		</script>`).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
