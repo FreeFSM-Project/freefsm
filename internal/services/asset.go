@@ -224,7 +224,7 @@ func (s *AssetService) Restore(ctx context.Context, id int64) error {
 
 func (s *AssetService) GetServiceHistory(ctx context.Context, assetID int64) ([]*ent.Job, error) {
 	return s.client.Job.Query().
-		Where(job.AssetIDEQ(assetID)).
+		Where(job.DeletedAtIsNil(), job.AssetIDEQ(assetID)).
 		Order(ent.Desc(job.FieldUpdatedAt)).
 		All(ctx)
 }

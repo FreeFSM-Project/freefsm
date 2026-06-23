@@ -74,7 +74,7 @@ func (s *JobService) ListAll(ctx context.Context) ([]*ent.Job, error) {
 
 func (s *JobService) ListByDateRange(ctx context.Context, start, end time.Time) ([]*ent.Job, error) {
 	return s.client.Job.Query().
-		Where(job.StartTimeNotNil(), job.StartTimeGTE(start), job.StartTimeLTE(end)).
+		Where(job.DeletedAtIsNil(), job.StartTimeNotNil(), job.StartTimeGTE(start), job.StartTimeLTE(end)).
 		Order(ent.Asc(job.FieldStartTime)).
 		All(ctx)
 }
@@ -88,14 +88,14 @@ func (s *JobService) ListAssignedByDateRange(ctx context.Context, userID int64, 
 		return nil, nil
 	}
 	return s.client.Job.Query().
-		Where(job.IDIn(jobIDs...), job.StartTimeNotNil(), job.StartTimeGTE(start), job.StartTimeLTE(end)).
+		Where(job.DeletedAtIsNil(), job.IDIn(jobIDs...), job.StartTimeNotNil(), job.StartTimeGTE(start), job.StartTimeLTE(end)).
 		Order(ent.Asc(job.FieldStartTime)).
 		All(ctx)
 }
 
 func (s *JobService) ListByProject(ctx context.Context, projectID int64) ([]*ent.Job, error) {
 	return s.client.Job.Query().
-		Where(job.ProjectIDEQ(projectID)).
+		Where(job.DeletedAtIsNil(), job.ProjectIDEQ(projectID)).
 		Order(ent.Desc(job.FieldCreatedAt)).
 		All(ctx)
 }
