@@ -113,16 +113,16 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 			handleLogout(w, r, sessions, activitySvc)
 		})
 		r.Get("/projects", projectHandler.List)
-		r.Get("/projects/activity", activityHandler.ListByType("project"))
+		r.With(middleware.DispatcherOrAdmin).Get("/projects/activity", activityHandler.ListByType("project"))
 		r.Get("/projects/{id}", projectHandler.Show)
 		r.Get("/customers", customerHandler.List)
-		r.Get("/customers/activity", activityHandler.ListByType("customer"))
+		r.With(middleware.DispatcherOrAdmin).Get("/customers/activity", activityHandler.ListByType("customer"))
 		r.Get("/customers/{id}", customerHandler.Show)
 		r.Get("/customers/{id}/contacts", customerHandler.ListContacts)
 		r.Get("/customers/{id}/contacts/options", customerHandler.Contacts)
 		r.Route("/items", func(r chi.Router) {
 			r.Get("/", itemHandler.List)
-			r.Get("/activity", activityHandler.ListByType("item"))
+			r.With(middleware.DispatcherOrAdmin).Get("/activity", activityHandler.ListByType("item"))
 			r.Post("/", itemHandler.Create)
 			r.Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
 				if chi.URLParam(r, "id") == "new" {
@@ -138,22 +138,22 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Get("/time-entries", timeEntryHandler.List)
 		r.Post("/time-entries/clock-in", timeEntryHandler.ClockIn)
 		r.Post("/time-entries/clock-out", timeEntryHandler.ClockOut)
-		r.Get("/time-entries/activity", activityHandler.ListByType("time_entry"))
+		r.With(middleware.DispatcherOrAdmin).Get("/time-entries/activity", activityHandler.ListByType("time_entry"))
 		r.Get("/time-entries/{id}/edit", timeEntryHandler.Update)
 		r.Post("/time-entries/{id}", timeEntryHandler.Update)
 		r.Get("/time-entries/{id}", timeEntryHandler.Show)
 		r.Post("/time-entries/{id}/delete", timeEntryHandler.Delete)
 		r.Get("/jobs", jobHandler.List)
-		r.Get("/jobs/activity", activityHandler.ListByType("job"))
+		r.With(middleware.DispatcherOrAdmin).Get("/jobs/activity", activityHandler.ListByType("job"))
 		r.Get("/jobs/{id}", jobHandler.Show)
 		r.Get("/assets", assetHandler.List)
-		r.Get("/assets/activity", activityHandler.ListByType("asset"))
+		r.With(middleware.DispatcherOrAdmin).Get("/assets/activity", activityHandler.ListByType("asset"))
 		r.Get("/assets/{id}", assetHandler.Show)
 		r.Get("/estimates", estimateHandler.List)
-		r.Get("/estimates/activity", activityHandler.ListByType("estimate"))
+		r.With(middleware.DispatcherOrAdmin).Get("/estimates/activity", activityHandler.ListByType("estimate"))
 		r.Get("/estimates/{id}", estimateHandler.Show)
 		r.Get("/invoices", invoiceHandler.List)
-		r.Get("/invoices/activity", activityHandler.ListByType("invoice"))
+		r.With(middleware.DispatcherOrAdmin).Get("/invoices/activity", activityHandler.ListByType("invoice"))
 		r.Get("/invoices/{id}", invoiceHandler.Show)
 
 		// Core operational mutations
@@ -241,7 +241,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		}
 
 		// Activity
-		r.Get("/activity", activityHandler.ListAll)
+		r.With(middleware.DispatcherOrAdmin).Get("/activity", activityHandler.ListAll)
 		for _, e := range []struct{ prefix, objType string }{
 			{"/customers", "customer"},
 			{"/jobs", "job"},
