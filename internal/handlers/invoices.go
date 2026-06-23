@@ -238,7 +238,7 @@ func (h *InvoiceHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	params := services.InvoiceUpdateParams{
 		CustomerID: int64Ptr(custID),
-		JobID:      int64Ptr(jobID),
+		JobID:      &jobID,
 		StatusID:   int64Ptr(statusID),
 		Title:      formPtr(r.FormValue("title")),
 		Notes:      formPtr(r.FormValue("notes")),

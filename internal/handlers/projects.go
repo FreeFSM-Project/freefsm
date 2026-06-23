@@ -374,7 +374,7 @@ func (h *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
 		Name:                 formPtr(r.FormValue("name")),
 		Description:          formPtr(r.FormValue("description")),
 		StatusID:             int64Ptr(statusID),
-		LocationID:           int64Ptr(locationID),
+		LocationID:           &locationID,
 		CompletionPercentage: &completion,
 		StartTime:            parseDatePtr(r.FormValue("start_time"), loc),
 		EndTime:              parseDatePtr(r.FormValue("end_time"), loc),

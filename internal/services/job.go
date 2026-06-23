@@ -185,6 +185,10 @@ func (s *JobService) GetByID(ctx context.Context, id int64) (*ent.Job, error) {
 }
 
 func (s *JobService) Create(ctx context.Context, params JobCreateParams) (*ent.Job, error) {
+	if err := validateJobCustomerLinks(ctx, s.client, params.CustomerID, params.ProjectID, params.LocationID, params.CustomerContactID, params.AssetID); err != nil {
+		return nil, err
+	}
+
 	b := s.client.Job.Create().
 		SetCustomerID(params.CustomerID).
 		SetJobType(params.JobType).
@@ -247,6 +251,34 @@ func (s *JobService) Create(ctx context.Context, params JobCreateParams) (*ent.J
 }
 
 func (s *JobService) Update(ctx context.Context, id int64, params JobUpdateParams) (*ent.Job, error) {
+	current, err := s.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	customerID := current.CustomerID
+	projectID := int64Value(current.ProjectID)
+	locationID := int64Value(current.LocationID)
+	contactID := int64Value(current.CustomerContactID)
+	assetID := int64Value(current.AssetID)
+	if params.CustomerID != nil {
+		customerID = *params.CustomerID
+	}
+	if params.ProjectID != nil {
+		projectID = *params.ProjectID
+	}
+	if params.LocationID != nil {
+		locationID = *params.LocationID
+	}
+	if params.CustomerContactID != nil {
+		contactID = *params.CustomerContactID
+	}
+	if params.AssetID != nil {
+		assetID = *params.AssetID
+	}
+	if err := validateJobCustomerLinks(ctx, s.client, customerID, projectID, locationID, contactID, assetID); err != nil {
+		return nil, err
+	}
+
 	u := s.client.Job.UpdateOneID(id)
 	var assignments []JobAssignment
 
@@ -275,16 +307,32 @@ func (s *JobService) Update(ctx context.Context, id int64, params JobUpdateParam
 		u.SetDueDate(*params.DueDate)
 	}
 	if params.ProjectID != nil {
-		u.SetProjectID(*params.ProjectID)
+		if *params.ProjectID > 0 {
+			u.SetProjectID(*params.ProjectID)
+		} else {
+			u.ClearProjectID()
+		}
 	}
 	if params.LocationID != nil {
-		u.SetLocationID(*params.LocationID)
+		if *params.LocationID > 0 {
+			u.SetLocationID(*params.LocationID)
+		} else {
+			u.ClearLocationID()
+		}
 	}
 	if params.CustomerContactID != nil {
-		u.SetCustomerContactID(*params.CustomerContactID)
+		if *params.CustomerContactID > 0 {
+			u.SetCustomerContactID(*params.CustomerContactID)
+		} else {
+			u.ClearCustomerContactID()
+		}
 	}
 	if params.AssetID != nil {
-		u.SetAssetID(*params.AssetID)
+		if *params.AssetID > 0 {
+			u.SetAssetID(*params.AssetID)
+		} else {
+			u.ClearAssetID()
+		}
 	}
 	if params.ArrivalStart != nil {
 		u.SetArrivalWindowStart(*params.ArrivalStart)

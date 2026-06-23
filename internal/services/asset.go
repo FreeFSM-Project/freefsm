@@ -113,6 +113,12 @@ func (s *AssetService) GetByID(ctx context.Context, id int64) (*ent.Asset, error
 }
 
 func (s *AssetService) Create(ctx context.Context, params AssetCreateParams) (*ent.Asset, error) {
+	if params.LocationID != nil {
+		if err := validateCustomerLocation(ctx, s.client, params.CustomerID, *params.LocationID); err != nil {
+			return nil, err
+		}
+	}
+
 	b := s.client.Asset.Create().
 		SetCustomerID(params.CustomerID).
 		SetAssetTypeID(params.AssetTypeID).
@@ -144,6 +150,22 @@ func (s *AssetService) Create(ctx context.Context, params AssetCreateParams) (*e
 }
 
 func (s *AssetService) Update(ctx context.Context, id int64, params AssetUpdateParams) (*ent.Asset, error) {
+	current, err := s.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	customerID := current.CustomerID
+	locationID := int64Value(current.LocationID)
+	if params.CustomerID != nil {
+		customerID = *params.CustomerID
+	}
+	if params.LocationID != nil {
+		locationID = *params.LocationID
+	}
+	if err := validateCustomerLocation(ctx, s.client, customerID, locationID); err != nil {
+		return nil, err
+	}
+
 	u := s.client.Asset.UpdateOneID(id)
 
 	if params.CustomerID != nil {

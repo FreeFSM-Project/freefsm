@@ -86,6 +86,12 @@ func (s *CustomerContactService) GetByID(ctx context.Context, id int64) (*ent.Cu
 	return s.client.CustomerContact.Get(ctx, id)
 }
 
+func (s *CustomerContactService) GetByCustomer(ctx context.Context, customerID, id int64) (*ent.CustomerContact, error) {
+	return s.client.CustomerContact.Query().
+		Where(customercontact.IDEQ(id), customercontact.CustomerIDEQ(customerID)).
+		Only(ctx)
+}
+
 func (s *CustomerContactService) Delete(ctx context.Context, id int64) error {
 	if err := s.client.CustomerContact.DeleteOneID(id).Exec(ctx); err != nil {
 		return fmt.Errorf("delete contact: %w", err)

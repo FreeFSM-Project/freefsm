@@ -247,10 +247,10 @@ func (h *JobHandler) Update(w http.ResponseWriter, r *http.Request) {
 	assetID, _ := strconv.ParseInt(r.FormValue("asset_id"), 10, 64)
 	params := services.JobUpdateParams{
 		CustomerID:        int64Ptr(custID),
-		ProjectID:         int64Ptr(projectID),
-		LocationID:        int64Ptr(locationID),
-		CustomerContactID: int64Ptr(contactID),
-		AssetID:           int64Ptr(assetID),
+		ProjectID:         &projectID,
+		LocationID:        &locationID,
+		CustomerContactID: &contactID,
+		AssetID:           &assetID,
 		JobType:           formPtr(r.FormValue("job_type")),
 		Subtitle:          formPtr(r.FormValue("subtitle")),
 		StatusID:          int64Ptr(statusID),

@@ -83,6 +83,13 @@ func (s *InvoiceService) GetByID(ctx context.Context, id int64) (*ent.Invoice, e
 }
 
 func (s *InvoiceService) Create(ctx context.Context, params InvoiceCreateParams) (*ent.Invoice, error) {
+	if err := validateJobCustomer(ctx, s.client, params.CustomerID, params.JobID); err != nil {
+		return nil, err
+	}
+	if err := validateEstimateCustomer(ctx, s.client, params.CustomerID, params.EstimateID); err != nil {
+		return nil, err
+	}
+
 	taxRate := params.TaxRate
 	if taxRate == "" {
 		taxRate = "0"
@@ -119,16 +126,47 @@ func (s *InvoiceService) Create(ctx context.Context, params InvoiceCreateParams)
 }
 
 func (s *InvoiceService) Update(ctx context.Context, id int64, params InvoiceUpdateParams) (*ent.Invoice, error) {
+	current, err := s.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	customerID := int64Value(current.CustomerID)
+	jobID := int64Value(current.JobID)
+	estimateID := int64Value(current.EstimateID)
+	if params.CustomerID != nil {
+		customerID = *params.CustomerID
+	}
+	if params.JobID != nil {
+		jobID = *params.JobID
+	}
+	if params.EstimateID != nil {
+		estimateID = *params.EstimateID
+	}
+	if err := validateJobCustomer(ctx, s.client, customerID, jobID); err != nil {
+		return nil, err
+	}
+	if err := validateEstimateCustomer(ctx, s.client, customerID, estimateID); err != nil {
+		return nil, err
+	}
+
 	u := s.client.Invoice.UpdateOneID(id)
 
 	if params.CustomerID != nil {
 		u.SetCustomerID(*params.CustomerID)
 	}
 	if params.JobID != nil {
-		u.SetJobID(*params.JobID)
+		if *params.JobID > 0 {
+			u.SetJobID(*params.JobID)
+		} else {
+			u.ClearJobID()
+		}
 	}
 	if params.EstimateID != nil {
-		u.SetEstimateID(*params.EstimateID)
+		if *params.EstimateID > 0 {
+			u.SetEstimateID(*params.EstimateID)
+		} else {
+			u.ClearEstimateID()
+		}
 	}
 	if params.StatusID != nil {
 		u.SetStatusID(*params.StatusID)

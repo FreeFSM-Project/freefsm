@@ -389,19 +389,21 @@ func (h *CustomerHandler) CreateContact(w http.ResponseWriter, r *http.Request) 
 func (h *CustomerHandler) EditContactForm(w http.ResponseWriter, r *http.Request) {
 	custID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	cid, _ := strconv.ParseInt(chi.URLParam(r, "cid"), 10, 64)
-	contacts, _ := h.contactSvc.ListByCustomer(r.Context(), custID)
-	for _, c := range contacts {
-		if c.ID == cid {
-			templates.ContactEditRow(custID, cid, c.FirstName, c.LastName, c.Email, c.Phone, c.Notes).Render(r.Context(), w)
-			return
-		}
+	c, err := h.contactSvc.GetByCustomer(r.Context(), custID, cid)
+	if err != nil {
+		http.NotFound(w, r)
+		return
 	}
-	http.NotFound(w, r)
+	templates.ContactEditRow(custID, cid, c.FirstName, c.LastName, c.Email, c.Phone, c.Notes).Render(r.Context(), w)
 }
 
 func (h *CustomerHandler) UpdateContact(w http.ResponseWriter, r *http.Request) {
 	custID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	cid, _ := strconv.ParseInt(chi.URLParam(r, "cid"), 10, 64)
+	if _, err := h.contactSvc.GetByCustomer(r.Context(), custID, cid); err != nil {
+		http.NotFound(w, r)
+		return
+	}
 	r.ParseForm()
 	c, err := h.contactSvc.Update(r.Context(), cid, services.ContactUpdateParams{
 		FirstName: formPtr(r.FormValue("first_name")),
@@ -431,17 +433,22 @@ func (h *CustomerHandler) UpdateContact(w http.ResponseWriter, r *http.Request) 
 func (h *CustomerHandler) DeleteContact(w http.ResponseWriter, r *http.Request) {
 	cid, _ := strconv.ParseInt(chi.URLParam(r, "cid"), 10, 64)
 	custID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	contact, err := h.contactSvc.GetByID(r.Context(), cid)
-	if err == nil {
-		u, _ := middleware.UserFromContext(r.Context())
-		if u != nil {
-			h.activitySvc.Record(r.Context(), u.ID, "contact_deleted", "customer", custID, map[string]interface{}{
-				"actor_name":  u.Name,
-				"entity_name": contact.FirstName + " " + contact.LastName,
-			})
-		}
+	contact, err := h.contactSvc.GetByCustomer(r.Context(), custID, cid)
+	if err != nil {
+		http.NotFound(w, r)
+		return
 	}
-	h.contactSvc.Delete(r.Context(), cid)
+	u, _ := middleware.UserFromContext(r.Context())
+	if u != nil {
+		h.activitySvc.Record(r.Context(), u.ID, "contact_deleted", "customer", custID, map[string]interface{}{
+			"actor_name":  u.Name,
+			"entity_name": contact.FirstName + " " + contact.LastName,
+		})
+	}
+	if err := h.contactSvc.Delete(r.Context(), cid); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	h.ListContacts(w, r)
 }
 

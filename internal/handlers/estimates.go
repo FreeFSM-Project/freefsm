@@ -236,7 +236,7 @@ func (h *EstimateHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 	params := services.EstimateUpdateParams{
 		CustomerID:   int64Ptr(custID),
-		JobID:        int64Ptr(jobID),
+		JobID:        &jobID,
 		StatusID:     int64Ptr(statusID),
 		Title:        formPtr(r.FormValue("title")),
 		Notes:        formPtr(r.FormValue("notes")),

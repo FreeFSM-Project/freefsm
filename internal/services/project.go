@@ -78,6 +78,10 @@ type ProjectCreateParams struct {
 }
 
 func (s *ProjectService) Create(ctx context.Context, params ProjectCreateParams) (*ent.Project, error) {
+	if err := validateCustomerLocation(ctx, s.client, params.CustomerID, params.LocationID); err != nil {
+		return nil, err
+	}
+
 	b := s.client.Project.Create().
 		SetCustomerID(params.CustomerID).
 		SetName(params.Name).
@@ -120,6 +124,22 @@ type ProjectUpdateParams struct {
 }
 
 func (s *ProjectService) Update(ctx context.Context, id int64, params ProjectUpdateParams) (*ent.Project, error) {
+	current, err := s.GetByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	customerID := current.CustomerID
+	locationID := int64Value(current.LocationID)
+	if params.CustomerID != nil {
+		customerID = *params.CustomerID
+	}
+	if params.LocationID != nil {
+		locationID = *params.LocationID
+	}
+	if err := validateCustomerLocation(ctx, s.client, customerID, locationID); err != nil {
+		return nil, err
+	}
+
 	b := s.client.Project.UpdateOneID(id)
 
 	if params.CustomerID != nil {

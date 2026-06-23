@@ -273,17 +273,14 @@ func (h *AssetHandler) Update(w http.ResponseWriter, r *http.Request) {
 	assetTypeID, _ := strconv.ParseInt(r.FormValue("asset_type_id"), 10, 64)
 	assetStatusID, _ := strconv.ParseInt(r.FormValue("asset_status_id"), 10, 64)
 
-	var locID, statusID *int64
-	if locationID > 0 {
-		locID = &locationID
-	}
+	var statusID *int64
 	if assetStatusID > 0 {
 		statusID = &assetStatusID
 	}
 
 	params := services.AssetUpdateParams{
 		CustomerID:    &customerID,
-		LocationID:    locID,
+		LocationID:    &locationID,
 		AssetTypeID:   &assetTypeID,
 		AssetStatusID: statusID,
 		Name:          strPtr(r.FormValue("name")),
