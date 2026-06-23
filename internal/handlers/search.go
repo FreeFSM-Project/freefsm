@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/MartialM1nd/freefsm/internal/middleware"
 	"github.com/MartialM1nd/freefsm/internal/services"
 	"github.com/MartialM1nd/freefsm/internal/templates"
 )
@@ -23,7 +24,13 @@ func (h *SearchHandler) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	customers, jobs, projects, invoices, estimates, err := h.svc.Search(r.Context(), q, 10)
+	u, ok := middleware.UserFromContext(r.Context())
+	if !ok || u == nil {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	customers, jobs, projects, invoices, estimates, err := h.svc.Search(r.Context(), q, 10, u.ID, u.Role)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
