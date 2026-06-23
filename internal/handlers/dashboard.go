@@ -10,8 +10,8 @@ import (
 )
 
 type DashboardHandler struct {
-	dashboardSvc  *services.DashboardService
-	timeEntrySvc  *services.TimeEntryService
+	dashboardSvc *services.DashboardService
+	timeEntrySvc *services.TimeEntryService
 }
 
 func NewDashboardHandler(dashboardSvc *services.DashboardService, timeEntrySvc *services.TimeEntryService) *DashboardHandler {
@@ -19,11 +19,13 @@ func NewDashboardHandler(dashboardSvc *services.DashboardService, timeEntrySvc *
 }
 
 func (h *DashboardHandler) Index(w http.ResponseWriter, r *http.Request) {
-	stats, _ := h.dashboardSvc.Stats(r.Context(), middleware.CompanyLocation(r.Context()))
-
 	loc := middleware.CompanyLocation(r.Context())
 	clockWidget := templates.ClockWidgetData{}
 	user, _ := middleware.UserFromContext(r.Context())
+	stats := services.DashboardStats{}
+	if isAdminOrDispatcher(user) {
+		stats, _ = h.dashboardSvc.Stats(r.Context(), loc)
+	}
 	if user != nil {
 		activeEntry, err := h.timeEntrySvc.GetActiveByUser(r.Context(), user.ID)
 		if err == nil && activeEntry != nil {
