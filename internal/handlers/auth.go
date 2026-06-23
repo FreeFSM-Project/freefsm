@@ -40,9 +40,9 @@ func (h *AuthHandler) showLogin(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/setup", http.StatusSeeOther)
 		return
 	}
-	templates.LoginPage(templates.LoginPageData{
+	render(w, r, templates.LoginPage(templates.LoginPageData{
 		Error: r.URL.Query().Get("error"),
-	}).Render(r.Context(), w)
+	}))
 }
 
 func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
@@ -99,14 +99,14 @@ func (h *AuthHandler) login(w http.ResponseWriter, r *http.Request) {
 
 func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		templates.ForgotPasswordPage(templates.ForgotPasswordData{}).Render(r.Context(), w)
+		render(w, r, templates.ForgotPasswordPage(templates.ForgotPasswordData{}))
 		return
 	}
 	r.ParseForm()
 	email := r.FormValue("email")
 	u, err := h.userSvc.GetByEmail(r.Context(), email)
 	if err != nil {
-		templates.ForgotPasswordPage(templates.ForgotPasswordData{Success: true}).Render(r.Context(), w)
+		render(w, r, templates.ForgotPasswordPage(templates.ForgotPasswordData{Success: true}))
 		return
 	}
 	tok, err := h.resetSvc.CreateToken(r.Context(), u.ID)
@@ -123,10 +123,10 @@ func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	if err := h.emailSvc.SendPasswordReset(r.Context(), email, u.Name, link); err != nil {
 		emailErr = "Failed to send email. Please try again."
 	}
-	templates.ForgotPasswordPage(templates.ForgotPasswordData{
+	render(w, r, templates.ForgotPasswordPage(templates.ForgotPasswordData{
 		Success:  true,
 		EMailErr: emailErr,
-	}).Render(r.Context(), w)
+	}))
 }
 
 func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
@@ -134,10 +134,10 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		token := r.URL.Query().Get("token")
 		_, err := h.resetSvc.Validate(r.Context(), token)
 		if err != nil {
-			templates.ResetPasswordPage(templates.ResetPasswordData{Error: "Invalid or expired reset link"}).Render(r.Context(), w)
+			render(w, r, templates.ResetPasswordPage(templates.ResetPasswordData{Error: "Invalid or expired reset link"}))
 			return
 		}
-		templates.ResetPasswordPage(templates.ResetPasswordData{Token: token, Valid: true}).Render(r.Context(), w)
+		render(w, r, templates.ResetPasswordPage(templates.ResetPasswordData{Token: token, Valid: true}))
 		return
 	}
 	r.ParseForm()
@@ -150,15 +150,15 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	cs, _ := h.csSvc.Get(r.Context())
 	if err := h.userSvc.ValidatePassword(password, cs); err != nil {
-		templates.ResetPasswordPage(templates.ResetPasswordData{
+		render(w, r, templates.ResetPasswordPage(templates.ResetPasswordData{
 			Token: token, Valid: true, Error: err.Error(),
-		}).Render(r.Context(), w)
+		}))
 		return
 	}
 	if err := h.userSvc.SetPassword(r.Context(), uid, password); err != nil {
-		templates.ResetPasswordPage(templates.ResetPasswordData{
+		render(w, r, templates.ResetPasswordPage(templates.ResetPasswordData{
 			Token: token, Valid: true, Error: "Failed to reset password. Please try again.",
-		}).Render(r.Context(), w)
+		}))
 		return
 	}
 	h.resetSvc.Consume(r.Context(), token)

@@ -38,9 +38,9 @@ func (h *SetupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *SetupHandler) show(w http.ResponseWriter, r *http.Request) {
-	templates.SetupPage(templates.SetupPageData{
+	render(w, r, templates.SetupPage(templates.SetupPageData{
 		Error: r.URL.Query().Get("error"),
-	}).Render(r.Context(), w)
+	}))
 }
 
 func (h *SetupHandler) create(w http.ResponseWriter, r *http.Request) {

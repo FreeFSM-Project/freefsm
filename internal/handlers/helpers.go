@@ -1,9 +1,24 @@
 package handlers
 
 import (
+	"bytes"
+	"log/slog"
+	"net/http"
+
 	"github.com/MartialM1nd/freefsm/internal/ent"
 	"github.com/MartialM1nd/freefsm/internal/templates"
+	"github.com/a-h/templ"
 )
+
+func render(w http.ResponseWriter, r *http.Request, component templ.Component) {
+	var buf bytes.Buffer
+	if err := component.Render(r.Context(), &buf); err != nil {
+		slog.Error("render template", "path", r.URL.Path, "error", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	_, _ = buf.WriteTo(w)
+}
 
 func customerMap(customers []*ent.Customer) map[int64]string {
 	m := make(map[int64]string, len(customers))
@@ -30,9 +45,13 @@ func customerOptions(customers []*ent.Customer) []templates.SelectOption {
 }
 
 func statusName(statuses []*ent.Status, id *int64) string {
-	if id == nil { return "" }
+	if id == nil {
+		return ""
+	}
 	for _, s := range statuses {
-		if s.ID == *id { return s.Name }
+		if s.ID == *id {
+			return s.Name
+		}
 	}
 	return "Unknown"
 }
@@ -46,9 +65,13 @@ func statusMap(statuses []*ent.Status) map[int64]string {
 }
 
 func statusColor(statuses []*ent.Status, id *int64) string {
-	if id == nil { return "#6B7280" }
+	if id == nil {
+		return "#6B7280"
+	}
 	for _, s := range statuses {
-		if s.ID == *id { return s.Color }
+		if s.ID == *id {
+			return s.Color
+		}
 	}
 	return "#6B7280"
 }

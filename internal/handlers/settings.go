@@ -29,10 +29,10 @@ func NewSettingsHandler(svc *services.CompanySettingsService, emailSvc *services
 
 func (h *SettingsHandler) Show(w http.ResponseWriter, r *http.Request) {
 	cs, _ := h.svc.Get(r.Context())
-	templates.SettingsPage(templates.SettingsPageData{
+	render(w, r, templates.SettingsPage(templates.SettingsPageData{
 		Settings: cs,
 		IsSetup:  r.URL.Path == "/setup/company",
-	}).Render(r.Context(), w)
+	}))
 }
 
 func (h *SettingsHandler) Save(w http.ResponseWriter, r *http.Request) {
@@ -191,10 +191,10 @@ func (h *SettingsHandler) TestEmail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.emailSvc.SendTestEmail(r.Context(), u.Email, u.Name); err != nil {
-		templates.TestEmailResult(false, err.Error()).Render(r.Context(), w)
+		render(w, r, templates.TestEmailResult(false, err.Error()))
 		return
 	}
-	templates.TestEmailResult(true, "").Render(r.Context(), w)
+	render(w, r, templates.TestEmailResult(true, ""))
 }
 
 func (h *SettingsHandler) UploadInvoiceLogo(w http.ResponseWriter, r *http.Request) {
@@ -250,7 +250,7 @@ func (h *SettingsHandler) UploadInvoiceLogo(w http.ResponseWriter, r *http.Reque
 		})
 	}
 
-	templates.InvoiceLogoPreview(logoPath, strconv.FormatInt(time.Now().UnixMilli(), 10)).Render(r.Context(), w)
+	render(w, r, templates.InvoiceLogoPreview(logoPath, strconv.FormatInt(time.Now().UnixMilli(), 10)))
 }
 
 func detectInvoiceLogoExt(f io.ReadSeeker) (string, error) {

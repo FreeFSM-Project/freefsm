@@ -88,10 +88,10 @@ func (h *TimeEntryHandler) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") == "true" && r.Header.Get("HX-Boosted") != "true" {
-		templates.TimeEntriesTable(data).Render(r.Context(), w)
+		render(w, r, templates.TimeEntriesTable(data))
 		return
 	}
-	templates.TimeEntriesIndex(data).Render(r.Context(), w)
+	render(w, r, templates.TimeEntriesIndex(data))
 }
 
 func (h *TimeEntryHandler) Show(w http.ResponseWriter, r *http.Request) {
@@ -149,7 +149,7 @@ func (h *TimeEntryHandler) Show(w http.ResponseWriter, r *http.Request) {
 		GPSLat:   gpsLat,
 		GPSLon:   gpsLon,
 	}
-	templates.TimeEntryShow(data).Render(r.Context(), w)
+	render(w, r, templates.TimeEntryShow(data))
 }
 
 func (h *TimeEntryHandler) ClockIn(w http.ResponseWriter, r *http.Request) {
@@ -274,7 +274,7 @@ func (h *TimeEntryHandler) Update(w http.ResponseWriter, r *http.Request) {
 				Notes:    entry.Notes,
 			},
 		}
-		templates.TimeEntryForm(data).Render(r.Context(), w)
+		render(w, r, templates.TimeEntryForm(data))
 		return
 	}
 
