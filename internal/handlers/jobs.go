@@ -95,11 +95,6 @@ func (h *JobHandler) Show(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	j, err := h.svc.GetByID(r.Context(), id)
-	if err != nil {
-		http.NotFound(w, r)
-		return
-	}
 	u, ok := middleware.UserFromContext(r.Context())
 	if !ok || u == nil {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
@@ -107,6 +102,11 @@ func (h *JobHandler) Show(w http.ResponseWriter, r *http.Request) {
 	}
 	if !h.policySvc.CanAccessObject(r.Context(), u.ID, u.Role, "job", id, policyRead) {
 		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	j, err := h.svc.GetByID(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
 		return
 	}
 	statuses := h.statusesForSelect(r.Context())

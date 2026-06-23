@@ -70,13 +70,13 @@ func (h *CustomerHandler) Show(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	if !h.canReadCustomer(r, id) {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
 	c, err := h.svc.GetByID(r.Context(), id)
 	if err != nil {
 		http.NotFound(w, r)
-		return
-	}
-	if !h.canReadCustomer(r, id) {
-		http.Error(w, "forbidden", http.StatusForbidden)
 		return
 	}
 	tags, _ := h.tagLinkSvc.ListForObject(r.Context(), "customer", c.ID)

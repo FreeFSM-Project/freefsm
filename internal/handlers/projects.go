@@ -80,14 +80,14 @@ func (h *ProjectHandler) Show(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	p, err := h.svc.GetByID(r.Context(), id)
-	if err != nil {
-		http.NotFound(w, r)
-		return
-	}
 	u, ok := middleware.UserFromContext(r.Context())
 	if !ok || u == nil || !h.policySvc.CanAccessObject(r.Context(), u.ID, u.Role, "project", id, policyRead) {
 		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	p, err := h.svc.GetByID(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
 		return
 	}
 

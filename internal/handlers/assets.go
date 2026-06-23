@@ -103,14 +103,14 @@ func (h *AssetHandler) Show(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	asset, err := h.svc.GetByID(r.Context(), id)
-	if err != nil {
-		http.NotFound(w, r)
-		return
-	}
 	u, ok := middleware.UserFromContext(r.Context())
 	if !ok || u == nil || !h.policySvc.CanAccessObject(r.Context(), u.ID, u.Role, "asset", id, policyRead) {
 		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	asset, err := h.svc.GetByID(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
 		return
 	}
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/MartialM1nd/freefsm/internal/ent"
 	"github.com/MartialM1nd/freefsm/internal/ent/customer"
+	"github.com/MartialM1nd/freefsm/internal/ent/estimate"
 	"github.com/MartialM1nd/freefsm/internal/ent/invoice"
 	"github.com/MartialM1nd/freefsm/internal/ent/job"
 	"github.com/MartialM1nd/freefsm/internal/ent/project"
@@ -14,24 +15,24 @@ import (
 )
 
 type DashboardStats struct {
-	TotalCustomers           int
-	NewCustomersThisMonth    int
-	TotalJobs                int
-	JobsOverdue              int
-	TotalEstimates           int
-	TotalInvoices            int
-	InvoicesPaid             int
-	InvoicesUnpaid           int
-	InvoicesOverdue          int
-	TotalProjects            int
-	ProjectsActive           int
-	ProjectsCompleted        int
-	RevenueMonth             float64
-	OutstandingReceivables   float64
-	OverdueAmount            float64
-	RecentJobs               []RecentJob
-	RecentInvoices           []RecentInvoice
-	RecentEstimates          []RecentEstimate
+	TotalCustomers         int
+	NewCustomersThisMonth  int
+	TotalJobs              int
+	JobsOverdue            int
+	TotalEstimates         int
+	TotalInvoices          int
+	InvoicesPaid           int
+	InvoicesUnpaid         int
+	InvoicesOverdue        int
+	TotalProjects          int
+	ProjectsActive         int
+	ProjectsCompleted      int
+	RevenueMonth           float64
+	OutstandingReceivables float64
+	OverdueAmount          float64
+	RecentJobs             []RecentJob
+	RecentInvoices         []RecentInvoice
+	RecentEstimates        []RecentEstimate
 }
 
 type RecentJob struct {
@@ -42,19 +43,19 @@ type RecentJob struct {
 }
 
 type RecentInvoice struct {
-	ID       int64
-	Title    string
-	Customer string
-	Total    float64
-	Status   string
+	ID        int64
+	Title     string
+	Customer  string
+	Total     float64
+	Status    string
 	CreatedAt string
 }
 
 type RecentEstimate struct {
-	ID       int64
-	Title    string
-	Customer string
-	Total    float64
+	ID        int64
+	Title     string
+	Customer  string
+	Total     float64
 	CreatedAt string
 }
 
@@ -71,18 +72,18 @@ func (s *DashboardService) Stats(ctx context.Context, loc *time.Location) (Dashb
 	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, loc)
 
 	// Basic counts
-	totalCustomers, _ := s.client.Customer.Query().Count(ctx)
+	totalCustomers, _ := s.client.Customer.Query().Where(customer.DeletedAtIsNil()).Count(ctx)
 	newCustomers, _ := s.client.Customer.Query().
-		Where(customer.CreatedAtGTE(startOfMonth)).
+		Where(customer.DeletedAtIsNil(), customer.CreatedAtGTE(startOfMonth)).
 		Count(ctx)
-	totalJobs, _ := s.client.Job.Query().Count(ctx)
-	totalEstimates, _ := s.client.Estimate.Query().Count(ctx)
-	totalInvoices, _ := s.client.Invoice.Query().Count(ctx)
-	totalProjects, _ := s.client.Project.Query().Count(ctx)
+	totalJobs, _ := s.client.Job.Query().Where(job.DeletedAtIsNil()).Count(ctx)
+	totalEstimates, _ := s.client.Estimate.Query().Where(estimate.DeletedAtIsNil()).Count(ctx)
+	totalInvoices, _ := s.client.Invoice.Query().Where(invoice.DeletedAtIsNil()).Count(ctx)
+	totalProjects, _ := s.client.Project.Query().Where(project.DeletedAtIsNil()).Count(ctx)
 
 	// Jobs overdue
 	jobsOverdue, _ := s.client.Job.Query().
-		Where(job.DueDateNotNil(), job.DueDateLT(now)).
+		Where(job.DeletedAtIsNil(), job.DueDateNotNil(), job.DueDateLT(now)).
 		Count(ctx)
 
 	// Find status IDs
@@ -94,29 +95,29 @@ func (s *DashboardService) Stats(ctx context.Context, loc *time.Location) (Dashb
 
 	// Invoices
 	invoicesPaid, _ := s.client.Invoice.Query().
-		Where(invoice.StatusIDEQ(paidStatusID)).
+		Where(invoice.DeletedAtIsNil(), invoice.StatusIDEQ(paidStatusID)).
 		Count(ctx)
 
 	invoicesUnpaid, _ := s.client.Invoice.Query().
-		Where(invoice.StatusIDNEQ(paidStatusID)).
+		Where(invoice.DeletedAtIsNil(), invoice.StatusIDNEQ(paidStatusID)).
 		Count(ctx)
 
 	invoicesOverdue, _ := s.client.Invoice.Query().
-		Where(invoice.DueDateLT(now), invoice.StatusIDNEQ(paidStatusID)).
+		Where(invoice.DeletedAtIsNil(), invoice.DueDateLT(now), invoice.StatusIDNEQ(paidStatusID)).
 		Count(ctx)
 
 	// Projects
 	projectsActive, _ := s.client.Project.Query().
-		Where(project.StatusIDEQ(inProgressStatusID)).
+		Where(project.DeletedAtIsNil(), project.StatusIDEQ(inProgressStatusID)).
 		Count(ctx)
 
 	projectsCompleted, _ := s.client.Project.Query().
-		Where(project.StatusIDEQ(completedStatusID)).
+		Where(project.DeletedAtIsNil(), project.StatusIDEQ(completedStatusID)).
 		Count(ctx)
 
 	// Revenue this month (payments received)
 	monthInvoices, _ := s.client.Invoice.Query().
-		Where(invoice.InvoiceDateGTE(startOfMonth)).
+		Where(invoice.DeletedAtIsNil(), invoice.InvoiceDateGTE(startOfMonth)).
 		All(ctx)
 
 	var revenue float64
@@ -130,6 +131,7 @@ func (s *DashboardService) Stats(ctx context.Context, loc *time.Location) (Dashb
 	// Financial totals (exclude draft, paid, and void invoices)
 	allInvoices, _ := s.client.Invoice.Query().
 		Where(
+			invoice.DeletedAtIsNil(),
 			invoice.StatusIDNEQ(draftStatusID),
 			invoice.StatusIDNEQ(paidStatusID),
 			invoice.StatusIDNEQ(voidStatusID),
@@ -148,20 +150,23 @@ func (s *DashboardService) Stats(ctx context.Context, loc *time.Location) (Dashb
 
 	// Recent items
 	recentJobs, _ := s.client.Job.Query().
+		Where(job.DeletedAtIsNil()).
 		Order(ent.Desc(job.FieldCreatedAt)).
 		Limit(5).
 		All(ctx)
 	recentInvoices, _ := s.client.Invoice.Query().
+		Where(invoice.DeletedAtIsNil()).
 		Order(ent.Desc(invoice.FieldCreatedAt)).
 		Limit(5).
 		All(ctx)
 	recentEstimates, _ := s.client.Estimate.Query().
+		Where(estimate.DeletedAtIsNil()).
 		Order(ent.Desc("created_at")).
 		Limit(5).
 		All(ctx)
 
 	// Build customer map
-	customers, _ := s.client.Customer.Query().All(ctx)
+	customers, _ := s.client.Customer.Query().Where(customer.DeletedAtIsNil()).All(ctx)
 	custMap := make(map[int64]string, len(customers))
 	for _, c := range customers {
 		custMap[c.ID] = c.DisplayName
@@ -222,7 +227,7 @@ func (s *DashboardService) invoiceSubtotal(i *ent.Invoice) float64 {
 
 func (s *DashboardService) invoiceTotal(i *ent.Invoice) float64 {
 	total := s.invoiceSubtotal(i)
-		if taxRate := parseTaxRate(i.TaxRate); taxRate > 0 {
+	if taxRate := parseTaxRate(i.TaxRate); taxRate > 0 {
 		items, _ := ParseLineItems(i.LineItems)
 		var taxableTotal float64
 		for _, li := range items {
@@ -317,7 +322,7 @@ func (s *DashboardService) estimateTotal(e *ent.Estimate) float64 {
 		total -= li.Discount
 		total += li.Surcharge
 	}
-		if taxRate := parseTaxRate(e.TaxRate); taxRate > 0 {
+	if taxRate := parseTaxRate(e.TaxRate); taxRate > 0 {
 		var taxableTotal float64
 		for _, li := range items {
 			if li.Taxable {
