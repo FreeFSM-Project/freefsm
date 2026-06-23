@@ -4318,6 +4318,10 @@ type CompanySettingsMutation struct {
 	smtp_user                  *string
 	smtp_password              *string
 	smtp_from                  *string
+	invoice_email_subject      *string
+	invoice_email_body         *string
+	estimate_email_subject     *string
+	estimate_email_body        *string
 	timezone                   *string
 	password_min_length        *int
 	addpassword_min_length     *int
@@ -5163,6 +5167,150 @@ func (m *CompanySettingsMutation) ResetSMTPFrom() {
 	m.smtp_from = nil
 }
 
+// SetInvoiceEmailSubject sets the "invoice_email_subject" field.
+func (m *CompanySettingsMutation) SetInvoiceEmailSubject(s string) {
+	m.invoice_email_subject = &s
+}
+
+// InvoiceEmailSubject returns the value of the "invoice_email_subject" field in the mutation.
+func (m *CompanySettingsMutation) InvoiceEmailSubject() (r string, exists bool) {
+	v := m.invoice_email_subject
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInvoiceEmailSubject returns the old "invoice_email_subject" field's value of the CompanySettings entity.
+// If the CompanySettings object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CompanySettingsMutation) OldInvoiceEmailSubject(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInvoiceEmailSubject is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInvoiceEmailSubject requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInvoiceEmailSubject: %w", err)
+	}
+	return oldValue.InvoiceEmailSubject, nil
+}
+
+// ResetInvoiceEmailSubject resets all changes to the "invoice_email_subject" field.
+func (m *CompanySettingsMutation) ResetInvoiceEmailSubject() {
+	m.invoice_email_subject = nil
+}
+
+// SetInvoiceEmailBody sets the "invoice_email_body" field.
+func (m *CompanySettingsMutation) SetInvoiceEmailBody(s string) {
+	m.invoice_email_body = &s
+}
+
+// InvoiceEmailBody returns the value of the "invoice_email_body" field in the mutation.
+func (m *CompanySettingsMutation) InvoiceEmailBody() (r string, exists bool) {
+	v := m.invoice_email_body
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInvoiceEmailBody returns the old "invoice_email_body" field's value of the CompanySettings entity.
+// If the CompanySettings object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CompanySettingsMutation) OldInvoiceEmailBody(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInvoiceEmailBody is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInvoiceEmailBody requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInvoiceEmailBody: %w", err)
+	}
+	return oldValue.InvoiceEmailBody, nil
+}
+
+// ResetInvoiceEmailBody resets all changes to the "invoice_email_body" field.
+func (m *CompanySettingsMutation) ResetInvoiceEmailBody() {
+	m.invoice_email_body = nil
+}
+
+// SetEstimateEmailSubject sets the "estimate_email_subject" field.
+func (m *CompanySettingsMutation) SetEstimateEmailSubject(s string) {
+	m.estimate_email_subject = &s
+}
+
+// EstimateEmailSubject returns the value of the "estimate_email_subject" field in the mutation.
+func (m *CompanySettingsMutation) EstimateEmailSubject() (r string, exists bool) {
+	v := m.estimate_email_subject
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEstimateEmailSubject returns the old "estimate_email_subject" field's value of the CompanySettings entity.
+// If the CompanySettings object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CompanySettingsMutation) OldEstimateEmailSubject(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEstimateEmailSubject is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEstimateEmailSubject requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEstimateEmailSubject: %w", err)
+	}
+	return oldValue.EstimateEmailSubject, nil
+}
+
+// ResetEstimateEmailSubject resets all changes to the "estimate_email_subject" field.
+func (m *CompanySettingsMutation) ResetEstimateEmailSubject() {
+	m.estimate_email_subject = nil
+}
+
+// SetEstimateEmailBody sets the "estimate_email_body" field.
+func (m *CompanySettingsMutation) SetEstimateEmailBody(s string) {
+	m.estimate_email_body = &s
+}
+
+// EstimateEmailBody returns the value of the "estimate_email_body" field in the mutation.
+func (m *CompanySettingsMutation) EstimateEmailBody() (r string, exists bool) {
+	v := m.estimate_email_body
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEstimateEmailBody returns the old "estimate_email_body" field's value of the CompanySettings entity.
+// If the CompanySettings object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CompanySettingsMutation) OldEstimateEmailBody(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEstimateEmailBody is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEstimateEmailBody requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEstimateEmailBody: %w", err)
+	}
+	return oldValue.EstimateEmailBody, nil
+}
+
+// ResetEstimateEmailBody resets all changes to the "estimate_email_body" field.
+func (m *CompanySettingsMutation) ResetEstimateEmailBody() {
+	m.estimate_email_body = nil
+}
+
 // SetTimezone sets the "timezone" field.
 func (m *CompanySettingsMutation) SetTimezone(s string) {
 	m.timezone = &s
@@ -5649,7 +5797,7 @@ func (m *CompanySettingsMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CompanySettingsMutation) Fields() []string {
-	fields := make([]string, 0, 30)
+	fields := make([]string, 0, 34)
 	if m.company_id != nil {
 		fields = append(fields, companysettings.FieldCompanyID)
 	}
@@ -5703,6 +5851,18 @@ func (m *CompanySettingsMutation) Fields() []string {
 	}
 	if m.smtp_from != nil {
 		fields = append(fields, companysettings.FieldSMTPFrom)
+	}
+	if m.invoice_email_subject != nil {
+		fields = append(fields, companysettings.FieldInvoiceEmailSubject)
+	}
+	if m.invoice_email_body != nil {
+		fields = append(fields, companysettings.FieldInvoiceEmailBody)
+	}
+	if m.estimate_email_subject != nil {
+		fields = append(fields, companysettings.FieldEstimateEmailSubject)
+	}
+	if m.estimate_email_body != nil {
+		fields = append(fields, companysettings.FieldEstimateEmailBody)
 	}
 	if m.timezone != nil {
 		fields = append(fields, companysettings.FieldTimezone)
@@ -5784,6 +5944,14 @@ func (m *CompanySettingsMutation) Field(name string) (ent.Value, bool) {
 		return m.SMTPPassword()
 	case companysettings.FieldSMTPFrom:
 		return m.SMTPFrom()
+	case companysettings.FieldInvoiceEmailSubject:
+		return m.InvoiceEmailSubject()
+	case companysettings.FieldInvoiceEmailBody:
+		return m.InvoiceEmailBody()
+	case companysettings.FieldEstimateEmailSubject:
+		return m.EstimateEmailSubject()
+	case companysettings.FieldEstimateEmailBody:
+		return m.EstimateEmailBody()
 	case companysettings.FieldTimezone:
 		return m.Timezone()
 	case companysettings.FieldPasswordMinLength:
@@ -5853,6 +6021,14 @@ func (m *CompanySettingsMutation) OldField(ctx context.Context, name string) (en
 		return m.OldSMTPPassword(ctx)
 	case companysettings.FieldSMTPFrom:
 		return m.OldSMTPFrom(ctx)
+	case companysettings.FieldInvoiceEmailSubject:
+		return m.OldInvoiceEmailSubject(ctx)
+	case companysettings.FieldInvoiceEmailBody:
+		return m.OldInvoiceEmailBody(ctx)
+	case companysettings.FieldEstimateEmailSubject:
+		return m.OldEstimateEmailSubject(ctx)
+	case companysettings.FieldEstimateEmailBody:
+		return m.OldEstimateEmailBody(ctx)
 	case companysettings.FieldTimezone:
 		return m.OldTimezone(ctx)
 	case companysettings.FieldPasswordMinLength:
@@ -6011,6 +6187,34 @@ func (m *CompanySettingsMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSMTPFrom(v)
+		return nil
+	case companysettings.FieldInvoiceEmailSubject:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInvoiceEmailSubject(v)
+		return nil
+	case companysettings.FieldInvoiceEmailBody:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInvoiceEmailBody(v)
+		return nil
+	case companysettings.FieldEstimateEmailSubject:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEstimateEmailSubject(v)
+		return nil
+	case companysettings.FieldEstimateEmailBody:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEstimateEmailBody(v)
 		return nil
 	case companysettings.FieldTimezone:
 		v, ok := value.(string)
@@ -6258,6 +6462,18 @@ func (m *CompanySettingsMutation) ResetField(name string) error {
 		return nil
 	case companysettings.FieldSMTPFrom:
 		m.ResetSMTPFrom()
+		return nil
+	case companysettings.FieldInvoiceEmailSubject:
+		m.ResetInvoiceEmailSubject()
+		return nil
+	case companysettings.FieldInvoiceEmailBody:
+		m.ResetInvoiceEmailBody()
+		return nil
+	case companysettings.FieldEstimateEmailSubject:
+		m.ResetEstimateEmailSubject()
+		return nil
+	case companysettings.FieldEstimateEmailBody:
+		m.ResetEstimateEmailBody()
 		return nil
 	case companysettings.FieldTimezone:
 		m.ResetTimezone()

@@ -53,6 +53,14 @@ type CompanySettings struct {
 	SMTPPassword string `json:"smtp_password,omitempty"`
 	// SMTPFrom holds the value of the "smtp_from" field.
 	SMTPFrom string `json:"smtp_from,omitempty"`
+	// InvoiceEmailSubject holds the value of the "invoice_email_subject" field.
+	InvoiceEmailSubject string `json:"invoice_email_subject,omitempty"`
+	// InvoiceEmailBody holds the value of the "invoice_email_body" field.
+	InvoiceEmailBody string `json:"invoice_email_body,omitempty"`
+	// EstimateEmailSubject holds the value of the "estimate_email_subject" field.
+	EstimateEmailSubject string `json:"estimate_email_subject,omitempty"`
+	// EstimateEmailBody holds the value of the "estimate_email_body" field.
+	EstimateEmailBody string `json:"estimate_email_body,omitempty"`
 	// Timezone holds the value of the "timezone" field.
 	Timezone string `json:"timezone,omitempty"`
 	// PasswordMinLength holds the value of the "password_min_length" field.
@@ -89,7 +97,7 @@ func (*CompanySettings) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case companysettings.FieldID, companysettings.FieldCompanyID, companysettings.FieldDefaultDueDays, companysettings.FieldSMTPPort, companysettings.FieldPasswordMinLength:
 			values[i] = new(sql.NullInt64)
-		case companysettings.FieldBusinessName, companysettings.FieldAddress, companysettings.FieldCity, companysettings.FieldState, companysettings.FieldZip, companysettings.FieldPhone, companysettings.FieldEmail, companysettings.FieldTaxID, companysettings.FieldDefaultTaxRate, companysettings.FieldInvoicePrefix, companysettings.FieldEstimatePrefix, companysettings.FieldSMTPHost, companysettings.FieldSMTPUser, companysettings.FieldSMTPPassword, companysettings.FieldSMTPFrom, companysettings.FieldTimezone, companysettings.FieldInvoiceColor, companysettings.FieldInvoiceFooter, companysettings.FieldInvoiceLogoPath, companysettings.FieldInvoicePaymentTerms:
+		case companysettings.FieldBusinessName, companysettings.FieldAddress, companysettings.FieldCity, companysettings.FieldState, companysettings.FieldZip, companysettings.FieldPhone, companysettings.FieldEmail, companysettings.FieldTaxID, companysettings.FieldDefaultTaxRate, companysettings.FieldInvoicePrefix, companysettings.FieldEstimatePrefix, companysettings.FieldSMTPHost, companysettings.FieldSMTPUser, companysettings.FieldSMTPPassword, companysettings.FieldSMTPFrom, companysettings.FieldInvoiceEmailSubject, companysettings.FieldInvoiceEmailBody, companysettings.FieldEstimateEmailSubject, companysettings.FieldEstimateEmailBody, companysettings.FieldTimezone, companysettings.FieldInvoiceColor, companysettings.FieldInvoiceFooter, companysettings.FieldInvoiceLogoPath, companysettings.FieldInvoicePaymentTerms:
 			values[i] = new(sql.NullString)
 		case companysettings.FieldCreatedAt, companysettings.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -222,6 +230,30 @@ func (_m *CompanySettings) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field smtp_from", values[i])
 			} else if value.Valid {
 				_m.SMTPFrom = value.String
+			}
+		case companysettings.FieldInvoiceEmailSubject:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field invoice_email_subject", values[i])
+			} else if value.Valid {
+				_m.InvoiceEmailSubject = value.String
+			}
+		case companysettings.FieldInvoiceEmailBody:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field invoice_email_body", values[i])
+			} else if value.Valid {
+				_m.InvoiceEmailBody = value.String
+			}
+		case companysettings.FieldEstimateEmailSubject:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field estimate_email_subject", values[i])
+			} else if value.Valid {
+				_m.EstimateEmailSubject = value.String
+			}
+		case companysettings.FieldEstimateEmailBody:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field estimate_email_body", values[i])
+			} else if value.Valid {
+				_m.EstimateEmailBody = value.String
 			}
 		case companysettings.FieldTimezone:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -386,6 +418,18 @@ func (_m *CompanySettings) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("smtp_from=")
 	builder.WriteString(_m.SMTPFrom)
+	builder.WriteString(", ")
+	builder.WriteString("invoice_email_subject=")
+	builder.WriteString(_m.InvoiceEmailSubject)
+	builder.WriteString(", ")
+	builder.WriteString("invoice_email_body=")
+	builder.WriteString(_m.InvoiceEmailBody)
+	builder.WriteString(", ")
+	builder.WriteString("estimate_email_subject=")
+	builder.WriteString(_m.EstimateEmailSubject)
+	builder.WriteString(", ")
+	builder.WriteString("estimate_email_body=")
+	builder.WriteString(_m.EstimateEmailBody)
 	builder.WriteString(", ")
 	builder.WriteString("timezone=")
 	builder.WriteString(_m.Timezone)

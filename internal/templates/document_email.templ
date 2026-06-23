@@ -1,0 +1,26 @@
+package templates
+
+templ DocumentEmailCompose(p DocumentEmailData) {
+	@Layout("Email "+p.Title) {
+		<p><a href={ templ.URL(p.BackURL) }>&larr; Back to Preview</a></p>
+		if p.Error != "" {
+			<article style="border-color:var(--pico-del-color);color:var(--pico-del-color)">{ p.Error }</article>
+		}
+		<form action={ templ.URL(p.ActionURL) } method="post">
+			<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+			<label>
+				To
+				<input type="email" name="to" value={ p.To } required/>
+			</label>
+			<label>
+				Subject
+				<input type="text" name="subject" value={ p.Subject } required/>
+			</label>
+			<label>
+				Body
+				<textarea name="body" rows="10" required>{ p.Body }</textarea>
+			</label>
+			<button type="submit">Send Email</button>
+		</form>
+	}
+}

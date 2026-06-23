@@ -7,7 +7,7 @@ templ EstimateShow(p EstimateDetail) {
 		if p.ArchivedAt == "" {
 			<div style="display:flex;justify-content:space-between;align-items:center">
 			<div style="display:flex;gap:0.5rem">
-				<a href={ templ.URL(fmt.Sprintf("/estimates/%d/pdf", p.ID)) } role="button" class="outline" target="_blank">PDF</a>
+				<a href={ templ.URL(fmt.Sprintf("/estimates/%d/pdf/preview", p.ID)) } role="button" class="outline">PDF</a>
 				<a href={ templ.URL(fmt.Sprintf("/estimates/%d/edit", p.ID)) } role="button" class="outline" aria-label={ fmt.Sprintf("Edit %s", p.Title) }>Edit</a>
 				<form action={ templ.URL(fmt.Sprintf("/estimates/%d/convert-to-invoice", p.ID)) } method="post" style="display:inline" onsubmit="return confirm('Convert this estimate to an invoice? The estimate will be removed.')">
 					<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
@@ -23,12 +23,15 @@ templ EstimateShow(p EstimateDetail) {
 		if p.ArchivedAt != "" {
 			<div style="background:var(--pico-muted-background);border:1px solid var(--pico-muted-border-color);border-radius:0.25rem;padding:0.75rem 1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center">
 				<span style="color:var(--pico-muted-color)">Archived on { p.ArchivedAt }</span>
+				<div style="display:flex;gap:0.5rem;align-items:center">
+				<a href={ templ.URL(fmt.Sprintf("/estimates/%d/pdf/preview", p.ID)) } role="button" class="outline" style="font-size:0.85rem">PDF</a>
 				if canAdmin(ctx) {
 					<form action={ templ.URL(fmt.Sprintf("/estimates/%d/restore", p.ID)) } method="post" style="display:inline">
 						<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
 						<button type="submit" class="outline" style="font-size:0.85rem">Restore</button>
 					</form>
 				}
+				</div>
 			</div>
 		}
 		if len(p.Tags) > 0 || true {

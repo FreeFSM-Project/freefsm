@@ -24,11 +24,12 @@ type InvoiceHandler struct {
 	tagLinkSvc  *services.TagLinkService
 	defSvc      *services.CustomFieldDefinitionService
 	fileSvc     *services.FileService
+	emailSvc    *services.EmailService
 	activitySvc *services.ActivityService
 }
 
-func NewInvoiceHandler(svc *services.InvoiceService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, fileSvc *services.FileService, activitySvc *services.ActivityService) *InvoiceHandler {
-	return &InvoiceHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, fileSvc: fileSvc, activitySvc: activitySvc}
+func NewInvoiceHandler(svc *services.InvoiceService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, fileSvc *services.FileService, emailSvc *services.EmailService, activitySvc *services.ActivityService) *InvoiceHandler {
+	return &InvoiceHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, fileSvc: fileSvc, emailSvc: emailSvc, activitySvc: activitySvc}
 }
 
 func (h *InvoiceHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -480,20 +481,156 @@ func (h *InvoiceHandler) PDF(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid id", 400)
 		return
 	}
+	doc, err := h.invoicePDFDocument(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	writePDFResponseWithDisposition(w, doc.Filename, r.URL.Query().Get("download") == "1", func(w io.Writer) error {
+		_, err := w.Write(doc.Data)
+		return err
+	})
+}
+
+func (h *InvoiceHandler) PreviewPDF(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", 400)
+		return
+	}
 	i, err := h.svc.GetByID(r.Context(), id)
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
-	statuses, _ := h.statusSvc.ByObjectType(r.Context(), "invoice")
+	templates.DocumentPreview(templates.DocumentPreviewData{
+		ObjectType:  "invoice",
+		ObjectID:    id,
+		Title:       i.Title,
+		BackURL:     fmt.Sprintf("/invoices/%d", id),
+		PDFURL:      fmt.Sprintf("/invoices/%d/pdf", id),
+		SaveURL:     fmt.Sprintf("/invoices/%d/pdf/save", id),
+		EmailURL:    fmt.Sprintf("/invoices/%d/email", id),
+		DownloadURL: fmt.Sprintf("/invoices/%d/pdf?download=1", id),
+		Archived:    i.DeletedAt != nil,
+	}).Render(r.Context(), w)
+}
+
+func (h *InvoiceHandler) SavePDF(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", 400)
+		return
+	}
+	doc, err := h.invoicePDFDocument(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if doc.Archived {
+		http.Error(w, "archived records are read-only", http.StatusForbidden)
+		return
+	}
+	u, _ := middleware.UserFromContext(r.Context())
+	if u == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	_, filename, err := saveVersionedDocumentPDF(r.Context(), h.fileSvc, "invoice", id, doc, u.ID)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	h.activitySvc.Record(r.Context(), u.ID, "pdf_saved", "invoice", id, map[string]interface{}{"entity_name": doc.Title, "actor_name": u.Name, "file_name": filename})
+	http.Redirect(w, r, fmt.Sprintf("/invoices/%d/pdf/preview?flash=PDF+saved", id), http.StatusSeeOther)
+}
+
+func (h *InvoiceHandler) Email(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", 400)
+		return
+	}
+	doc, err := h.invoicePDFDocument(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if doc.Archived {
+		http.Error(w, "archived records are read-only", http.StatusForbidden)
+		return
+	}
+	data := templates.DocumentEmailData{
+		ObjectType: "invoice",
+		ObjectID:   id,
+		Title:      doc.Title,
+		BackURL:    fmt.Sprintf("/invoices/%d/pdf/preview", id),
+		ActionURL:  fmt.Sprintf("/invoices/%d/email", id),
+		To:         doc.CustomerEmail,
+	}
+	data.Subject, data.Body = documentEmailDefaults("invoice", doc, middleware.CompanyFromContext(r.Context()))
+	if r.Method == http.MethodGet {
+		templates.DocumentEmailCompose(data).Render(r.Context(), w)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", 400)
+		return
+	}
+	data.To = r.FormValue("to")
+	data.Subject = r.FormValue("subject")
+	data.Body = r.FormValue("body")
+	u, _ := middleware.UserFromContext(r.Context())
+	if u == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	savedFile, filename, err := saveVersionedDocumentPDF(r.Context(), h.fileSvc, "invoice", id, doc, u.ID)
+	if err != nil {
+		data.Error = err.Error()
+		templates.DocumentEmailCompose(data).Render(r.Context(), w)
+		return
+	}
+	if err := h.emailSvc.SendEmailWithAttachment(r.Context(), data.To, data.Subject, data.Body, filename, "application/pdf", doc.Data); err != nil {
+		_ = h.fileSvc.Delete(r.Context(), savedFile.ID)
+		data.Error = err.Error()
+		templates.DocumentEmailCompose(data).Render(r.Context(), w)
+		return
+	}
+	h.activitySvc.Record(r.Context(), u.ID, "email_sent", "invoice", id, map[string]interface{}{"entity_name": doc.Title, "actor_name": u.Name, "to": data.To, "file_name": filename})
+	http.Redirect(w, r, fmt.Sprintf("/invoices/%d?flash=Invoice+emailed", id), http.StatusSeeOther)
+}
+
+func (h *InvoiceHandler) invoicePDFDocument(ctx context.Context, id int64) (documentPDF, error) {
+	i, err := h.svc.GetByID(ctx, id)
+	if err != nil {
+		return documentPDF{}, err
+	}
+	statuses, _ := h.statusSvc.ByObjectType(ctx, "invoice")
 	var customer *ent.Customer
 	if i.CustomerID != nil && *i.CustomerID > 0 {
-		c, _ := h.custSvc.GetByID(r.Context(), *i.CustomerID)
+		c, _ := h.custSvc.GetByID(ctx, *i.CustomerID)
 		customer = c
 	}
-	writePDFResponse(w, fmt.Sprintf("INV-%05d.pdf", id), func(w io.Writer) error {
-		return services.GenerateInvoicePDF(w, i, customer, statuses, middleware.CompanyFromContext(r.Context()))
+	data, err := generatePDFBytes(func(w io.Writer) error {
+		return services.GenerateInvoicePDF(w, i, customer, statuses, middleware.CompanyFromContext(ctx))
 	})
+	if err != nil {
+		return documentPDF{}, err
+	}
+	to := ""
+	customerName := ""
+	if customer != nil {
+		to = customer.Email
+		customerName = customer.DisplayName
+	}
+	var job *ent.Job
+	if i.JobID != nil && *i.JobID > 0 {
+		job, _ = h.jobSvc.GetByID(ctx, *i.JobID)
+	}
+	jobName, jobType, jobSubtitle := documentJobFields(job)
+	number := fmt.Sprintf("INV-%05d", id)
+	return documentPDF{Filename: number + ".pdf", Data: data, Title: i.Title, Number: number, CustomerEmail: to, CustomerName: customerName, JobName: jobName, JobType: jobType, JobSubtitle: jobSubtitle, Archived: i.DeletedAt != nil}, nil
 }
 
 func (h *InvoiceHandler) RecordPayment(w http.ResponseWriter, r *http.Request) {

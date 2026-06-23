@@ -100,6 +100,26 @@ templ SettingsPage(p SettingsPageData) {
 					From Address
 					<input type="email" name="smtp_from" value={ p.Settings.SMTPFrom } placeholder="freefsm@example.com"/>
 				</label>
+				<hr/>
+				<h3>Invoice Email Defaults</h3>
+				<label>
+					Subject
+					<input type="text" name="invoice_email_subject" value={ p.Settings.InvoiceEmailSubject } placeholder="Invoice {invoice_number} from {business_name}"/>
+				</label>
+				<label>
+					Body
+					<textarea name="invoice_email_body" rows="6" placeholder="Hello {customer_name},">{ p.Settings.InvoiceEmailBody }</textarea>
+				</label>
+				<h3>Estimate Email Defaults</h3>
+				<label>
+					Subject
+					<input type="text" name="estimate_email_subject" value={ p.Settings.EstimateEmailSubject } placeholder="Estimate {estimate_number} from {business_name}"/>
+				</label>
+				<label>
+					Body
+					<textarea name="estimate_email_body" rows="6" placeholder="Hello {customer_name},">{ p.Settings.EstimateEmailBody }</textarea>
+				</label>
+				<p style="font-size:0.85rem;color:var(--pico-muted-color)">Available placeholders: <code>{ "{customer_name}" }</code>, <code>{ "{business_name}" }</code>, <code>{ "{invoice_number}" }</code>, <code>{ "{estimate_number}" }</code>, <code>{ "{job_name}" }</code>, <code>{ "{job_type}" }</code>, and <code>{ "{job_subtitle}" }</code>.</p>
 				<div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem">
 					<button type="button"
 						hx-post="/settings/test-email"

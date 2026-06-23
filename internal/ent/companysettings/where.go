@@ -144,6 +144,26 @@ func SMTPFrom(v string) predicate.CompanySettings {
 	return predicate.CompanySettings(sql.FieldEQ(FieldSMTPFrom, v))
 }
 
+// InvoiceEmailSubject applies equality check predicate on the "invoice_email_subject" field. It's identical to InvoiceEmailSubjectEQ.
+func InvoiceEmailSubject(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailBody applies equality check predicate on the "invoice_email_body" field. It's identical to InvoiceEmailBodyEQ.
+func InvoiceEmailBody(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldInvoiceEmailBody, v))
+}
+
+// EstimateEmailSubject applies equality check predicate on the "estimate_email_subject" field. It's identical to EstimateEmailSubjectEQ.
+func EstimateEmailSubject(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailBody applies equality check predicate on the "estimate_email_body" field. It's identical to EstimateEmailBodyEQ.
+func EstimateEmailBody(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldEstimateEmailBody, v))
+}
+
 // Timezone applies equality check predicate on the "timezone" field. It's identical to TimezoneEQ.
 func Timezone(v string) predicate.CompanySettings {
 	return predicate.CompanySettings(sql.FieldEQ(FieldTimezone, v))
@@ -1307,6 +1327,266 @@ func SMTPFromEqualFold(v string) predicate.CompanySettings {
 // SMTPFromContainsFold applies the ContainsFold predicate on the "smtp_from" field.
 func SMTPFromContainsFold(v string) predicate.CompanySettings {
 	return predicate.CompanySettings(sql.FieldContainsFold(FieldSMTPFrom, v))
+}
+
+// InvoiceEmailSubjectEQ applies the EQ predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectNEQ applies the NEQ predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectNEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectIn applies the In predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldInvoiceEmailSubject, vs...))
+}
+
+// InvoiceEmailSubjectNotIn applies the NotIn predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectNotIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldInvoiceEmailSubject, vs...))
+}
+
+// InvoiceEmailSubjectGT applies the GT predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectGT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectGTE applies the GTE predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectGTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectLT applies the LT predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectLT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectLTE applies the LTE predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectLTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectContains applies the Contains predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectContains(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContains(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectHasPrefix applies the HasPrefix predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectHasPrefix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasPrefix(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectHasSuffix applies the HasSuffix predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectHasSuffix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasSuffix(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectEqualFold applies the EqualFold predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectEqualFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEqualFold(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailSubjectContainsFold applies the ContainsFold predicate on the "invoice_email_subject" field.
+func InvoiceEmailSubjectContainsFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContainsFold(FieldInvoiceEmailSubject, v))
+}
+
+// InvoiceEmailBodyEQ applies the EQ predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyNEQ applies the NEQ predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyNEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyIn applies the In predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldInvoiceEmailBody, vs...))
+}
+
+// InvoiceEmailBodyNotIn applies the NotIn predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyNotIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldInvoiceEmailBody, vs...))
+}
+
+// InvoiceEmailBodyGT applies the GT predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyGT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyGTE applies the GTE predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyGTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyLT applies the LT predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyLT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyLTE applies the LTE predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyLTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyContains applies the Contains predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyContains(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContains(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyHasPrefix applies the HasPrefix predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyHasPrefix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasPrefix(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyHasSuffix applies the HasSuffix predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyHasSuffix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasSuffix(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyEqualFold applies the EqualFold predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyEqualFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEqualFold(FieldInvoiceEmailBody, v))
+}
+
+// InvoiceEmailBodyContainsFold applies the ContainsFold predicate on the "invoice_email_body" field.
+func InvoiceEmailBodyContainsFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContainsFold(FieldInvoiceEmailBody, v))
+}
+
+// EstimateEmailSubjectEQ applies the EQ predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectNEQ applies the NEQ predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectNEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectIn applies the In predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldEstimateEmailSubject, vs...))
+}
+
+// EstimateEmailSubjectNotIn applies the NotIn predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectNotIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldEstimateEmailSubject, vs...))
+}
+
+// EstimateEmailSubjectGT applies the GT predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectGT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectGTE applies the GTE predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectGTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectLT applies the LT predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectLT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectLTE applies the LTE predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectLTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectContains applies the Contains predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectContains(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContains(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectHasPrefix applies the HasPrefix predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectHasPrefix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasPrefix(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectHasSuffix applies the HasSuffix predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectHasSuffix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasSuffix(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectEqualFold applies the EqualFold predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectEqualFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEqualFold(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailSubjectContainsFold applies the ContainsFold predicate on the "estimate_email_subject" field.
+func EstimateEmailSubjectContainsFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContainsFold(FieldEstimateEmailSubject, v))
+}
+
+// EstimateEmailBodyEQ applies the EQ predicate on the "estimate_email_body" field.
+func EstimateEmailBodyEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyNEQ applies the NEQ predicate on the "estimate_email_body" field.
+func EstimateEmailBodyNEQ(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyIn applies the In predicate on the "estimate_email_body" field.
+func EstimateEmailBodyIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldEstimateEmailBody, vs...))
+}
+
+// EstimateEmailBodyNotIn applies the NotIn predicate on the "estimate_email_body" field.
+func EstimateEmailBodyNotIn(vs ...string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldEstimateEmailBody, vs...))
+}
+
+// EstimateEmailBodyGT applies the GT predicate on the "estimate_email_body" field.
+func EstimateEmailBodyGT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyGTE applies the GTE predicate on the "estimate_email_body" field.
+func EstimateEmailBodyGTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyLT applies the LT predicate on the "estimate_email_body" field.
+func EstimateEmailBodyLT(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyLTE applies the LTE predicate on the "estimate_email_body" field.
+func EstimateEmailBodyLTE(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyContains applies the Contains predicate on the "estimate_email_body" field.
+func EstimateEmailBodyContains(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContains(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyHasPrefix applies the HasPrefix predicate on the "estimate_email_body" field.
+func EstimateEmailBodyHasPrefix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasPrefix(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyHasSuffix applies the HasSuffix predicate on the "estimate_email_body" field.
+func EstimateEmailBodyHasSuffix(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldHasSuffix(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyEqualFold applies the EqualFold predicate on the "estimate_email_body" field.
+func EstimateEmailBodyEqualFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEqualFold(FieldEstimateEmailBody, v))
+}
+
+// EstimateEmailBodyContainsFold applies the ContainsFold predicate on the "estimate_email_body" field.
+func EstimateEmailBodyContainsFold(v string) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldContainsFold(FieldEstimateEmailBody, v))
 }
 
 // TimezoneEQ applies the EQ predicate on the "timezone" field.

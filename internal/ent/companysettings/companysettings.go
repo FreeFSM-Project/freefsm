@@ -49,6 +49,14 @@ const (
 	FieldSMTPPassword = "smtp_password"
 	// FieldSMTPFrom holds the string denoting the smtp_from field in the database.
 	FieldSMTPFrom = "smtp_from"
+	// FieldInvoiceEmailSubject holds the string denoting the invoice_email_subject field in the database.
+	FieldInvoiceEmailSubject = "invoice_email_subject"
+	// FieldInvoiceEmailBody holds the string denoting the invoice_email_body field in the database.
+	FieldInvoiceEmailBody = "invoice_email_body"
+	// FieldEstimateEmailSubject holds the string denoting the estimate_email_subject field in the database.
+	FieldEstimateEmailSubject = "estimate_email_subject"
+	// FieldEstimateEmailBody holds the string denoting the estimate_email_body field in the database.
+	FieldEstimateEmailBody = "estimate_email_body"
 	// FieldTimezone holds the string denoting the timezone field in the database.
 	FieldTimezone = "timezone"
 	// FieldPasswordMinLength holds the string denoting the password_min_length field in the database.
@@ -98,6 +106,10 @@ var Columns = []string{
 	FieldSMTPUser,
 	FieldSMTPPassword,
 	FieldSMTPFrom,
+	FieldInvoiceEmailSubject,
+	FieldInvoiceEmailBody,
+	FieldEstimateEmailSubject,
+	FieldEstimateEmailBody,
 	FieldTimezone,
 	FieldPasswordMinLength,
 	FieldPasswordRequireUppercase,
@@ -157,6 +169,14 @@ var (
 	DefaultSMTPPassword string
 	// DefaultSMTPFrom holds the default value on creation for the "smtp_from" field.
 	DefaultSMTPFrom string
+	// DefaultInvoiceEmailSubject holds the default value on creation for the "invoice_email_subject" field.
+	DefaultInvoiceEmailSubject string
+	// DefaultInvoiceEmailBody holds the default value on creation for the "invoice_email_body" field.
+	DefaultInvoiceEmailBody string
+	// DefaultEstimateEmailSubject holds the default value on creation for the "estimate_email_subject" field.
+	DefaultEstimateEmailSubject string
+	// DefaultEstimateEmailBody holds the default value on creation for the "estimate_email_body" field.
+	DefaultEstimateEmailBody string
 	// DefaultTimezone holds the default value on creation for the "timezone" field.
 	DefaultTimezone string
 	// DefaultPasswordMinLength holds the default value on creation for the "password_min_length" field.
@@ -281,6 +301,26 @@ func BySMTPPassword(opts ...sql.OrderTermOption) OrderOption {
 // BySMTPFrom orders the results by the smtp_from field.
 func BySMTPFrom(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSMTPFrom, opts...).ToFunc()
+}
+
+// ByInvoiceEmailSubject orders the results by the invoice_email_subject field.
+func ByInvoiceEmailSubject(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldInvoiceEmailSubject, opts...).ToFunc()
+}
+
+// ByInvoiceEmailBody orders the results by the invoice_email_body field.
+func ByInvoiceEmailBody(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldInvoiceEmailBody, opts...).ToFunc()
+}
+
+// ByEstimateEmailSubject orders the results by the estimate_email_subject field.
+func ByEstimateEmailSubject(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEstimateEmailSubject, opts...).ToFunc()
+}
+
+// ByEstimateEmailBody orders the results by the estimate_email_body field.
+func ByEstimateEmailBody(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEstimateEmailBody, opts...).ToFunc()
 }
 
 // ByTimezone orders the results by the timezone field.

@@ -307,6 +307,62 @@ func (_u *CompanySettingsUpdate) SetNillableSMTPFrom(v *string) *CompanySettings
 	return _u
 }
 
+// SetInvoiceEmailSubject sets the "invoice_email_subject" field.
+func (_u *CompanySettingsUpdate) SetInvoiceEmailSubject(v string) *CompanySettingsUpdate {
+	_u.mutation.SetInvoiceEmailSubject(v)
+	return _u
+}
+
+// SetNillableInvoiceEmailSubject sets the "invoice_email_subject" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableInvoiceEmailSubject(v *string) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetInvoiceEmailSubject(*v)
+	}
+	return _u
+}
+
+// SetInvoiceEmailBody sets the "invoice_email_body" field.
+func (_u *CompanySettingsUpdate) SetInvoiceEmailBody(v string) *CompanySettingsUpdate {
+	_u.mutation.SetInvoiceEmailBody(v)
+	return _u
+}
+
+// SetNillableInvoiceEmailBody sets the "invoice_email_body" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableInvoiceEmailBody(v *string) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetInvoiceEmailBody(*v)
+	}
+	return _u
+}
+
+// SetEstimateEmailSubject sets the "estimate_email_subject" field.
+func (_u *CompanySettingsUpdate) SetEstimateEmailSubject(v string) *CompanySettingsUpdate {
+	_u.mutation.SetEstimateEmailSubject(v)
+	return _u
+}
+
+// SetNillableEstimateEmailSubject sets the "estimate_email_subject" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableEstimateEmailSubject(v *string) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetEstimateEmailSubject(*v)
+	}
+	return _u
+}
+
+// SetEstimateEmailBody sets the "estimate_email_body" field.
+func (_u *CompanySettingsUpdate) SetEstimateEmailBody(v string) *CompanySettingsUpdate {
+	_u.mutation.SetEstimateEmailBody(v)
+	return _u
+}
+
+// SetNillableEstimateEmailBody sets the "estimate_email_body" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableEstimateEmailBody(v *string) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetEstimateEmailBody(*v)
+	}
+	return _u
+}
+
 // SetTimezone sets the "timezone" field.
 func (_u *CompanySettingsUpdate) SetTimezone(v string) *CompanySettingsUpdate {
 	_u.mutation.SetTimezone(v)
@@ -575,6 +631,18 @@ func (_u *CompanySettingsUpdate) sqlSave(ctx context.Context) (_node int, err er
 	}
 	if value, ok := _u.mutation.SMTPFrom(); ok {
 		_spec.SetField(companysettings.FieldSMTPFrom, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.InvoiceEmailSubject(); ok {
+		_spec.SetField(companysettings.FieldInvoiceEmailSubject, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.InvoiceEmailBody(); ok {
+		_spec.SetField(companysettings.FieldInvoiceEmailBody, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.EstimateEmailSubject(); ok {
+		_spec.SetField(companysettings.FieldEstimateEmailSubject, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.EstimateEmailBody(); ok {
+		_spec.SetField(companysettings.FieldEstimateEmailBody, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Timezone(); ok {
 		_spec.SetField(companysettings.FieldTimezone, field.TypeString, value)
@@ -911,6 +979,62 @@ func (_u *CompanySettingsUpdateOne) SetNillableSMTPFrom(v *string) *CompanySetti
 	return _u
 }
 
+// SetInvoiceEmailSubject sets the "invoice_email_subject" field.
+func (_u *CompanySettingsUpdateOne) SetInvoiceEmailSubject(v string) *CompanySettingsUpdateOne {
+	_u.mutation.SetInvoiceEmailSubject(v)
+	return _u
+}
+
+// SetNillableInvoiceEmailSubject sets the "invoice_email_subject" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableInvoiceEmailSubject(v *string) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetInvoiceEmailSubject(*v)
+	}
+	return _u
+}
+
+// SetInvoiceEmailBody sets the "invoice_email_body" field.
+func (_u *CompanySettingsUpdateOne) SetInvoiceEmailBody(v string) *CompanySettingsUpdateOne {
+	_u.mutation.SetInvoiceEmailBody(v)
+	return _u
+}
+
+// SetNillableInvoiceEmailBody sets the "invoice_email_body" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableInvoiceEmailBody(v *string) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetInvoiceEmailBody(*v)
+	}
+	return _u
+}
+
+// SetEstimateEmailSubject sets the "estimate_email_subject" field.
+func (_u *CompanySettingsUpdateOne) SetEstimateEmailSubject(v string) *CompanySettingsUpdateOne {
+	_u.mutation.SetEstimateEmailSubject(v)
+	return _u
+}
+
+// SetNillableEstimateEmailSubject sets the "estimate_email_subject" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableEstimateEmailSubject(v *string) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetEstimateEmailSubject(*v)
+	}
+	return _u
+}
+
+// SetEstimateEmailBody sets the "estimate_email_body" field.
+func (_u *CompanySettingsUpdateOne) SetEstimateEmailBody(v string) *CompanySettingsUpdateOne {
+	_u.mutation.SetEstimateEmailBody(v)
+	return _u
+}
+
+// SetNillableEstimateEmailBody sets the "estimate_email_body" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableEstimateEmailBody(v *string) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetEstimateEmailBody(*v)
+	}
+	return _u
+}
+
 // SetTimezone sets the "timezone" field.
 func (_u *CompanySettingsUpdateOne) SetTimezone(v string) *CompanySettingsUpdateOne {
 	_u.mutation.SetTimezone(v)
@@ -1209,6 +1333,18 @@ func (_u *CompanySettingsUpdateOne) sqlSave(ctx context.Context) (_node *Company
 	}
 	if value, ok := _u.mutation.SMTPFrom(); ok {
 		_spec.SetField(companysettings.FieldSMTPFrom, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.InvoiceEmailSubject(); ok {
+		_spec.SetField(companysettings.FieldInvoiceEmailSubject, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.InvoiceEmailBody(); ok {
+		_spec.SetField(companysettings.FieldInvoiceEmailBody, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.EstimateEmailSubject(); ok {
+		_spec.SetField(companysettings.FieldEstimateEmailSubject, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.EstimateEmailBody(); ok {
+		_spec.SetField(companysettings.FieldEstimateEmailBody, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Timezone(); ok {
 		_spec.SetField(companysettings.FieldTimezone, field.TypeString, value)

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -194,6 +195,10 @@ func (s *FileService) Create(ctx context.Context, objectType string, objectID in
 	}
 
 	return entFile, nil
+}
+
+func (s *FileService) CreateBytes(ctx context.Context, objectType string, objectID int64, originalName string, mimeType string, data []byte, uploadedBy int64) (*ent.File, error) {
+	return s.Create(ctx, objectType, objectID, originalName, mimeType, int64(len(data)), bytes.NewReader(data), uploadedBy)
 }
 
 func (s *FileService) Delete(ctx context.Context, id int64) error {

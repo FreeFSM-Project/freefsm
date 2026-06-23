@@ -1,0 +1,21 @@
+package templates
+
+templ DocumentPreview(p DocumentPreviewData) {
+	@Layout(p.Title+" PDF") {
+		<div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
+			<a href={ templ.URL(p.BackURL) } role="button" class="outline">Back</a>
+			if p.Archived {
+				<button class="outline" disabled>Save PDF</button>
+				<button class="outline" disabled>Email to Customer</button>
+			} else {
+				<form action={ templ.URL(p.SaveURL) } method="post" style="display:inline;margin:0">
+					<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+					<button type="submit" class="outline" style="margin:0">Save PDF</button>
+				</form>
+				<a href={ templ.URL(p.EmailURL) } role="button" class="outline">Email to Customer</a>
+			}
+			<a href={ templ.URL(p.DownloadURL) } role="button">Download</a>
+		</div>
+		<iframe src={ templ.URL(p.PDFURL) } title={ p.Title+" PDF preview" } style="width:100%;height:calc(100vh - 12rem);border:1px solid var(--pico-muted-border-color);border-radius:0.25rem;background:white"></iframe>
+	}
+}

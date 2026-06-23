@@ -272,6 +272,62 @@ func (_c *CompanySettingsCreate) SetNillableSMTPFrom(v *string) *CompanySettings
 	return _c
 }
 
+// SetInvoiceEmailSubject sets the "invoice_email_subject" field.
+func (_c *CompanySettingsCreate) SetInvoiceEmailSubject(v string) *CompanySettingsCreate {
+	_c.mutation.SetInvoiceEmailSubject(v)
+	return _c
+}
+
+// SetNillableInvoiceEmailSubject sets the "invoice_email_subject" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableInvoiceEmailSubject(v *string) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetInvoiceEmailSubject(*v)
+	}
+	return _c
+}
+
+// SetInvoiceEmailBody sets the "invoice_email_body" field.
+func (_c *CompanySettingsCreate) SetInvoiceEmailBody(v string) *CompanySettingsCreate {
+	_c.mutation.SetInvoiceEmailBody(v)
+	return _c
+}
+
+// SetNillableInvoiceEmailBody sets the "invoice_email_body" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableInvoiceEmailBody(v *string) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetInvoiceEmailBody(*v)
+	}
+	return _c
+}
+
+// SetEstimateEmailSubject sets the "estimate_email_subject" field.
+func (_c *CompanySettingsCreate) SetEstimateEmailSubject(v string) *CompanySettingsCreate {
+	_c.mutation.SetEstimateEmailSubject(v)
+	return _c
+}
+
+// SetNillableEstimateEmailSubject sets the "estimate_email_subject" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableEstimateEmailSubject(v *string) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetEstimateEmailSubject(*v)
+	}
+	return _c
+}
+
+// SetEstimateEmailBody sets the "estimate_email_body" field.
+func (_c *CompanySettingsCreate) SetEstimateEmailBody(v string) *CompanySettingsCreate {
+	_c.mutation.SetEstimateEmailBody(v)
+	return _c
+}
+
+// SetNillableEstimateEmailBody sets the "estimate_email_body" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableEstimateEmailBody(v *string) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetEstimateEmailBody(*v)
+	}
+	return _c
+}
+
 // SetTimezone sets the "timezone" field.
 func (_c *CompanySettingsCreate) SetTimezone(v string) *CompanySettingsCreate {
 	_c.mutation.SetTimezone(v)
@@ -549,6 +605,22 @@ func (_c *CompanySettingsCreate) defaults() {
 		v := companysettings.DefaultSMTPFrom
 		_c.mutation.SetSMTPFrom(v)
 	}
+	if _, ok := _c.mutation.InvoiceEmailSubject(); !ok {
+		v := companysettings.DefaultInvoiceEmailSubject
+		_c.mutation.SetInvoiceEmailSubject(v)
+	}
+	if _, ok := _c.mutation.InvoiceEmailBody(); !ok {
+		v := companysettings.DefaultInvoiceEmailBody
+		_c.mutation.SetInvoiceEmailBody(v)
+	}
+	if _, ok := _c.mutation.EstimateEmailSubject(); !ok {
+		v := companysettings.DefaultEstimateEmailSubject
+		_c.mutation.SetEstimateEmailSubject(v)
+	}
+	if _, ok := _c.mutation.EstimateEmailBody(); !ok {
+		v := companysettings.DefaultEstimateEmailBody
+		_c.mutation.SetEstimateEmailBody(v)
+	}
 	if _, ok := _c.mutation.Timezone(); !ok {
 		v := companysettings.DefaultTimezone
 		_c.mutation.SetTimezone(v)
@@ -651,6 +723,18 @@ func (_c *CompanySettingsCreate) check() error {
 	}
 	if _, ok := _c.mutation.SMTPFrom(); !ok {
 		return &ValidationError{Name: "smtp_from", err: errors.New(`ent: missing required field "CompanySettings.smtp_from"`)}
+	}
+	if _, ok := _c.mutation.InvoiceEmailSubject(); !ok {
+		return &ValidationError{Name: "invoice_email_subject", err: errors.New(`ent: missing required field "CompanySettings.invoice_email_subject"`)}
+	}
+	if _, ok := _c.mutation.InvoiceEmailBody(); !ok {
+		return &ValidationError{Name: "invoice_email_body", err: errors.New(`ent: missing required field "CompanySettings.invoice_email_body"`)}
+	}
+	if _, ok := _c.mutation.EstimateEmailSubject(); !ok {
+		return &ValidationError{Name: "estimate_email_subject", err: errors.New(`ent: missing required field "CompanySettings.estimate_email_subject"`)}
+	}
+	if _, ok := _c.mutation.EstimateEmailBody(); !ok {
+		return &ValidationError{Name: "estimate_email_body", err: errors.New(`ent: missing required field "CompanySettings.estimate_email_body"`)}
 	}
 	if _, ok := _c.mutation.Timezone(); !ok {
 		return &ValidationError{Name: "timezone", err: errors.New(`ent: missing required field "CompanySettings.timezone"`)}
@@ -791,6 +875,22 @@ func (_c *CompanySettingsCreate) createSpec() (*CompanySettings, *sqlgraph.Creat
 	if value, ok := _c.mutation.SMTPFrom(); ok {
 		_spec.SetField(companysettings.FieldSMTPFrom, field.TypeString, value)
 		_node.SMTPFrom = value
+	}
+	if value, ok := _c.mutation.InvoiceEmailSubject(); ok {
+		_spec.SetField(companysettings.FieldInvoiceEmailSubject, field.TypeString, value)
+		_node.InvoiceEmailSubject = value
+	}
+	if value, ok := _c.mutation.InvoiceEmailBody(); ok {
+		_spec.SetField(companysettings.FieldInvoiceEmailBody, field.TypeString, value)
+		_node.InvoiceEmailBody = value
+	}
+	if value, ok := _c.mutation.EstimateEmailSubject(); ok {
+		_spec.SetField(companysettings.FieldEstimateEmailSubject, field.TypeString, value)
+		_node.EstimateEmailSubject = value
+	}
+	if value, ok := _c.mutation.EstimateEmailBody(); ok {
+		_spec.SetField(companysettings.FieldEstimateEmailBody, field.TypeString, value)
+		_node.EstimateEmailBody = value
 	}
 	if value, ok := _c.mutation.Timezone(); ok {
 		_spec.SetField(companysettings.FieldTimezone, field.TypeString, value)

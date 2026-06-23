@@ -513,6 +513,30 @@ type InvoiceFormPageData struct {
 	CustomFields      []CustomFieldDisplay
 }
 
+type DocumentPreviewData struct {
+	ObjectType  string
+	ObjectID    int64
+	Title       string
+	BackURL     string
+	PDFURL      string
+	SaveURL     string
+	EmailURL    string
+	DownloadURL string
+	Archived    bool
+}
+
+type DocumentEmailData struct {
+	ObjectType string
+	ObjectID   int64
+	Title      string
+	BackURL    string
+	ActionURL  string
+	To         string
+	Subject    string
+	Body       string
+	Error      string
+}
+
 func jobFormTitle(isNew bool) string {
 	if isNew {
 		return "New Job"
@@ -930,9 +954,9 @@ type TagFormData struct {
 }
 
 type TagWidgetData struct {
-	BaseURL string
-	Tags    []TagRow
-	AllTags []TagRow
+	BaseURL  string
+	Tags     []TagRow
+	AllTags  []TagRow
 	ReadOnly bool
 }
 

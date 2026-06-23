@@ -36,6 +36,10 @@ type CompanySettingsParams struct {
 	SmtpUser                 string
 	SmtpPassword             string
 	SmtpFrom                 string
+	InvoiceEmailSubject      string
+	InvoiceEmailBody         string
+	EstimateEmailSubject     string
+	EstimateEmailBody        string
 	Timezone                 string
 	PasswordMinLength        int
 	PasswordRequireUppercase bool
@@ -70,6 +74,10 @@ func (s *CompanySettingsService) Save(ctx context.Context, p CompanySettingsPara
 		SetSMTPUser(p.SmtpUser).
 		SetSMTPPassword(p.SmtpPassword).
 		SetSMTPFrom(p.SmtpFrom).
+		SetInvoiceEmailSubject(p.InvoiceEmailSubject).
+		SetInvoiceEmailBody(p.InvoiceEmailBody).
+		SetEstimateEmailSubject(p.EstimateEmailSubject).
+		SetEstimateEmailBody(p.EstimateEmailBody).
 		SetTimezone(p.Timezone).
 		SetPasswordMinLength(p.PasswordMinLength).
 		SetPasswordRequireUppercase(p.PasswordRequireUppercase).

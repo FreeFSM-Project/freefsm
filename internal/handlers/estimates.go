@@ -26,11 +26,12 @@ type EstimateHandler struct {
 	tagLinkSvc  *services.TagLinkService
 	defSvc      *services.CustomFieldDefinitionService
 	fileSvc     *services.FileService
+	emailSvc    *services.EmailService
 	activitySvc *services.ActivityService
 }
 
-func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, invoiceSvc *services.InvoiceService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, fileSvc *services.FileService, activitySvc *services.ActivityService) *EstimateHandler {
-	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, invoiceSvc: invoiceSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, fileSvc: fileSvc, activitySvc: activitySvc}
+func NewEstimateHandler(svc *services.EstimateService, custSvc *services.CustomerService, jobSvc *services.JobService, statusSvc *services.StatusService, itemSvc *services.ItemService, invoiceSvc *services.InvoiceService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, fileSvc *services.FileService, emailSvc *services.EmailService, activitySvc *services.ActivityService) *EstimateHandler {
+	return &EstimateHandler{svc: svc, custSvc: custSvc, jobSvc: jobSvc, statusSvc: statusSvc, itemSvc: itemSvc, invoiceSvc: invoiceSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, fileSvc: fileSvc, emailSvc: emailSvc, activitySvc: activitySvc}
 }
 
 func (h *EstimateHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -316,20 +317,156 @@ func (h *EstimateHandler) PDF(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid id", 400)
 		return
 	}
+	doc, err := h.estimatePDFDocument(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	writePDFResponseWithDisposition(w, doc.Filename, r.URL.Query().Get("download") == "1", func(w io.Writer) error {
+		_, err := w.Write(doc.Data)
+		return err
+	})
+}
+
+func (h *EstimateHandler) PreviewPDF(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", 400)
+		return
+	}
 	e, err := h.svc.GetByID(r.Context(), id)
 	if err != nil {
 		http.NotFound(w, r)
 		return
 	}
-	statuses, _ := h.statusSvc.ByObjectType(r.Context(), "estimate")
+	templates.DocumentPreview(templates.DocumentPreviewData{
+		ObjectType:  "estimate",
+		ObjectID:    id,
+		Title:       e.Title,
+		BackURL:     fmt.Sprintf("/estimates/%d", id),
+		PDFURL:      fmt.Sprintf("/estimates/%d/pdf", id),
+		SaveURL:     fmt.Sprintf("/estimates/%d/pdf/save", id),
+		EmailURL:    fmt.Sprintf("/estimates/%d/email", id),
+		DownloadURL: fmt.Sprintf("/estimates/%d/pdf?download=1", id),
+		Archived:    e.DeletedAt != nil,
+	}).Render(r.Context(), w)
+}
+
+func (h *EstimateHandler) SavePDF(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", 400)
+		return
+	}
+	doc, err := h.estimatePDFDocument(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if doc.Archived {
+		http.Error(w, "archived records are read-only", http.StatusForbidden)
+		return
+	}
+	u, _ := middleware.UserFromContext(r.Context())
+	if u == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	_, filename, err := saveVersionedDocumentPDF(r.Context(), h.fileSvc, "estimate", id, doc, u.ID)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	h.activitySvc.Record(r.Context(), u.ID, "pdf_saved", "estimate", id, map[string]interface{}{"entity_name": doc.Title, "actor_name": u.Name, "file_name": filename})
+	http.Redirect(w, r, fmt.Sprintf("/estimates/%d/pdf/preview?flash=PDF+saved", id), http.StatusSeeOther)
+}
+
+func (h *EstimateHandler) Email(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", 400)
+		return
+	}
+	doc, err := h.estimatePDFDocument(r.Context(), id)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if doc.Archived {
+		http.Error(w, "archived records are read-only", http.StatusForbidden)
+		return
+	}
+	data := templates.DocumentEmailData{
+		ObjectType: "estimate",
+		ObjectID:   id,
+		Title:      doc.Title,
+		BackURL:    fmt.Sprintf("/estimates/%d/pdf/preview", id),
+		ActionURL:  fmt.Sprintf("/estimates/%d/email", id),
+		To:         doc.CustomerEmail,
+	}
+	data.Subject, data.Body = documentEmailDefaults("estimate", doc, middleware.CompanyFromContext(r.Context()))
+	if r.Method == http.MethodGet {
+		templates.DocumentEmailCompose(data).Render(r.Context(), w)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", 400)
+		return
+	}
+	data.To = r.FormValue("to")
+	data.Subject = r.FormValue("subject")
+	data.Body = r.FormValue("body")
+	u, _ := middleware.UserFromContext(r.Context())
+	if u == nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	savedFile, filename, err := saveVersionedDocumentPDF(r.Context(), h.fileSvc, "estimate", id, doc, u.ID)
+	if err != nil {
+		data.Error = err.Error()
+		templates.DocumentEmailCompose(data).Render(r.Context(), w)
+		return
+	}
+	if err := h.emailSvc.SendEmailWithAttachment(r.Context(), data.To, data.Subject, data.Body, filename, "application/pdf", doc.Data); err != nil {
+		_ = h.fileSvc.Delete(r.Context(), savedFile.ID)
+		data.Error = err.Error()
+		templates.DocumentEmailCompose(data).Render(r.Context(), w)
+		return
+	}
+	h.activitySvc.Record(r.Context(), u.ID, "email_sent", "estimate", id, map[string]interface{}{"entity_name": doc.Title, "actor_name": u.Name, "to": data.To, "file_name": filename})
+	http.Redirect(w, r, fmt.Sprintf("/estimates/%d?flash=Estimate+emailed", id), http.StatusSeeOther)
+}
+
+func (h *EstimateHandler) estimatePDFDocument(ctx context.Context, id int64) (documentPDF, error) {
+	e, err := h.svc.GetByID(ctx, id)
+	if err != nil {
+		return documentPDF{}, err
+	}
+	statuses, _ := h.statusSvc.ByObjectType(ctx, "estimate")
 	var customer *ent.Customer
 	if e.CustomerID != nil && *e.CustomerID > 0 {
-		c, _ := h.custSvc.GetByID(r.Context(), *e.CustomerID)
+		c, _ := h.custSvc.GetByID(ctx, *e.CustomerID)
 		customer = c
 	}
-	writePDFResponse(w, fmt.Sprintf("EST-%05d.pdf", id), func(w io.Writer) error {
-		return services.GenerateEstimatePDF(w, e, customer, statuses, middleware.CompanyFromContext(r.Context()))
+	data, err := generatePDFBytes(func(w io.Writer) error {
+		return services.GenerateEstimatePDF(w, e, customer, statuses, middleware.CompanyFromContext(ctx))
 	})
+	if err != nil {
+		return documentPDF{}, err
+	}
+	to := ""
+	customerName := ""
+	if customer != nil {
+		to = customer.Email
+		customerName = customer.DisplayName
+	}
+	var job *ent.Job
+	if e.JobID != nil && *e.JobID > 0 {
+		job, _ = h.jobSvc.GetByID(ctx, *e.JobID)
+	}
+	jobName, jobType, jobSubtitle := documentJobFields(job)
+	number := fmt.Sprintf("EST-%05d", id)
+	return documentPDF{Filename: number + ".pdf", Data: data, Title: e.Title, Number: number, CustomerEmail: to, CustomerName: customerName, JobName: jobName, JobType: jobType, JobSubtitle: jobSubtitle, Archived: e.DeletedAt != nil}, nil
 }
 
 func (h *EstimateHandler) Delete(w http.ResponseWriter, r *http.Request) {

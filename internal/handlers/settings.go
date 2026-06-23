@@ -65,6 +65,10 @@ func (h *SettingsHandler) Save(w http.ResponseWriter, r *http.Request) {
 		SmtpUser:                 r.FormValue("smtp_user"),
 		SmtpPassword:             r.FormValue("smtp_password"),
 		SmtpFrom:                 r.FormValue("smtp_from"),
+		InvoiceEmailSubject:      r.FormValue("invoice_email_subject"),
+		InvoiceEmailBody:         r.FormValue("invoice_email_body"),
+		EstimateEmailSubject:     r.FormValue("estimate_email_subject"),
+		EstimateEmailBody:        r.FormValue("estimate_email_body"),
 		Timezone:                 r.FormValue("timezone"),
 		PasswordMinLength:        pwMinLen,
 		PasswordRequireUppercase: r.FormValue("password_require_uppercase") == "on",
@@ -135,6 +139,18 @@ func (h *SettingsHandler) Save(w http.ResponseWriter, r *http.Request) {
 			}
 			if oldSettings.SMTPFrom != newSettings.SMTPFrom {
 				changed = append(changed, "smtp_from")
+			}
+			if oldSettings.InvoiceEmailSubject != newSettings.InvoiceEmailSubject {
+				changed = append(changed, "invoice_email_subject")
+			}
+			if oldSettings.InvoiceEmailBody != newSettings.InvoiceEmailBody {
+				changed = append(changed, "invoice_email_body")
+			}
+			if oldSettings.EstimateEmailSubject != newSettings.EstimateEmailSubject {
+				changed = append(changed, "estimate_email_subject")
+			}
+			if oldSettings.EstimateEmailBody != newSettings.EstimateEmailBody {
+				changed = append(changed, "estimate_email_body")
 			}
 			if oldSettings.Timezone != newSettings.Timezone {
 				changed = append(changed, "timezone")
