@@ -32,6 +32,7 @@ func TestHTTPAuthorizationBoundaries(t *testing.T) {
 	router := New(pool, client, sessions, &config.Config{UploadDir: t.TempDir(), MaxUploadSize: 1024 * 1024})
 
 	tech := client.User.Create().SetEmail("tech@example.test").SetPasswordHash("hash").SetName("Tech").SetRole("tech").SaveX(ctx)
+	admin := client.User.Create().SetEmail("admin@example.test").SetPasswordHash("hash").SetName("Admin").SetRole("admin").SaveX(ctx)
 	dispatcher := client.User.Create().SetEmail("dispatcher@example.test").SetPasswordHash("hash").SetName("Dispatcher").SetRole("dispatcher").SaveX(ctx)
 	customer := client.Customer.Create().SetDisplayName("Route Customer").SaveX(ctx)
 	assignedJob := client.Job.Create().SetCustomerID(customer.ID).SetJobType("Assigned Route Job").SetBillingType("hourly").SetLineItems(`[{"title":"Billable","quantity":1,"unit_price":100}]`).SaveX(ctx)
@@ -41,6 +42,7 @@ func TestHTTPAuthorizationBoundaries(t *testing.T) {
 	client.JobAssignment.Create().SetJobID(archivedJob.ID).SetUserID(tech.ID).SaveX(ctx)
 
 	techCookie := sessionCookie(t, ctx, sessions, tech.ID)
+	adminCookie := sessionCookie(t, ctx, sessions, admin.ID)
 	dispatcherCookie := sessionCookie(t, ctx, sessions, dispatcher.ID)
 
 	t.Run("tech route boundaries", func(t *testing.T) {
@@ -63,6 +65,25 @@ func TestHTTPAuthorizationBoundaries(t *testing.T) {
 		expectStatus(t, router, dispatcherCookie, http.MethodGet, "/customers", http.StatusOK)
 		expectStatus(t, router, dispatcherCookie, http.MethodGet, "/invoices", http.StatusOK)
 		expectStatus(t, router, dispatcherCookie, http.MethodGet, fmt.Sprintf("/jobs/%d", assignedJob.ID), http.StatusOK)
+		expectStatus(t, router, dispatcherCookie, http.MethodGet, fmt.Sprintf("/jobs/%d", archivedJob.ID), http.StatusOK)
+	})
+
+	t.Run("archived job pages are read-only", func(t *testing.T) {
+		dispatcherBody := requestBody(t, router, dispatcherCookie, http.MethodGet, fmt.Sprintf("/jobs/%d", archivedJob.ID), http.StatusOK)
+		assertContains(t, dispatcherBody, "Archived Route Job")
+		assertContains(t, dispatcherBody, "Archived on")
+		assertNotContains(t, dispatcherBody, "Edit")
+		assertNotContains(t, dispatcherBody, "Delete")
+		assertNotContains(t, dispatcherBody, "Create Invoice")
+		assertNotContains(t, dispatcherBody, "Restore")
+
+		adminBody := requestBody(t, router, adminCookie, http.MethodGet, fmt.Sprintf("/jobs/%d", archivedJob.ID), http.StatusOK)
+		assertContains(t, adminBody, "Restore")
+		assertNotContains(t, adminBody, "Create Invoice")
+
+		expectStatus(t, router, dispatcherCookie, http.MethodGet, fmt.Sprintf("/jobs/%d/edit", archivedJob.ID), http.StatusForbidden)
+		expectStatus(t, router, dispatcherCookie, http.MethodPost, fmt.Sprintf("/jobs/%d/create-invoice", archivedJob.ID), http.StatusForbidden)
+		expectStatus(t, router, dispatcherCookie, http.MethodPost, fmt.Sprintf("/jobs/%d/comments", archivedJob.ID), http.StatusForbidden)
 	})
 
 	t.Run("tech page hides commercial data", func(t *testing.T) {

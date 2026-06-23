@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import "fmt"
 
-func ContactsList(contacts []ContactRow, customerID int64) templ.Component {
+func ContactsList(contacts []ContactRow, customerID int64, readOnly bool) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -40,7 +40,7 @@ func ContactsList(contacts []ContactRow, customerID int64) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if canManageOperational(ctx) {
+			if canManageOperational(ctx) && !readOnly {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<th></th>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -120,7 +120,7 @@ func ContactsList(contacts []ContactRow, customerID int64) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if canManageOperational(ctx) {
+				if canManageOperational(ctx) && !readOnly {
 					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<td style=\"text-align:right\"><button class=\"outline small\" hx-get=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -175,7 +175,7 @@ func ContactsList(contacts []ContactRow, customerID int64) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if canManageOperational(ctx) {
+		if canManageOperational(ctx) && !readOnly {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<button hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

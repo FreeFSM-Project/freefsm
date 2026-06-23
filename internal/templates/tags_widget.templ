@@ -8,7 +8,7 @@ templ TagWidget(p TagWidgetData) {
 			for _, t := range p.Tags {
 				<span class="tag-badge" style={ badgeStyle(t.Color) }>
 					{ t.Name }
-					if canManageOperational(ctx) {
+					if canManageOperational(ctx) && !p.ReadOnly {
 						<button
 							class="tag-remove"
 							hx-post={ fmt.Sprintf("%s/tags/%d/detach", p.BaseURL, t.ID) }
@@ -19,7 +19,7 @@ templ TagWidget(p TagWidgetData) {
 					}
 				</span>
 			}
-			if canManageOperational(ctx) && len(p.AllTags) > len(p.Tags) {
+			if canManageOperational(ctx) && !p.ReadOnly && len(p.AllTags) > len(p.Tags) {
 				<select
 					style="width:auto;font-size:0.8rem;padding:0.25rem"
 					hx-on:change="htmx.trigger(this, 'addTag')"

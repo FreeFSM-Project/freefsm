@@ -2,7 +2,7 @@ package templates
 
 import "fmt"
 
-templ ContactsList(contacts []ContactRow, customerID int64) {
+templ ContactsList(contacts []ContactRow, customerID int64, readOnly bool) {
 	<div id="contacts-section">
 		<h3>Contacts</h3>
 		if len(contacts) > 0 {
@@ -10,7 +10,7 @@ templ ContactsList(contacts []ContactRow, customerID int64) {
 				<thead>
 					<tr>
 						<th>Name</th><th>Email</th><th>Phone</th>
-						if canManageOperational(ctx) {
+						if canManageOperational(ctx) && !readOnly {
 							<th></th>
 						}
 					</tr>
@@ -21,7 +21,7 @@ templ ContactsList(contacts []ContactRow, customerID int64) {
 							<td>{ c.FirstName } { c.LastName }</td>
 							<td>{ c.Email }</td>
 							<td>{ c.Phone }</td>
-							if canManageOperational(ctx) {
+							if canManageOperational(ctx) && !readOnly {
 								<td style="text-align:right">
 									<button class="outline small"
 										hx-get={ templ.URL(fmt.Sprintf("/customers/%d/contacts/%d/edit", customerID, c.ID)) }
@@ -39,7 +39,7 @@ templ ContactsList(contacts []ContactRow, customerID int64) {
 				</tbody>
 			</table>
 		}
-		if canManageOperational(ctx) {
+		if canManageOperational(ctx) && !readOnly {
 			<button hx-get={ templ.URL(fmt.Sprintf("/customers/%d/contacts/new", customerID)) }
 				hx-target="#contact-form-wrap"
 				hx-swap="innerHTML" class="outline"

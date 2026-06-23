@@ -14,7 +14,7 @@ templ CommentsWidget(p CommentsWidgetData) {
 						<strong>{ c.Author }</strong>
 						<div style="display:flex;gap:0.5rem;align-items:center">
 							<small style="color:var(--pico-muted-color)">{ c.CreatedAt }</small>
-							if c.CanDelete {
+							if c.CanDelete && !p.ReadOnly {
 								<button
 									class="outline contrast"
 									style="font-size:0.7rem;padding:0 0.35rem;margin:0"
@@ -30,17 +30,19 @@ templ CommentsWidget(p CommentsWidgetData) {
 				</div>
 			}
 		}
-		<form
-			hx-post={ fmt.Sprintf("%s/comments", p.BaseURL) }
-			hx-target={ fmt.Sprintf("#comments-%s-%d", p.ObjectType, p.ObjectID) }
-			hx-swap="outerHTML"
-			style="margin-top:1rem"
-		>
-			<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
-			<label>
-				<textarea name="content" rows="2" placeholder="Add a comment..." style="margin-bottom:0.25rem"></textarea>
-			</label>
-			<button type="submit" class="outline" style="font-size:0.85rem">Add Comment</button>
-		</form>
+		if !p.ReadOnly {
+			<form
+				hx-post={ fmt.Sprintf("%s/comments", p.BaseURL) }
+				hx-target={ fmt.Sprintf("#comments-%s-%d", p.ObjectType, p.ObjectID) }
+				hx-swap="outerHTML"
+				style="margin-top:1rem"
+			>
+				<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+				<label>
+					<textarea name="content" rows="2" placeholder="Add a comment..." style="margin-bottom:0.25rem"></textarea>
+				</label>
+				<button type="submit" class="outline" style="font-size:0.85rem">Add Comment</button>
+			</form>
+		}
 	</div>
 }

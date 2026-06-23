@@ -4,7 +4,8 @@ import "fmt"
 
 templ ItemShow(p ItemDetail) {
 	@Layout("Item - "+p.Name) {
-		<div style="display:flex;justify-content:space-between;align-items:center">
+		if p.ArchivedAt == "" {
+			<div style="display:flex;justify-content:space-between;align-items:center">
 			<div style="display:flex;gap:0.5rem">
 				<a href={ templ.URL(fmt.Sprintf("/items/%d/edit", p.ID)) } role="button" class="outline">Edit</a>
 				<form action={ templ.URL(fmt.Sprintf("/items/%d/delete", p.ID)) } method="post" style="display:inline" onsubmit="return confirm('Delete this item?')">
@@ -12,14 +13,17 @@ templ ItemShow(p ItemDetail) {
 					<button class="outline contrast">Delete</button>
 				</form>
 			</div>
-		</div>
+			</div>
+		}
 		if p.ArchivedAt != "" {
 			<div style="background:var(--pico-muted-background);border:1px solid var(--pico-muted-border-color);border-radius:0.25rem;padding:0.75rem 1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center">
 				<span style="color:var(--pico-muted-color)">Archived on { p.ArchivedAt }</span>
-				<form action={ templ.URL(fmt.Sprintf("/items/%d/restore", p.ID)) } method="post" style="display:inline">
-					<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
-					<button type="submit" class="outline" style="font-size:0.85rem">Restore</button>
-				</form>
+				if canAdmin(ctx) {
+					<form action={ templ.URL(fmt.Sprintf("/items/%d/restore", p.ID)) } method="post" style="display:inline">
+						<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+						<button type="submit" class="outline" style="font-size:0.85rem">Restore</button>
+					</form>
+				}
 			</div>
 		}
 		<table>

@@ -4,7 +4,8 @@ import "fmt"
 
 templ InvoiceShow(p InvoiceDetail) {
 	@Layout(invoicePrefix(ctx)+fmt.Sprintf("%05d", p.ID)+": "+p.Title) {
-		<div style="display:flex;justify-content:space-between;align-items:center">
+		if p.ArchivedAt == "" {
+			<div style="display:flex;justify-content:space-between;align-items:center">
 			<div style="display:flex;gap:0.5rem">
 				<a href={ templ.URL(fmt.Sprintf("/invoices/%d/pdf", p.ID)) } role="button" class="outline" target="_blank">PDF</a>
 				<a href={ templ.URL(fmt.Sprintf("/invoices/%d/edit", p.ID)) } role="button" class="outline" aria-label={ fmt.Sprintf("Edit %s", p.Title) }>Edit</a>
@@ -13,18 +14,21 @@ templ InvoiceShow(p InvoiceDetail) {
 					<button class="outline contrast" aria-label={ fmt.Sprintf("Delete %s", p.Title) }>Delete</button>
 				</form>
 			</div>
-		</div>
+			</div>
+		}
 		if p.ArchivedAt != "" {
 			<div style="background:var(--pico-muted-background);border:1px solid var(--pico-muted-border-color);border-radius:0.25rem;padding:0.75rem 1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center">
 				<span style="color:var(--pico-muted-color)">Archived on { p.ArchivedAt }</span>
-				<form action={ templ.URL(fmt.Sprintf("/invoices/%d/restore", p.ID)) } method="post" style="display:inline">
-					<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
-					<button type="submit" class="outline" style="font-size:0.85rem">Restore</button>
-				</form>
+				if canAdmin(ctx) {
+					<form action={ templ.URL(fmt.Sprintf("/invoices/%d/restore", p.ID)) } method="post" style="display:inline">
+						<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+						<button type="submit" class="outline" style="font-size:0.85rem">Restore</button>
+					</form>
+				}
 			</div>
 		}
 		if len(p.Tags) > 0 || true {
-			@TagWidget(TagWidgetData{BaseURL: fmt.Sprintf("/invoices/%d", p.ID), Tags: p.Tags, AllTags: p.AllTags})
+			@TagWidget(TagWidgetData{BaseURL: fmt.Sprintf("/invoices/%d", p.ID), Tags: p.Tags, AllTags: p.AllTags, ReadOnly: p.ArchivedAt != ""})
 		}
 		if len(p.CustomFields) > 0 {
 			@CustomFieldsWidget(CustomFieldsWidgetData{Fields: p.CustomFields})
@@ -97,6 +101,7 @@ templ InvoiceShow(p InvoiceDetail) {
 				<p><strong>Total Paid: { fmt.Sprintf("$%.2f", paymentsTotal(p.Payments)) }</strong></p>
 			</div>
 		}
+		if p.ArchivedAt == "" {
 		<details open>
 			<summary>Record Payment</summary>
 			<form action={ templ.URL(fmt.Sprintf("/invoices/%d/payments", p.ID)) } method="post" style="margin-top:0.5rem">
@@ -134,14 +139,21 @@ templ InvoiceShow(p InvoiceDetail) {
 				<button type="submit">Record Payment</button>
 			</form>
 		</details>
+		}
 		if p.Notes != "" {
 			<h3>Notes</h3>
 			<p>{ p.Notes }</p>
 		}
-		<div hx-get={ templ.URL(fmt.Sprintf("/invoices/%d/comments", p.ID)) } hx-trigger="load" hx-swap="innerHTML">
-			<p>Loading comments...</p>
-		</div>
-		@FileUploadWidget("invoice", p.ID, fmt.Sprintf("/invoices/%d", p.ID))
+		if p.ArchivedAt != "" {
+			<div hx-get={ templ.URL(fmt.Sprintf("/invoices/%d/comments?read_only=1", p.ID)) } hx-trigger="load" hx-swap="innerHTML">
+				<p>Loading comments...</p>
+			</div>
+		} else {
+			<div hx-get={ templ.URL(fmt.Sprintf("/invoices/%d/comments", p.ID)) } hx-trigger="load" hx-swap="innerHTML">
+				<p>Loading comments...</p>
+			</div>
+			@FileUploadWidget("invoice", p.ID, fmt.Sprintf("/invoices/%d", p.ID))
+		}
 	@FileList(p.FileList)
 	<div hx-get={ templ.URL(fmt.Sprintf("/invoices/%d/activity", p.ID)) } hx-trigger="load" hx-swap="innerHTML">
 		<p>Loading activity...</p>

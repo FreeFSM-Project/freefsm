@@ -79,7 +79,7 @@ func TagWidget(p TagWidgetData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if canManageOperational(ctx) {
+			if canManageOperational(ctx) && !p.ReadOnly {
 				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<button class=\"tag-remove\" hx-post=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -103,7 +103,7 @@ func TagWidget(p TagWidgetData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		if canManageOperational(ctx) && len(p.AllTags) > len(p.Tags) {
+		if canManageOperational(ctx) && !p.ReadOnly && len(p.AllTags) > len(p.Tags) {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<select style=\"width:auto;font-size:0.8rem;padding:0.25rem\" hx-on:change=\"htmx.trigger(this, 'addTag')\"><option value=\"\">+ Add tag</option> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

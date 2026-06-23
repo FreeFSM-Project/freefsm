@@ -55,6 +55,7 @@ func (h *CommentHandler) List(objectType string) http.HandlerFunc {
 		}
 
 		baseURL := fmt.Sprintf("%s/%d", typeToPrefix[objectType], objectID)
+		readOnly := r.URL.Query().Get("read_only") == "1"
 		rows := make([]templates.CommentRow, len(comments))
 		for i, c := range comments {
 			author, _ := h.userSvc.GetByID(r.Context(), c.AuthorID)
@@ -79,6 +80,7 @@ func (h *CommentHandler) List(objectType string) http.HandlerFunc {
 			ObjectType: objectType,
 			ObjectID:   objectID,
 			Comments:   rows,
+			ReadOnly:   readOnly,
 		}))
 	}
 }
@@ -153,7 +155,7 @@ func (h *CommentHandler) Delete(objectType string) http.HandlerFunc {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
-		if !h.policySvc.CanAccessObject(r.Context(), u.ID, u.Role, objectType, comment.ObjectID, policyDelete) && !(u.ID == comment.AuthorID && h.policySvc.CanAccessObject(r.Context(), u.ID, u.Role, objectType, comment.ObjectID, policyRead)) {
+		if !h.policySvc.CanAccessObject(r.Context(), u.ID, u.Role, objectType, comment.ObjectID, policyDelete) && !(u.ID == comment.AuthorID && h.policySvc.CanAccessObject(r.Context(), u.ID, u.Role, objectType, comment.ObjectID, policyCreate)) {
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}

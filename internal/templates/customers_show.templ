@@ -4,7 +4,7 @@ import "fmt"
 
 templ CustomerShow(p CustomerShowPageData) {
 	@Layout("Customer - "+p.Customer.DisplayName) {
-		if canManageOperational(ctx) {
+		if canManageOperational(ctx) && p.Customer.ArchivedAt == "" {
 			<div style="display:flex;justify-content:space-between;align-items:center">
 				<div style="display:flex;gap:0.5rem">
 					<a href={ templ.URL(fmt.Sprintf("/customers/%d/edit", p.Customer.ID)) } role="button" class="outline" aria-label={ fmt.Sprintf("Edit %s", p.Customer.DisplayName) }>Edit</a>
@@ -18,7 +18,7 @@ templ CustomerShow(p CustomerShowPageData) {
 		if p.Customer.ArchivedAt != "" {
 			<div style="background:var(--pico-muted-background);border:1px solid var(--pico-muted-border-color);border-radius:0.25rem;padding:0.75rem 1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center">
 				<span style="color:var(--pico-muted-color)">Archived on { p.Customer.ArchivedAt }</span>
-				if canManageOperational(ctx) {
+				if canAdmin(ctx) {
 					<form action={ templ.URL(fmt.Sprintf("/customers/%d/restore", p.Customer.ID)) } method="post" style="display:inline">
 						<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
 						<button type="submit" class="outline" style="font-size:0.85rem">Restore</button>
@@ -27,7 +27,7 @@ templ CustomerShow(p CustomerShowPageData) {
 			</div>
 		}
 		if len(p.Tags) > 0 || true {
-			@TagWidget(TagWidgetData{BaseURL: fmt.Sprintf("/customers/%d", p.Customer.ID), Tags: p.Tags, AllTags: p.AllTags})
+			@TagWidget(TagWidgetData{BaseURL: fmt.Sprintf("/customers/%d", p.Customer.ID), Tags: p.Tags, AllTags: p.AllTags, ReadOnly: p.Customer.ArchivedAt != ""})
 		}
 		if len(p.CustomFields) > 0 {
 			@CustomFieldsWidget(CustomFieldsWidgetData{Fields: p.CustomFields})
@@ -69,14 +69,27 @@ templ CustomerShow(p CustomerShowPageData) {
 			}
 			{ p.Customer.ServiceCity }, { p.Customer.ServiceState } { p.Customer.ServiceZipCode }
 		</p>
-		<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/contacts", p.Customer.ID)) }
+		if p.Customer.ArchivedAt != "" {
+			<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/contacts?read_only=1", p.Customer.ID)) }
 		hx-trigger="load" hx-swap="innerHTML">
 		<p>Loading contacts...</p>
 	</div>
-	<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/comments", p.Customer.ID)) } hx-trigger="load" hx-swap="innerHTML">
-		<p>Loading comments...</p>
+		} else {
+			<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/contacts", p.Customer.ID)) }
+		hx-trigger="load" hx-swap="innerHTML">
+		<p>Loading contacts...</p>
 	</div>
-	@FileUploadWidget("customer", p.Customer.ID, fmt.Sprintf("/customers/%d", p.Customer.ID))
+		}
+	if p.Customer.ArchivedAt != "" {
+		<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/comments?read_only=1", p.Customer.ID)) } hx-trigger="load" hx-swap="innerHTML">
+			<p>Loading comments...</p>
+		</div>
+	} else {
+		<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/comments", p.Customer.ID)) } hx-trigger="load" hx-swap="innerHTML">
+			<p>Loading comments...</p>
+		</div>
+		@FileUploadWidget("customer", p.Customer.ID, fmt.Sprintf("/customers/%d", p.Customer.ID))
+	}
 	@FileList(p.FileList)
 	<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/activity", p.Customer.ID)) } hx-trigger="load" hx-swap="innerHTML">
 		<p>Loading activity...</p>

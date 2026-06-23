@@ -6,6 +6,9 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent"
 	"github.com/MartialM1nd/freefsm/internal/ent/asset"
 	"github.com/MartialM1nd/freefsm/internal/ent/customer"
+	"github.com/MartialM1nd/freefsm/internal/ent/estimate"
+	"github.com/MartialM1nd/freefsm/internal/ent/invoice"
+	"github.com/MartialM1nd/freefsm/internal/ent/item"
 	"github.com/MartialM1nd/freefsm/internal/ent/job"
 	"github.com/MartialM1nd/freefsm/internal/ent/jobassignment"
 	"github.com/MartialM1nd/freefsm/internal/ent/project"
@@ -24,12 +27,12 @@ func (s *PolicyService) CanAccessObject(ctx context.Context, userID int64, role,
 		return false
 	}
 	if role == "admin" {
-		return true
+		return action == "read" || s.canMutateObject(ctx, objectType, objectID)
 	}
 	if role == "dispatcher" {
 		switch objectType {
 		case "customer", "job", "project", "estimate", "invoice", "asset", "item", "time_entry":
-			return true
+			return action == "read" || s.canMutateObject(ctx, objectType, objectID)
 		default:
 			return false
 		}
@@ -127,4 +130,37 @@ func (s *PolicyService) isCustomerAssignedToUser(ctx context.Context, customerID
 
 func (s *PolicyService) assignedJobIDs(ctx context.Context, userID int64) ([]int64, error) {
 	return NewJobService(s.client).assignedJobIDs(ctx, userID)
+}
+
+func (s *PolicyService) canMutateObject(ctx context.Context, objectType string, objectID int64) bool {
+	if s.client == nil {
+		return true
+	}
+	switch objectType {
+	case "customer":
+		exists, err := s.client.Customer.Query().Where(customer.IDEQ(objectID), customer.DeletedAtIsNil()).Exist(ctx)
+		return err == nil && exists
+	case "job":
+		exists, err := s.client.Job.Query().Where(job.IDEQ(objectID), job.DeletedAtIsNil()).Exist(ctx)
+		return err == nil && exists
+	case "project":
+		exists, err := s.client.Project.Query().Where(project.IDEQ(objectID), project.DeletedAtIsNil()).Exist(ctx)
+		return err == nil && exists
+	case "estimate":
+		exists, err := s.client.Estimate.Query().Where(estimate.IDEQ(objectID), estimate.DeletedAtIsNil()).Exist(ctx)
+		return err == nil && exists
+	case "invoice":
+		exists, err := s.client.Invoice.Query().Where(invoice.IDEQ(objectID), invoice.DeletedAtIsNil()).Exist(ctx)
+		return err == nil && exists
+	case "asset":
+		exists, err := s.client.Asset.Query().Where(asset.IDEQ(objectID), asset.DeletedAtIsNil()).Exist(ctx)
+		return err == nil && exists
+	case "item":
+		exists, err := s.client.Item.Query().Where(item.IDEQ(objectID), item.DeletedAtIsNil()).Exist(ctx)
+		return err == nil && exists
+	case "time_entry":
+		return true
+	default:
+		return false
+	}
 }

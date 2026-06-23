@@ -31,6 +31,12 @@ func TestPolicyServiceAssignmentAccessIntegration(t *testing.T) {
 		SetName("Tech").
 		SetRole("tech").
 		SaveX(ctx)
+	dispatcher := client.User.Create().
+		SetEmail("dispatcher@example.test").
+		SetPasswordHash("hash").
+		SetName("Dispatcher").
+		SetRole("dispatcher").
+		SaveX(ctx)
 
 	activeCustomer := client.Customer.Create().SetDisplayName("Active Customer").SaveX(ctx)
 	archivedCustomer := client.Customer.Create().SetDisplayName("Archived Customer").SetDeletedAt(now).SaveX(ctx)
@@ -102,6 +108,16 @@ func TestPolicyServiceAssignmentAccessIntegration(t *testing.T) {
 				t.Fatalf("CanAccessObject(%q, %d) = %v, want %v", tt.objectType, tt.objectID, got, tt.want)
 			}
 		})
+	}
+
+	if !policy.CanAccessObject(ctx, dispatcher.ID, dispatcher.Role, "job", archivedJob.ID, "read") {
+		t.Fatal("dispatcher read archived job = false, want true")
+	}
+	if policy.CanAccessObject(ctx, dispatcher.ID, dispatcher.Role, "job", archivedJob.ID, "create") {
+		t.Fatal("dispatcher create on archived job = true, want false")
+	}
+	if policy.CanAccessObject(ctx, dispatcher.ID, dispatcher.Role, "job", archivedJob.ID, "delete") {
+		t.Fatal("dispatcher delete on archived job = true, want false")
 	}
 }
 

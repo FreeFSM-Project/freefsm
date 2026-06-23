@@ -93,6 +93,34 @@ func (s *FileService) TargetExists(ctx context.Context, objectType string, objec
 	}
 }
 
+func (s *FileService) TargetExistsAny(ctx context.Context, objectType string, objectID int64) bool {
+	if objectID <= 0 {
+		return false
+	}
+	switch objectType {
+	case "customer":
+		exists, err := s.client.Customer.Query().Where(customer.IDEQ(objectID)).Exist(ctx)
+		return err == nil && exists
+	case "job":
+		exists, err := s.client.Job.Query().Where(job.IDEQ(objectID)).Exist(ctx)
+		return err == nil && exists
+	case "project":
+		exists, err := s.client.Project.Query().Where(project.IDEQ(objectID)).Exist(ctx)
+		return err == nil && exists
+	case "estimate":
+		exists, err := s.client.Estimate.Query().Where(estimate.IDEQ(objectID)).Exist(ctx)
+		return err == nil && exists
+	case "invoice":
+		exists, err := s.client.Invoice.Query().Where(invoice.IDEQ(objectID)).Exist(ctx)
+		return err == nil && exists
+	case "asset":
+		exists, err := s.client.Asset.Query().Where(asset.IDEQ(objectID)).Exist(ctx)
+		return err == nil && exists
+	default:
+		return false
+	}
+}
+
 func (s *FileService) MaxSize() int64 {
 	return s.maxSize
 }

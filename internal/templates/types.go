@@ -35,6 +35,11 @@ func canManageOperational(ctx context.Context) bool {
 	return u != nil && (u.Role == "admin" || u.Role == "dispatcher")
 }
 
+func canAdmin(ctx context.Context) bool {
+	u := getUser(ctx)
+	return u != nil && u.Role == "admin"
+}
+
 type User struct {
 	ID    int64
 	Name  string
@@ -928,6 +933,7 @@ type TagWidgetData struct {
 	BaseURL string
 	Tags    []TagRow
 	AllTags []TagRow
+	ReadOnly bool
 }
 
 type CommentRow struct {
@@ -943,6 +949,7 @@ type CommentsWidgetData struct {
 	ObjectType string
 	ObjectID   int64
 	Comments   []CommentRow
+	ReadOnly   bool
 }
 
 type CustomFieldDefRow struct {

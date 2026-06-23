@@ -349,7 +349,7 @@ func (h *CustomerHandler) ListContacts(w http.ResponseWriter, r *http.Request) {
 			Email: c.Email, Phone: c.Phone,
 		}
 	}
-	templates.ContactsList(rows, id).Render(r.Context(), w)
+	templates.ContactsList(rows, id, r.URL.Query().Get("read_only") == "1").Render(r.Context(), w)
 }
 
 func (h *CustomerHandler) canReadCustomer(r *http.Request, customerID int64) bool {
