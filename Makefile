@@ -29,7 +29,8 @@ build: generate
 	@echo "building $(BINARY)..."
 	@mkdir -p $(BUILD_DIR)
 	@COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo "dev"); \
-	 VERSION=$$(git describe --tags --dirty --always 2>/dev/null || echo "0.1.0"); \
+	 DIRTY=$$(git diff --quiet && git diff --cached --quiet || echo ".dirty"); \
+	 VERSION=$$(git describe --tags --dirty 2>/dev/null || echo "0.1.0-dev.$$COMMIT$$DIRTY"); \
 	 PATH="$(_PATH_EXTRA):$$PATH" CGO_ENABLED=0 $(GO) build \
 	 -ldflags "-s -w -X $(MODULE)/internal/config.Version=$$VERSION -X $(MODULE)/internal/config.Commit=$$COMMIT" \
 	 -o $(BUILD_DIR)/$(BINARY) ./cmd/freefsm/
@@ -38,7 +39,8 @@ compile:
 	@echo "building $(BINARY)..."
 	@mkdir -p $(BUILD_DIR)
 	@COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo "dev"); \
-	 VERSION=$$(git describe --tags --dirty --always 2>/dev/null || echo "0.1.0"); \
+	 DIRTY=$$(git diff --quiet && git diff --cached --quiet || echo ".dirty"); \
+	 VERSION=$$(git describe --tags --dirty 2>/dev/null || echo "0.1.0-dev.$$COMMIT$$DIRTY"); \
 	 PATH="$(_PATH_EXTRA):$$PATH" CGO_ENABLED=0 $(GO) build \
 	 -ldflags "-s -w -X $(MODULE)/internal/config.Version=$$VERSION -X $(MODULE)/internal/config.Commit=$$COMMIT" \
 	 -o $(BUILD_DIR)/$(BINARY) ./cmd/freefsm/
