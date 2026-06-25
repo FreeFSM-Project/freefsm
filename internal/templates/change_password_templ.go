@@ -43,19 +43,19 @@ func ChangePasswordPage(p ChangePasswordData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article style=\"max-width:420px;margin:0 auto;padding:2rem\"><header><h2>Change Password</h2></header>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"auth-card-padded\"><header><h2>Change Password</h2></header>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if p.Error != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<p style=\"color:var(--pico-color-red-500)\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<p class=\"auth-error-text\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(p.Error)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/change_password.templ`, Line: 10, Col: 56}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/change_password.templ`, Line: 10, Col: 40}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -79,7 +79,7 @@ func ChangePasswordPage(p ChangePasswordData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"> <label>Current Password <input type=\"password\" name=\"current_password\" required autofocus></label> <label>New Password <input type=\"password\" name=\"new_password\" id=\"new_password\" required></label> <label>Confirm New Password <input type=\"password\" name=\"confirm_password\" required></label><div style=\"margin-bottom:1rem\"><div class=\"policy-item\" id=\"policy-length\">At least ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"> <label>Current Password <input type=\"password\" name=\"current_password\" required autofocus></label> <label>New Password <input type=\"password\" name=\"new_password\" id=\"new_password\" required></label> <label>Confirm New Password <input type=\"password\" name=\"confirm_password\" required></label><div class=\"password-policy\"><div class=\"policy-item\" id=\"policy-length\">At least ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

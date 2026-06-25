@@ -41,7 +41,7 @@ func ForgotPasswordPage(p ForgotPasswordData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article style=\"max-width:500px;margin:4rem auto\"><hgroup><h2>Forgot Password</h2><p>Enter your email to receive a reset link</p></hgroup> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"auth-card\"><hgroup><h2>Forgot Password</h2><p>Enter your email to receive a reset link</p></hgroup> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -70,7 +70,7 @@ func ForgotPasswordPage(p ForgotPasswordData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				if p.ResetURL != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<p style=\"font-size:0.85rem;color:var(--pico-muted-color)\">(Email not configured: <code>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<p class=\"auth-muted\">(Email not configured: <code>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -106,7 +106,7 @@ func ForgotPasswordPage(p ForgotPasswordData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"> <label>Email <input type=\"email\" name=\"email\" placeholder=\"email@example.com\" required autofocus></label> <button type=\"submit\">Send Reset Link</button></form><p style=\"margin-top:1rem\"><a href=\"/login\">&larr; Back to Login</a></p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"> <label>Email <input type=\"email\" name=\"email\" placeholder=\"email@example.com\" required autofocus></label> <button type=\"submit\">Send Reset Link</button></form><p class=\"auth-link\"><a href=\"/login\">&larr; Back to Login</a></p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

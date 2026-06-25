@@ -41,7 +41,7 @@ func ResetPasswordPage(p ResetPasswordData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article style=\"max-width:500px;margin:4rem auto\"><hgroup><h2>Reset Password</h2><p>Enter your new password</p></hgroup> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"auth-card\"><hgroup><h2>Reset Password</h2><p>Enter your new password</p></hgroup> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -96,7 +96,7 @@ func ResetPasswordPage(p ResetPasswordData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<p style=\"margin-top:1rem\"><a href=\"/login\">&larr; Back to Login</a></p></article>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<p class=\"auth-link\"><a href=\"/login\">&larr; Back to Login</a></p></article>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

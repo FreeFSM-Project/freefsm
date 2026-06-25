@@ -5,22 +5,21 @@ import "fmt"
 templ JobSubtasks(p JobDetail) {
 	<div id="job-subtasks">
 		<h3>Subtasks</h3>
-		<div style="margin-bottom:0.5rem">
+		<div class="subtasks-progress">
 			if len(p.Subtasks) > 0 {
-				<progress value={ fmt.Sprintf("%d", subtaskCompletedCount(p.Subtasks)) } max={ fmt.Sprintf("%d", len(p.Subtasks)) } style="width:200px"></progress>
+				<progress value={ fmt.Sprintf("%d", subtaskCompletedCount(p.Subtasks)) } max={ fmt.Sprintf("%d", len(p.Subtasks)) }></progress>
 				<small>{ fmt.Sprintf("%d of %d completed", subtaskCompletedCount(p.Subtasks), len(p.Subtasks)) }</small>
 			}
 		</div>
-		<ul style="list-style:none;padding:0">
+		<ul class="subtasks-list">
 			for idx, st := range p.Subtasks {
-				<li style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.25rem">
+				<li>
 					<input
 						type="checkbox"
 						checked?={ st.Completed }
 						hx-post={ fmt.Sprintf("/jobs/%d/subtasks/%d/toggle", p.ID, idx) }
 						hx-target="#job-subtasks"
 						hx-swap="outerHTML"
-						style="margin:0"
 					/>
 					<span class={ templ.KV("subtask-completed", st.Completed) }>
 						{ st.Title }

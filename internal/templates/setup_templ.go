@@ -41,7 +41,7 @@ func SetupPage(p SetupPageData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article style=\"max-width:500px;margin:4rem auto\"><hgroup><h2>Setup FreeFSM</h2><p>Create the initial admin account</p></hgroup> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"auth-card\"><hgroup><h2>Setup FreeFSM</h2><p>Create the initial admin account</p></hgroup> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

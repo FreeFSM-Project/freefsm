@@ -537,6 +537,132 @@ html[data-theme="dark"] .theme-icon-moon {
   margin-top: 1rem;
 }
 
+/* Auth cards */
+.auth-card {
+  max-width: 500px;
+  margin: 4rem auto;
+}
+
+.auth-card-sm {
+  max-width: 400px;
+}
+
+.auth-card-padded {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.auth-logo {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.auth-logo img {
+  height: 48px;
+}
+
+.auth-link {
+  margin-top: 1rem;
+}
+
+.auth-link-center {
+  text-align: center;
+}
+
+.auth-muted {
+  color: var(--pico-muted-color);
+  font-size: 0.85rem;
+}
+
+.auth-error-text {
+  color: var(--pico-color-red-500);
+}
+
+.password-policy {
+  margin-bottom: 1rem;
+}
+
+/* Document previews and email compose */
+.document-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.document-toolbar form {
+  display: inline;
+  margin: 0;
+}
+
+.document-toolbar button {
+  margin: 0;
+}
+
+.document-preview-frame {
+  width: 100%;
+  height: calc(100vh - 12rem);
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: 0.25rem;
+  background: white;
+}
+
+.document-error {
+  border-color: var(--pico-del-color);
+  color: var(--pico-del-color);
+}
+
+/* Files widget */
+.files-widget {
+  margin-top: 1rem;
+}
+
+.files-upload-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.files-upload-row button {
+  margin-bottom: 0;
+}
+
+.files-actions form {
+  display: inline;
+}
+
+.files-delete-button {
+  padding: 0 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* Subtasks */
+.subtasks-progress {
+  margin-bottom: 0.5rem;
+}
+
+.subtasks-progress progress {
+  width: 200px;
+}
+
+.subtasks-list {
+  list-style: none;
+  padding: 0;
+}
+
+.subtasks-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.subtasks-list input[type="checkbox"] {
+  margin: 0;
+}
+
 /* Scoped shared widgets */
 .shared-widget {
   margin-top: 1.5rem;

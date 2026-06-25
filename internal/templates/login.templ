@@ -2,9 +2,9 @@ package templates
 
 templ LoginPage(p LoginPageData) {
 	@Layout("Login") {
-		<article style="max-width:400px;margin:4rem auto">
-			<div style="text-align:center;margin-bottom:1.5rem">
-				<img src="/static/img/logo.png" alt="FreeFSM" style="height:48px"/>
+		<article class="auth-card auth-card-sm">
+			<div class="auth-logo">
+				<img src="/static/img/logo.png" alt="FreeFSM"/>
 			</div>
 			<hgroup>
 				<h2>Login</h2>
@@ -25,7 +25,7 @@ templ LoginPage(p LoginPageData) {
 				</label>
 				<button type="submit">Sign In</button>
 			</form>
-			<p style="text-align:center;margin-top:1rem">
+			<p class="auth-link auth-link-center">
 				<a href="/forgot-password">Forgot password?</a>
 			</p>
 		</article>
