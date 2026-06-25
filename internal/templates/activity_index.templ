@@ -5,12 +5,12 @@ templ ActivityIndex(p ActivityPageData) {
 		if len(p.Entries) == 0 {
 			<p>No activity recorded yet.</p>
 		} else {
-			<div class="activity-list">
+			<div class="activity-list activity-list-compact">
 				for _, e := range p.Entries {
-					<div class="activity-item">
+					<div class="activity-item activity-item-compact">
 						<span class="activity-icon">{ e.Icon }</span>
 						<div class="activity-body">
-							<span class="activity-text">
+							<span class="activity-text activity-text-compact">
 								<strong>{ e.ActorName }</strong>
 								{" "}
 								<span class={ activityActionClass(e.Action) }>{ activityVerb(e.Action) }</span>
@@ -51,10 +51,10 @@ templ ActivityIndex(p ActivityPageData) {
 								<span class="shared-widget-muted">({ e.ObjectType })</span>
 							</span>
 							if e.Metadata.CommentPreview != "" && e.Action == "comment_added" {
-								<p class="activity-preview">{ TruncateText(e.Metadata.CommentPreview, 100) }</p>
+								<p class="activity-preview activity-preview-compact">{ TruncateText(e.Metadata.CommentPreview, 100) }</p>
 							}
 						</div>
-						<small class="activity-time" title={ e.CreatedAt }>{ e.RelativeTime }</small>
+						<small class="activity-time activity-time-compact" title={ e.CreatedAt }>{ e.RelativeTime }</small>
 					</div>
 				}
 			</div>
