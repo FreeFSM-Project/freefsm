@@ -31,7 +31,7 @@ templ JobForm(p JobFormPageData) {
 				</label>
 				<label>
 					Location (optional)
-					<select name="location_id">
+					<select name="location_id" id="job-location-select" data-selected={ fmt.Sprintf("%d", p.Job.LocationID) }>
 						<option value="0">No location</option>
 						for _, l := range p.Locations {
 							<option value={ fmt.Sprintf("%d", l.Value) } selected?={ p.Job.LocationID == l.Value }>{ l.Label }</option>
@@ -180,6 +180,7 @@ templ JobForm(p JobFormPageData) {
 		@templ.Raw(`<script>
 			const jobCustomer = document.getElementById('job-customer-select');
 			const contactSelect = document.getElementById('contact-select');
+			const jobLocationSelect = document.getElementById('job-location-select');
 			function loadContacts(customerID) {
 				if (!customerID) { contactSelect.innerHTML = '<option value="0">No contact</option>'; return; }
 				const sel = contactSelect.dataset.selected || 0;
@@ -187,9 +188,21 @@ templ JobForm(p JobFormPageData) {
 					.then(r => r.text())
 					.then(html => contactSelect.innerHTML = html);
 			}
+			function loadJobLocations(customerID) {
+				if (!jobLocationSelect) return;
+				if (!customerID) { jobLocationSelect.innerHTML = '<option value="0">No location</option>'; return; }
+				const sel = jobLocationSelect.dataset.selected || 0;
+				fetch('/customers/' + customerID + '/locations/options?selected=' + sel)
+					.then(r => r.text())
+					.then(html => jobLocationSelect.innerHTML = html);
+			}
 			if (jobCustomer && contactSelect) {
-				jobCustomer.addEventListener('change', function() { loadContacts(this.value); });
+				jobCustomer.addEventListener('change', function() { contactSelect.dataset.selected = 0; loadContacts(this.value); });
 				if (jobCustomer.value) loadContacts(jobCustomer.value);
+			}
+			if (jobCustomer && jobLocationSelect) {
+				jobCustomer.addEventListener('change', function() { jobLocationSelect.dataset.selected = 0; loadJobLocations(this.value); });
+				if (jobCustomer.value && jobLocationSelect.options.length <= 1) loadJobLocations(jobCustomer.value);
 			}
 			const startEl = document.querySelector('[name=start_time]');
 			const endEl = document.querySelector('[name=end_time]');

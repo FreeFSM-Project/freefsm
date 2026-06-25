@@ -264,76 +264,6 @@ func (_c *CustomerCreate) SetNillableBillingZipCode(v *string) *CustomerCreate {
 	return _c
 }
 
-// SetServiceAddress1 sets the "service_address_1" field.
-func (_c *CustomerCreate) SetServiceAddress1(v string) *CustomerCreate {
-	_c.mutation.SetServiceAddress1(v)
-	return _c
-}
-
-// SetNillableServiceAddress1 sets the "service_address_1" field if the given value is not nil.
-func (_c *CustomerCreate) SetNillableServiceAddress1(v *string) *CustomerCreate {
-	if v != nil {
-		_c.SetServiceAddress1(*v)
-	}
-	return _c
-}
-
-// SetServiceAddress2 sets the "service_address_2" field.
-func (_c *CustomerCreate) SetServiceAddress2(v string) *CustomerCreate {
-	_c.mutation.SetServiceAddress2(v)
-	return _c
-}
-
-// SetNillableServiceAddress2 sets the "service_address_2" field if the given value is not nil.
-func (_c *CustomerCreate) SetNillableServiceAddress2(v *string) *CustomerCreate {
-	if v != nil {
-		_c.SetServiceAddress2(*v)
-	}
-	return _c
-}
-
-// SetServiceCity sets the "service_city" field.
-func (_c *CustomerCreate) SetServiceCity(v string) *CustomerCreate {
-	_c.mutation.SetServiceCity(v)
-	return _c
-}
-
-// SetNillableServiceCity sets the "service_city" field if the given value is not nil.
-func (_c *CustomerCreate) SetNillableServiceCity(v *string) *CustomerCreate {
-	if v != nil {
-		_c.SetServiceCity(*v)
-	}
-	return _c
-}
-
-// SetServiceState sets the "service_state" field.
-func (_c *CustomerCreate) SetServiceState(v string) *CustomerCreate {
-	_c.mutation.SetServiceState(v)
-	return _c
-}
-
-// SetNillableServiceState sets the "service_state" field if the given value is not nil.
-func (_c *CustomerCreate) SetNillableServiceState(v *string) *CustomerCreate {
-	if v != nil {
-		_c.SetServiceState(*v)
-	}
-	return _c
-}
-
-// SetServiceZipCode sets the "service_zip_code" field.
-func (_c *CustomerCreate) SetServiceZipCode(v string) *CustomerCreate {
-	_c.mutation.SetServiceZipCode(v)
-	return _c
-}
-
-// SetNillableServiceZipCode sets the "service_zip_code" field if the given value is not nil.
-func (_c *CustomerCreate) SetNillableServiceZipCode(v *string) *CustomerCreate {
-	if v != nil {
-		_c.SetServiceZipCode(*v)
-	}
-	return _c
-}
-
 // SetCustomFields sets the "custom_fields" field.
 func (_c *CustomerCreate) SetCustomFields(v string) *CustomerCreate {
 	_c.mutation.SetCustomFields(v)
@@ -483,26 +413,6 @@ func (_c *CustomerCreate) defaults() {
 		v := customer.DefaultBillingZipCode
 		_c.mutation.SetBillingZipCode(v)
 	}
-	if _, ok := _c.mutation.ServiceAddress1(); !ok {
-		v := customer.DefaultServiceAddress1
-		_c.mutation.SetServiceAddress1(v)
-	}
-	if _, ok := _c.mutation.ServiceAddress2(); !ok {
-		v := customer.DefaultServiceAddress2
-		_c.mutation.SetServiceAddress2(v)
-	}
-	if _, ok := _c.mutation.ServiceCity(); !ok {
-		v := customer.DefaultServiceCity
-		_c.mutation.SetServiceCity(v)
-	}
-	if _, ok := _c.mutation.ServiceState(); !ok {
-		v := customer.DefaultServiceState
-		_c.mutation.SetServiceState(v)
-	}
-	if _, ok := _c.mutation.ServiceZipCode(); !ok {
-		v := customer.DefaultServiceZipCode
-		_c.mutation.SetServiceZipCode(v)
-	}
 	if _, ok := _c.mutation.CustomFields(); !ok {
 		v := customer.DefaultCustomFields
 		_c.mutation.SetCustomFields(v)
@@ -565,21 +475,6 @@ func (_c *CustomerCreate) check() error {
 	}
 	if _, ok := _c.mutation.BillingZipCode(); !ok {
 		return &ValidationError{Name: "billing_zip_code", err: errors.New(`ent: missing required field "Customer.billing_zip_code"`)}
-	}
-	if _, ok := _c.mutation.ServiceAddress1(); !ok {
-		return &ValidationError{Name: "service_address_1", err: errors.New(`ent: missing required field "Customer.service_address_1"`)}
-	}
-	if _, ok := _c.mutation.ServiceAddress2(); !ok {
-		return &ValidationError{Name: "service_address_2", err: errors.New(`ent: missing required field "Customer.service_address_2"`)}
-	}
-	if _, ok := _c.mutation.ServiceCity(); !ok {
-		return &ValidationError{Name: "service_city", err: errors.New(`ent: missing required field "Customer.service_city"`)}
-	}
-	if _, ok := _c.mutation.ServiceState(); !ok {
-		return &ValidationError{Name: "service_state", err: errors.New(`ent: missing required field "Customer.service_state"`)}
-	}
-	if _, ok := _c.mutation.ServiceZipCode(); !ok {
-		return &ValidationError{Name: "service_zip_code", err: errors.New(`ent: missing required field "Customer.service_zip_code"`)}
 	}
 	if _, ok := _c.mutation.CustomFields(); !ok {
 		return &ValidationError{Name: "custom_fields", err: errors.New(`ent: missing required field "Customer.custom_fields"`)}
@@ -693,26 +588,6 @@ func (_c *CustomerCreate) createSpec() (*Customer, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.BillingZipCode(); ok {
 		_spec.SetField(customer.FieldBillingZipCode, field.TypeString, value)
 		_node.BillingZipCode = value
-	}
-	if value, ok := _c.mutation.ServiceAddress1(); ok {
-		_spec.SetField(customer.FieldServiceAddress1, field.TypeString, value)
-		_node.ServiceAddress1 = value
-	}
-	if value, ok := _c.mutation.ServiceAddress2(); ok {
-		_spec.SetField(customer.FieldServiceAddress2, field.TypeString, value)
-		_node.ServiceAddress2 = value
-	}
-	if value, ok := _c.mutation.ServiceCity(); ok {
-		_spec.SetField(customer.FieldServiceCity, field.TypeString, value)
-		_node.ServiceCity = value
-	}
-	if value, ok := _c.mutation.ServiceState(); ok {
-		_spec.SetField(customer.FieldServiceState, field.TypeString, value)
-		_node.ServiceState = value
-	}
-	if value, ok := _c.mutation.ServiceZipCode(); ok {
-		_spec.SetField(customer.FieldServiceZipCode, field.TypeString, value)
-		_node.ServiceZipCode = value
 	}
 	if value, ok := _c.mutation.CustomFields(); ok {
 		_spec.SetField(customer.FieldCustomFields, field.TypeString, value)

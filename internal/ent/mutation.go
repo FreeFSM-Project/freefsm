@@ -7609,11 +7609,6 @@ type CustomerMutation struct {
 	billing_city          *string
 	billing_state         *string
 	billing_zip_code      *string
-	service_address_1     *string
-	service_address_2     *string
-	service_city          *string
-	service_state         *string
-	service_zip_code      *string
 	custom_fields         *string
 	deleted_at            *time.Time
 	created_at            *time.Time
@@ -8512,186 +8507,6 @@ func (m *CustomerMutation) ResetBillingZipCode() {
 	m.billing_zip_code = nil
 }
 
-// SetServiceAddress1 sets the "service_address_1" field.
-func (m *CustomerMutation) SetServiceAddress1(s string) {
-	m.service_address_1 = &s
-}
-
-// ServiceAddress1 returns the value of the "service_address_1" field in the mutation.
-func (m *CustomerMutation) ServiceAddress1() (r string, exists bool) {
-	v := m.service_address_1
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldServiceAddress1 returns the old "service_address_1" field's value of the Customer entity.
-// If the Customer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CustomerMutation) OldServiceAddress1(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldServiceAddress1 is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldServiceAddress1 requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldServiceAddress1: %w", err)
-	}
-	return oldValue.ServiceAddress1, nil
-}
-
-// ResetServiceAddress1 resets all changes to the "service_address_1" field.
-func (m *CustomerMutation) ResetServiceAddress1() {
-	m.service_address_1 = nil
-}
-
-// SetServiceAddress2 sets the "service_address_2" field.
-func (m *CustomerMutation) SetServiceAddress2(s string) {
-	m.service_address_2 = &s
-}
-
-// ServiceAddress2 returns the value of the "service_address_2" field in the mutation.
-func (m *CustomerMutation) ServiceAddress2() (r string, exists bool) {
-	v := m.service_address_2
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldServiceAddress2 returns the old "service_address_2" field's value of the Customer entity.
-// If the Customer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CustomerMutation) OldServiceAddress2(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldServiceAddress2 is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldServiceAddress2 requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldServiceAddress2: %w", err)
-	}
-	return oldValue.ServiceAddress2, nil
-}
-
-// ResetServiceAddress2 resets all changes to the "service_address_2" field.
-func (m *CustomerMutation) ResetServiceAddress2() {
-	m.service_address_2 = nil
-}
-
-// SetServiceCity sets the "service_city" field.
-func (m *CustomerMutation) SetServiceCity(s string) {
-	m.service_city = &s
-}
-
-// ServiceCity returns the value of the "service_city" field in the mutation.
-func (m *CustomerMutation) ServiceCity() (r string, exists bool) {
-	v := m.service_city
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldServiceCity returns the old "service_city" field's value of the Customer entity.
-// If the Customer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CustomerMutation) OldServiceCity(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldServiceCity is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldServiceCity requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldServiceCity: %w", err)
-	}
-	return oldValue.ServiceCity, nil
-}
-
-// ResetServiceCity resets all changes to the "service_city" field.
-func (m *CustomerMutation) ResetServiceCity() {
-	m.service_city = nil
-}
-
-// SetServiceState sets the "service_state" field.
-func (m *CustomerMutation) SetServiceState(s string) {
-	m.service_state = &s
-}
-
-// ServiceState returns the value of the "service_state" field in the mutation.
-func (m *CustomerMutation) ServiceState() (r string, exists bool) {
-	v := m.service_state
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldServiceState returns the old "service_state" field's value of the Customer entity.
-// If the Customer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CustomerMutation) OldServiceState(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldServiceState is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldServiceState requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldServiceState: %w", err)
-	}
-	return oldValue.ServiceState, nil
-}
-
-// ResetServiceState resets all changes to the "service_state" field.
-func (m *CustomerMutation) ResetServiceState() {
-	m.service_state = nil
-}
-
-// SetServiceZipCode sets the "service_zip_code" field.
-func (m *CustomerMutation) SetServiceZipCode(s string) {
-	m.service_zip_code = &s
-}
-
-// ServiceZipCode returns the value of the "service_zip_code" field in the mutation.
-func (m *CustomerMutation) ServiceZipCode() (r string, exists bool) {
-	v := m.service_zip_code
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldServiceZipCode returns the old "service_zip_code" field's value of the Customer entity.
-// If the Customer object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CustomerMutation) OldServiceZipCode(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldServiceZipCode is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldServiceZipCode requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldServiceZipCode: %w", err)
-	}
-	return oldValue.ServiceZipCode, nil
-}
-
-// ResetServiceZipCode resets all changes to the "service_zip_code" field.
-func (m *CustomerMutation) ResetServiceZipCode() {
-	m.service_zip_code = nil
-}
-
 // SetCustomFields sets the "custom_fields" field.
 func (m *CustomerMutation) SetCustomFields(s string) {
 	m.custom_fields = &s
@@ -8883,7 +8698,7 @@ func (m *CustomerMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CustomerMutation) Fields() []string {
-	fields := make([]string, 0, 27)
+	fields := make([]string, 0, 22)
 	if m.company_id != nil {
 		fields = append(fields, customer.FieldCompanyID)
 	}
@@ -8937,21 +8752,6 @@ func (m *CustomerMutation) Fields() []string {
 	}
 	if m.billing_zip_code != nil {
 		fields = append(fields, customer.FieldBillingZipCode)
-	}
-	if m.service_address_1 != nil {
-		fields = append(fields, customer.FieldServiceAddress1)
-	}
-	if m.service_address_2 != nil {
-		fields = append(fields, customer.FieldServiceAddress2)
-	}
-	if m.service_city != nil {
-		fields = append(fields, customer.FieldServiceCity)
-	}
-	if m.service_state != nil {
-		fields = append(fields, customer.FieldServiceState)
-	}
-	if m.service_zip_code != nil {
-		fields = append(fields, customer.FieldServiceZipCode)
 	}
 	if m.custom_fields != nil {
 		fields = append(fields, customer.FieldCustomFields)
@@ -9009,16 +8809,6 @@ func (m *CustomerMutation) Field(name string) (ent.Value, bool) {
 		return m.BillingState()
 	case customer.FieldBillingZipCode:
 		return m.BillingZipCode()
-	case customer.FieldServiceAddress1:
-		return m.ServiceAddress1()
-	case customer.FieldServiceAddress2:
-		return m.ServiceAddress2()
-	case customer.FieldServiceCity:
-		return m.ServiceCity()
-	case customer.FieldServiceState:
-		return m.ServiceState()
-	case customer.FieldServiceZipCode:
-		return m.ServiceZipCode()
 	case customer.FieldCustomFields:
 		return m.CustomFields()
 	case customer.FieldDeletedAt:
@@ -9072,16 +8862,6 @@ func (m *CustomerMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldBillingState(ctx)
 	case customer.FieldBillingZipCode:
 		return m.OldBillingZipCode(ctx)
-	case customer.FieldServiceAddress1:
-		return m.OldServiceAddress1(ctx)
-	case customer.FieldServiceAddress2:
-		return m.OldServiceAddress2(ctx)
-	case customer.FieldServiceCity:
-		return m.OldServiceCity(ctx)
-	case customer.FieldServiceState:
-		return m.OldServiceState(ctx)
-	case customer.FieldServiceZipCode:
-		return m.OldServiceZipCode(ctx)
 	case customer.FieldCustomFields:
 		return m.OldCustomFields(ctx)
 	case customer.FieldDeletedAt:
@@ -9224,41 +9004,6 @@ func (m *CustomerMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBillingZipCode(v)
-		return nil
-	case customer.FieldServiceAddress1:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetServiceAddress1(v)
-		return nil
-	case customer.FieldServiceAddress2:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetServiceAddress2(v)
-		return nil
-	case customer.FieldServiceCity:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetServiceCity(v)
-		return nil
-	case customer.FieldServiceState:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetServiceState(v)
-		return nil
-	case customer.FieldServiceZipCode:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetServiceZipCode(v)
 		return nil
 	case customer.FieldCustomFields:
 		v, ok := value.(string)
@@ -9474,21 +9219,6 @@ func (m *CustomerMutation) ResetField(name string) error {
 		return nil
 	case customer.FieldBillingZipCode:
 		m.ResetBillingZipCode()
-		return nil
-	case customer.FieldServiceAddress1:
-		m.ResetServiceAddress1()
-		return nil
-	case customer.FieldServiceAddress2:
-		m.ResetServiceAddress2()
-		return nil
-	case customer.FieldServiceCity:
-		m.ResetServiceCity()
-		return nil
-	case customer.FieldServiceState:
-		m.ResetServiceState()
-		return nil
-	case customer.FieldServiceZipCode:
-		m.ResetServiceZipCode()
 		return nil
 	case customer.FieldCustomFields:
 		m.ResetCustomFields()

@@ -130,12 +130,19 @@ type CustomerDetail struct {
 	BillingCity     string
 	BillingState    string
 	BillingZipCode  string
-	ServiceAddress1 string
-	ServiceAddress2 string
-	ServiceCity     string
-	ServiceState    string
-	ServiceZipCode  string
 	ArchivedAt      string
+}
+
+type LocationRow struct {
+	ID        int64
+	Title     string
+	Address1  string
+	Address2  string
+	City      string
+	State     string
+	ZipCode   string
+	Notes     string
+	IsPrimary bool
 }
 
 type CustomerFormPageData struct {

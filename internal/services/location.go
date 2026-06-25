@@ -26,6 +26,13 @@ func (s *LocationService) ListAll(ctx context.Context) ([]*ent.Location, error) 
 	return s.client.Location.Query().Order(ent.Asc(location.FieldTitle)).All(ctx)
 }
 
+func (s *LocationService) ListByCustomer(ctx context.Context, customerID int64) ([]*ent.Location, error) {
+	return s.client.Location.Query().
+		Where(location.ObjectTypeEQ("customer"), location.ObjectIDEQ(customerID)).
+		Order(ent.Desc(location.FieldIsPrimary), ent.Asc(location.FieldTitle)).
+		All(ctx)
+}
+
 func (s *LocationService) ListByIDs(ctx context.Context, ids []int64) ([]*ent.Location, error) {
 	if len(ids) == 0 {
 		return nil, nil
@@ -39,6 +46,106 @@ func (s *LocationService) GetByID(ctx context.Context, id int64) (*ent.Location,
 		return nil, fmt.Errorf("get location %d: %w", id, err)
 	}
 	return l, nil
+}
+
+func (s *LocationService) GetByCustomer(ctx context.Context, customerID, id int64) (*ent.Location, error) {
+	l, err := s.client.Location.Query().
+		Where(location.IDEQ(id), location.ObjectTypeEQ("customer"), location.ObjectIDEQ(customerID)).
+		Only(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get customer location %d: %w", id, err)
+	}
+	return l, nil
+}
+
+type CustomerLocationCreateParams struct {
+	Title     string
+	Address1  string
+	Address2  string
+	City      string
+	State     string
+	ZipCode   string
+	Notes     string
+	IsPrimary bool
+}
+
+type CustomerLocationUpdateParams struct {
+	Title     *string
+	Address1  *string
+	Address2  *string
+	City      *string
+	State     *string
+	ZipCode   *string
+	Notes     *string
+	IsPrimary *bool
+}
+
+func (s *LocationService) CreateForCustomer(ctx context.Context, customerID int64, params CustomerLocationCreateParams) (*ent.Location, error) {
+	if err := validateActiveCustomer(ctx, s.client, customerID); err != nil {
+		return nil, err
+	}
+	l, err := s.client.Location.Create().
+		SetObjectType("customer").
+		SetObjectID(customerID).
+		SetTitle(params.Title).
+		SetAddress1(params.Address1).
+		SetAddress2(params.Address2).
+		SetCity(params.City).
+		SetState(params.State).
+		SetZipCode(params.ZipCode).
+		SetNotes(params.Notes).
+		SetIsPrimary(params.IsPrimary).
+		Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("create customer location: %w", err)
+	}
+	return l, nil
+}
+
+func (s *LocationService) UpdateCustomerLocation(ctx context.Context, customerID, id int64, params CustomerLocationUpdateParams) (*ent.Location, error) {
+	if _, err := s.GetByCustomer(ctx, customerID, id); err != nil {
+		return nil, err
+	}
+	u := s.client.Location.UpdateOneID(id)
+	if params.Title != nil {
+		u.SetTitle(*params.Title)
+	}
+	if params.Address1 != nil {
+		u.SetAddress1(*params.Address1)
+	}
+	if params.Address2 != nil {
+		u.SetAddress2(*params.Address2)
+	}
+	if params.City != nil {
+		u.SetCity(*params.City)
+	}
+	if params.State != nil {
+		u.SetState(*params.State)
+	}
+	if params.ZipCode != nil {
+		u.SetZipCode(*params.ZipCode)
+	}
+	if params.Notes != nil {
+		u.SetNotes(*params.Notes)
+	}
+	if params.IsPrimary != nil {
+		u.SetIsPrimary(*params.IsPrimary)
+	}
+	l, err := u.Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("update customer location: %w", err)
+	}
+	return l, nil
+}
+
+func (s *LocationService) DeleteCustomerLocation(ctx context.Context, customerID, id int64) error {
+	if _, err := s.GetByCustomer(ctx, customerID, id); err != nil {
+		return err
+	}
+	if err := s.client.Location.DeleteOneID(id).Exec(ctx); err != nil {
+		return fmt.Errorf("delete customer location: %w", err)
+	}
+	return nil
 }
 
 func (s *LocationService) Geocode(ctx context.Context, l *ent.Location, geocoderURL string) (*ent.Location, error) {

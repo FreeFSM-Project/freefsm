@@ -1,0 +1,10 @@
+package templates
+
+import "fmt"
+
+templ LocationOptions(locations []SelectOption, selectedID int64) {
+	<option value="0">No location</option>
+	for _, l := range locations {
+		<option value={ fmt.Sprintf("%d", l.Value) } selected?={ selectedID == l.Value }>{ l.Label }</option>
+	}
+}

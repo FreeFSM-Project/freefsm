@@ -264,6 +264,8 @@ func activityIcon(action string) string {
 		return "↩"
 	case "contact_created", "contact_updated":
 		return "👤"
+	case "location_created", "location_updated", "location_deleted":
+		return "📍"
 	default:
 		return "●"
 	}

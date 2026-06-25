@@ -49,16 +49,6 @@ const (
 	FieldBillingState = "billing_state"
 	// FieldBillingZipCode holds the string denoting the billing_zip_code field in the database.
 	FieldBillingZipCode = "billing_zip_code"
-	// FieldServiceAddress1 holds the string denoting the service_address_1 field in the database.
-	FieldServiceAddress1 = "service_address_1"
-	// FieldServiceAddress2 holds the string denoting the service_address_2 field in the database.
-	FieldServiceAddress2 = "service_address_2"
-	// FieldServiceCity holds the string denoting the service_city field in the database.
-	FieldServiceCity = "service_city"
-	// FieldServiceState holds the string denoting the service_state field in the database.
-	FieldServiceState = "service_state"
-	// FieldServiceZipCode holds the string denoting the service_zip_code field in the database.
-	FieldServiceZipCode = "service_zip_code"
 	// FieldCustomFields holds the string denoting the custom_fields field in the database.
 	FieldCustomFields = "custom_fields"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
@@ -92,11 +82,6 @@ var Columns = []string{
 	FieldBillingCity,
 	FieldBillingState,
 	FieldBillingZipCode,
-	FieldServiceAddress1,
-	FieldServiceAddress2,
-	FieldServiceCity,
-	FieldServiceState,
-	FieldServiceZipCode,
 	FieldCustomFields,
 	FieldDeletedAt,
 	FieldCreatedAt,
@@ -142,16 +127,6 @@ var (
 	DefaultBillingState string
 	// DefaultBillingZipCode holds the default value on creation for the "billing_zip_code" field.
 	DefaultBillingZipCode string
-	// DefaultServiceAddress1 holds the default value on creation for the "service_address_1" field.
-	DefaultServiceAddress1 string
-	// DefaultServiceAddress2 holds the default value on creation for the "service_address_2" field.
-	DefaultServiceAddress2 string
-	// DefaultServiceCity holds the default value on creation for the "service_city" field.
-	DefaultServiceCity string
-	// DefaultServiceState holds the default value on creation for the "service_state" field.
-	DefaultServiceState string
-	// DefaultServiceZipCode holds the default value on creation for the "service_zip_code" field.
-	DefaultServiceZipCode string
 	// DefaultCustomFields holds the default value on creation for the "custom_fields" field.
 	DefaultCustomFields string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -258,31 +233,6 @@ func ByBillingState(opts ...sql.OrderTermOption) OrderOption {
 // ByBillingZipCode orders the results by the billing_zip_code field.
 func ByBillingZipCode(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBillingZipCode, opts...).ToFunc()
-}
-
-// ByServiceAddress1 orders the results by the service_address_1 field.
-func ByServiceAddress1(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldServiceAddress1, opts...).ToFunc()
-}
-
-// ByServiceAddress2 orders the results by the service_address_2 field.
-func ByServiceAddress2(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldServiceAddress2, opts...).ToFunc()
-}
-
-// ByServiceCity orders the results by the service_city field.
-func ByServiceCity(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldServiceCity, opts...).ToFunc()
-}
-
-// ByServiceState orders the results by the service_state field.
-func ByServiceState(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldServiceState, opts...).ToFunc()
-}
-
-// ByServiceZipCode orders the results by the service_zip_code field.
-func ByServiceZipCode(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldServiceZipCode, opts...).ToFunc()
 }
 
 // ByCustomFields orders the results by the custom_fields field.

@@ -384,36 +384,16 @@ func init() {
 	customerDescBillingZipCode := customerFields[18].Descriptor()
 	// customer.DefaultBillingZipCode holds the default value on creation for the billing_zip_code field.
 	customer.DefaultBillingZipCode = customerDescBillingZipCode.Default.(string)
-	// customerDescServiceAddress1 is the schema descriptor for service_address_1 field.
-	customerDescServiceAddress1 := customerFields[19].Descriptor()
-	// customer.DefaultServiceAddress1 holds the default value on creation for the service_address_1 field.
-	customer.DefaultServiceAddress1 = customerDescServiceAddress1.Default.(string)
-	// customerDescServiceAddress2 is the schema descriptor for service_address_2 field.
-	customerDescServiceAddress2 := customerFields[20].Descriptor()
-	// customer.DefaultServiceAddress2 holds the default value on creation for the service_address_2 field.
-	customer.DefaultServiceAddress2 = customerDescServiceAddress2.Default.(string)
-	// customerDescServiceCity is the schema descriptor for service_city field.
-	customerDescServiceCity := customerFields[21].Descriptor()
-	// customer.DefaultServiceCity holds the default value on creation for the service_city field.
-	customer.DefaultServiceCity = customerDescServiceCity.Default.(string)
-	// customerDescServiceState is the schema descriptor for service_state field.
-	customerDescServiceState := customerFields[22].Descriptor()
-	// customer.DefaultServiceState holds the default value on creation for the service_state field.
-	customer.DefaultServiceState = customerDescServiceState.Default.(string)
-	// customerDescServiceZipCode is the schema descriptor for service_zip_code field.
-	customerDescServiceZipCode := customerFields[23].Descriptor()
-	// customer.DefaultServiceZipCode holds the default value on creation for the service_zip_code field.
-	customer.DefaultServiceZipCode = customerDescServiceZipCode.Default.(string)
 	// customerDescCustomFields is the schema descriptor for custom_fields field.
-	customerDescCustomFields := customerFields[24].Descriptor()
+	customerDescCustomFields := customerFields[19].Descriptor()
 	// customer.DefaultCustomFields holds the default value on creation for the custom_fields field.
 	customer.DefaultCustomFields = customerDescCustomFields.Default.(string)
 	// customerDescCreatedAt is the schema descriptor for created_at field.
-	customerDescCreatedAt := customerFields[26].Descriptor()
+	customerDescCreatedAt := customerFields[21].Descriptor()
 	// customer.DefaultCreatedAt holds the default value on creation for the created_at field.
 	customer.DefaultCreatedAt = customerDescCreatedAt.Default.(func() time.Time)
 	// customerDescUpdatedAt is the schema descriptor for updated_at field.
-	customerDescUpdatedAt := customerFields[27].Descriptor()
+	customerDescUpdatedAt := customerFields[22].Descriptor()
 	// customer.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	customer.DefaultUpdatedAt = customerDescUpdatedAt.Default.(func() time.Time)
 	// customer.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

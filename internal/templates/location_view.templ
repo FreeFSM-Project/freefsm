@@ -1,0 +1,35 @@
+package templates
+
+import "fmt"
+
+templ LocationViewRow(customerID int64, l LocationRow, readOnly bool) {
+	<tr id={ templ.SafeURL(fmt.Sprintf("location-%d", l.ID)) }>
+		<td>
+			{ l.Title }
+			if l.IsPrimary {
+				<small>Primary</small>
+			}
+		</td>
+		<td>
+			{ l.Address1 }<br/>
+			if l.Address2 != "" {
+				{ l.Address2 }<br/>
+			}
+			{ l.City }, { l.State } { l.ZipCode }
+		</td>
+		<td>{ l.Notes }</td>
+		if canManageOperational(ctx) && !readOnly {
+			<td class="text-right">
+				<button class="outline small"
+					hx-get={ templ.URL(fmt.Sprintf("/customers/%d/locations/%d/edit", customerID, l.ID)) }
+					hx-target={ templ.SafeURL(fmt.Sprintf("#location-%d", l.ID)) }
+					hx-swap="outerHTML">Edit</button>
+				<button class="outline contrast small"
+					hx-post={ templ.URL(fmt.Sprintf("/customers/%d/locations/%d/delete", customerID, l.ID)) }
+					hx-confirm="Delete this location?"
+					hx-target="#locations-section"
+					hx-swap="outerHTML">Del</button>
+			</td>
+		}
+	</tr>
+}

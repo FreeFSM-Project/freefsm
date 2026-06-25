@@ -53,16 +53,6 @@ type Customer struct {
 	BillingState string `json:"billing_state,omitempty"`
 	// BillingZipCode holds the value of the "billing_zip_code" field.
 	BillingZipCode string `json:"billing_zip_code,omitempty"`
-	// ServiceAddress1 holds the value of the "service_address_1" field.
-	ServiceAddress1 string `json:"service_address_1,omitempty"`
-	// ServiceAddress2 holds the value of the "service_address_2" field.
-	ServiceAddress2 string `json:"service_address_2,omitempty"`
-	// ServiceCity holds the value of the "service_city" field.
-	ServiceCity string `json:"service_city,omitempty"`
-	// ServiceState holds the value of the "service_state" field.
-	ServiceState string `json:"service_state,omitempty"`
-	// ServiceZipCode holds the value of the "service_zip_code" field.
-	ServiceZipCode string `json:"service_zip_code,omitempty"`
 	// CustomFields holds the value of the "custom_fields" field.
 	CustomFields string `json:"custom_fields,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
@@ -81,7 +71,7 @@ func (*Customer) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case customer.FieldID, customer.FieldCompanyID, customer.FieldAssignedTo, customer.FieldPipelineStatusID, customer.FieldLeadSourceID:
 			values[i] = new(sql.NullInt64)
-		case customer.FieldFirstName, customer.FieldLastName, customer.FieldDisplayName, customer.FieldEmail, customer.FieldPhone, customer.FieldCompanyName, customer.FieldNotes, customer.FieldStatus, customer.FieldAccountType, customer.FieldBillingAddress1, customer.FieldBillingAddress2, customer.FieldBillingCity, customer.FieldBillingState, customer.FieldBillingZipCode, customer.FieldServiceAddress1, customer.FieldServiceAddress2, customer.FieldServiceCity, customer.FieldServiceState, customer.FieldServiceZipCode, customer.FieldCustomFields:
+		case customer.FieldFirstName, customer.FieldLastName, customer.FieldDisplayName, customer.FieldEmail, customer.FieldPhone, customer.FieldCompanyName, customer.FieldNotes, customer.FieldStatus, customer.FieldAccountType, customer.FieldBillingAddress1, customer.FieldBillingAddress2, customer.FieldBillingCity, customer.FieldBillingState, customer.FieldBillingZipCode, customer.FieldCustomFields:
 			values[i] = new(sql.NullString)
 		case customer.FieldDeletedAt, customer.FieldCreatedAt, customer.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -218,36 +208,6 @@ func (_m *Customer) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.BillingZipCode = value.String
 			}
-		case customer.FieldServiceAddress1:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field service_address_1", values[i])
-			} else if value.Valid {
-				_m.ServiceAddress1 = value.String
-			}
-		case customer.FieldServiceAddress2:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field service_address_2", values[i])
-			} else if value.Valid {
-				_m.ServiceAddress2 = value.String
-			}
-		case customer.FieldServiceCity:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field service_city", values[i])
-			} else if value.Valid {
-				_m.ServiceCity = value.String
-			}
-		case customer.FieldServiceState:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field service_state", values[i])
-			} else if value.Valid {
-				_m.ServiceState = value.String
-			}
-		case customer.FieldServiceZipCode:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field service_zip_code", values[i])
-			} else if value.Valid {
-				_m.ServiceZipCode = value.String
-			}
 		case customer.FieldCustomFields:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field custom_fields", values[i])
@@ -370,21 +330,6 @@ func (_m *Customer) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("billing_zip_code=")
 	builder.WriteString(_m.BillingZipCode)
-	builder.WriteString(", ")
-	builder.WriteString("service_address_1=")
-	builder.WriteString(_m.ServiceAddress1)
-	builder.WriteString(", ")
-	builder.WriteString("service_address_2=")
-	builder.WriteString(_m.ServiceAddress2)
-	builder.WriteString(", ")
-	builder.WriteString("service_city=")
-	builder.WriteString(_m.ServiceCity)
-	builder.WriteString(", ")
-	builder.WriteString("service_state=")
-	builder.WriteString(_m.ServiceState)
-	builder.WriteString(", ")
-	builder.WriteString("service_zip_code=")
-	builder.WriteString(_m.ServiceZipCode)
 	builder.WriteString(", ")
 	builder.WriteString("custom_fields=")
 	builder.WriteString(_m.CustomFields)

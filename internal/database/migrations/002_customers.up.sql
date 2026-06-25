@@ -20,13 +20,6 @@ CREATE TABLE customers (
     billing_city TEXT NOT NULL DEFAULT '',
     billing_state TEXT NOT NULL DEFAULT '',
     billing_zip_code TEXT NOT NULL DEFAULT '',
-
-    service_address_1 TEXT NOT NULL DEFAULT '',
-    service_address_2 TEXT NOT NULL DEFAULT '',
-    service_city TEXT NOT NULL DEFAULT '',
-    service_state TEXT NOT NULL DEFAULT '',
-    service_zip_code TEXT NOT NULL DEFAULT '',
-
     custom_fields JSONB NOT NULL DEFAULT '[]',
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

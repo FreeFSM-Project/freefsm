@@ -62,14 +62,17 @@ templ CustomerShow(p CustomerShowPageData) {
 				{ p.Customer.BillingCity }, { p.Customer.BillingState } { p.Customer.BillingZipCode }
 			</p>
 			}
-		<h3>Service Address</h3>
-		<p>
-			{ p.Customer.ServiceAddress1 }<br/>
-			if p.Customer.ServiceAddress2 != "" {
-				{ p.Customer.ServiceAddress2 }<br/>
-			}
-			{ p.Customer.ServiceCity }, { p.Customer.ServiceState } { p.Customer.ServiceZipCode }
-		</p>
+		if p.Customer.ArchivedAt != "" {
+			<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/locations?read_only=1", p.Customer.ID)) }
+		hx-trigger="load" hx-swap="innerHTML">
+		<p>Loading locations...</p>
+	</div>
+		} else {
+			<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/locations", p.Customer.ID)) }
+		hx-trigger="load" hx-swap="innerHTML">
+		<p>Loading locations...</p>
+	</div>
+		}
 		if p.Customer.ArchivedAt != "" {
 			<div hx-get={ templ.URL(fmt.Sprintf("/customers/%d/contacts?read_only=1", p.Customer.ID)) }
 		hx-trigger="load" hx-swap="innerHTML">

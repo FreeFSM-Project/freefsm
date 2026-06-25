@@ -54,7 +54,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	fileHandler := NewFileHandler(fileSvc, activitySvc, policySvc)
 	activityHandler := NewActivityHandler(activitySvc, userService, policySvc)
 
-	customerHandler := NewCustomerHandler(customerService, contactSvc, tagSvc, tagLinkSvc, defSvc, fileSvc, activitySvc, policySvc)
+	customerHandler := NewCustomerHandler(customerService, contactSvc, locationSvc, tagSvc, tagLinkSvc, defSvc, fileSvc, activitySvc, policySvc)
 	itemHandler := NewItemHandler(itemService, activitySvc)
 	// Asset services
 	assetTypeSvc := services.NewAssetTypeService(entClient)
@@ -77,7 +77,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 	passwordHandler := NewPasswordHandler(userService, companySettingsSvc, activitySvc)
 
 	// Asset handlers
-	assetHandler := NewAssetHandler(assetSvc, assetTypeSvc, assetStatusSvc, customerService, tagSvc, tagLinkSvc, defSvc, fileSvc, activitySvc, policySvc)
+	assetHandler := NewAssetHandler(assetSvc, assetTypeSvc, assetStatusSvc, customerService, locationSvc, tagSvc, tagLinkSvc, defSvc, fileSvc, activitySvc, policySvc)
 	assetTypeHandler := NewAssetTypeHandler(assetTypeSvc, assetStatusSvc, activitySvc, depSvc)
 	assetStatusHandler := NewAssetStatusHandler(assetStatusSvc, activitySvc, depSvc)
 
@@ -122,6 +122,8 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Get("/customers/{id}", customerHandler.Show)
 		r.Get("/customers/{id}/contacts", customerHandler.ListContacts)
 		r.Get("/customers/{id}/contacts/options", customerHandler.Contacts)
+		r.Get("/customers/{id}/locations", customerHandler.ListLocations)
+		r.Get("/customers/{id}/locations/options", customerHandler.LocationOptions)
 		r.Route("/items", func(r chi.Router) {
 			r.With(middleware.DispatcherOrAdmin).Get("/", itemHandler.List)
 			r.With(middleware.DispatcherOrAdmin).Get("/activity", activityHandler.ListByType("item"))
@@ -176,6 +178,11 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 			r.With(requireActiveObject(entClient, "customer")).Get("/customers/{id}/contacts/{cid}/edit", customerHandler.EditContactForm)
 			r.With(requireActiveObject(entClient, "customer")).Post("/customers/{id}/contacts/{cid}", customerHandler.UpdateContact)
 			r.With(requireActiveObject(entClient, "customer")).Post("/customers/{id}/contacts/{cid}/delete", customerHandler.DeleteContact)
+			r.With(requireActiveObject(entClient, "customer")).Get("/customers/{id}/locations/new", customerHandler.NewLocationForm)
+			r.With(requireActiveObject(entClient, "customer")).Post("/customers/{id}/locations", customerHandler.CreateLocation)
+			r.With(requireActiveObject(entClient, "customer")).Get("/customers/{id}/locations/{lid}/edit", customerHandler.EditLocationForm)
+			r.With(requireActiveObject(entClient, "customer")).Post("/customers/{id}/locations/{lid}", customerHandler.UpdateLocation)
+			r.With(requireActiveObject(entClient, "customer")).Post("/customers/{id}/locations/{lid}/delete", customerHandler.DeleteLocation)
 			r.Get("/jobs/new", jobHandler.Create)
 			r.Post("/jobs", jobHandler.Create)
 			r.With(requireActiveObject(entClient, "job")).Get("/jobs/{id}/edit", jobHandler.Update)

@@ -94,7 +94,6 @@ func (h *ProjectHandler) Show(w http.ResponseWriter, r *http.Request) {
 	statuses := h.statusesForSelect(r.Context())
 	customers, _ := h.custSvc.ListAll(r.Context())
 	custMap := customerMap(customers)
-	locations, _ := h.locSvc.ListAll(r.Context())
 	jobs, _ := h.jobSvc.ListByProject(r.Context(), id)
 	if !isAdminOrDispatcher(u) {
 		jobs = filterReadableJobs(r.Context(), h.policySvc, u, jobs)
@@ -120,11 +119,8 @@ func (h *ProjectHandler) Show(w http.ResponseWriter, r *http.Request) {
 	}
 	if p.LocationID != nil {
 		d.LocationID = *p.LocationID
-		for _, l := range locations {
-			if l.ID == *p.LocationID {
-				d.LocationName = l.Title
-				break
-			}
+		if l, err := h.locSvc.GetByCustomer(r.Context(), p.CustomerID, *p.LocationID); err == nil {
+			d.LocationName = l.Title
 		}
 	}
 	if p.StartTime != nil && !p.StartTime.IsZero() {
@@ -246,7 +242,7 @@ func (h *ProjectHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if len(errors) > 0 {
 		statuses := h.statusesForSelect(r.Context())
 		customers, _ := h.custSvc.ListAll(r.Context())
-		locations, _ := h.locSvc.ListAll(r.Context())
+		locations, _ := h.locSvc.ListByCustomer(r.Context(), custID)
 		defs, _ := h.defSvc.ListForObjectType(r.Context(), "project")
 		d := &templates.ProjectDetail{
 			Name:                 name,
@@ -339,7 +335,7 @@ func (h *ProjectHandler) Update(w http.ResponseWriter, r *http.Request) {
 	if len(errors) > 0 {
 		statuses := h.statusesForSelect(r.Context())
 		customers, _ := h.custSvc.ListAll(r.Context())
-		locations, _ := h.locSvc.ListAll(r.Context())
+		locations, _ := h.locSvc.ListByCustomer(r.Context(), custID)
 		defs, _ := h.defSvc.ListForObjectType(r.Context(), "project")
 		d := &templates.ProjectDetail{
 			ID:                   id,
@@ -455,7 +451,6 @@ func (h *ProjectHandler) statusesForSelect(ctx context.Context) []*ent.Status {
 func (h *ProjectHandler) newProjectForm(ctx context.Context) templates.ProjectFormPageData {
 	statuses := h.statusesForSelect(ctx)
 	customers, _ := h.custSvc.ListAll(ctx)
-	locations, _ := h.locSvc.ListAll(ctx)
 	defs, _ := h.defSvc.ListForObjectType(ctx, "project")
 	return templates.ProjectFormPageData{
 		Project: &templates.ProjectDetail{
@@ -464,14 +459,14 @@ func (h *ProjectHandler) newProjectForm(ctx context.Context) templates.ProjectFo
 		IsNew:        true,
 		Customers:    customerOptions(customers),
 		Statuses:     statusOptions(statuses),
-		Locations:    locationOptions(locations),
+		Locations:    nil,
 		CustomFields: buildCustomFieldDisplay(defs, "[]"),
 	}
 }
 
 func (h *ProjectHandler) formDataFromProject(ctx context.Context, p *ent.Project, statuses []*ent.Status) templates.ProjectFormPageData {
 	customers, _ := h.custSvc.ListAll(ctx)
-	locations, _ := h.locSvc.ListAll(ctx)
+	locations, _ := h.locSvc.ListByCustomer(ctx, p.CustomerID)
 	defs, _ := h.defSvc.ListForObjectType(ctx, "project")
 	statusesMap := statusMap(statuses)
 	d := templates.ProjectDetail{

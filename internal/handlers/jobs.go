@@ -405,7 +405,6 @@ func (h *JobHandler) newJobForm(ctx context.Context) templates.JobFormPageData {
 	statuses := h.statusesForSelect(ctx)
 	customers, _ := h.custSvc.ListAll(ctx)
 	projects, _ := h.projectSvc.ListAll(ctx)
-	locations, _ := h.locSvc.ListAll(ctx)
 	assets, _ := h.assetSvc.ListAll(ctx)
 	users, _ := h.userSvc.ListAll(ctx)
 	defs, _ := h.defSvc.ListForObjectType(ctx, "job")
@@ -417,7 +416,7 @@ func (h *JobHandler) newJobForm(ctx context.Context) templates.JobFormPageData {
 		IsNew:                   true,
 		Customers:               customerOptions(customers),
 		Projects:                projectOptions(projects),
-		Locations:               locationOptions(locations),
+		Locations:               nil,
 		Assets:                  assetOptions(assets),
 		Users:                   userOptions(users),
 		Statuses:                statusOptions(statuses),
@@ -432,7 +431,7 @@ func (h *JobHandler) newJobForm(ctx context.Context) templates.JobFormPageData {
 func (h *JobHandler) formDataFromJob(ctx context.Context, j *ent.Job, statuses []*ent.Status) templates.JobFormPageData {
 	customers, _ := h.custSvc.ListAll(ctx)
 	projects, _ := h.projectSvc.ListAll(ctx)
-	locations, _ := h.locSvc.ListAll(ctx)
+	locations, _ := h.locSvc.ListByCustomer(ctx, j.CustomerID)
 	assets, _ := h.assetSvc.ListAll(ctx)
 	users, _ := h.userSvc.ListAll(ctx)
 	defs, _ := h.defSvc.ListForObjectType(ctx, "job")

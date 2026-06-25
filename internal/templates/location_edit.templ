@@ -1,0 +1,32 @@
+package templates
+
+import "fmt"
+
+templ LocationEditRow(customerID int64, l LocationRow) {
+	<tr id={ templ.SafeURL(fmt.Sprintf("location-%d", l.ID)) }>
+		<td colspan="4">
+			<form hx-post={ templ.URL(fmt.Sprintf("/customers/%d/locations/%d", customerID, l.ID)) }
+				hx-target={ templ.SafeURL(fmt.Sprintf("#location-%d", l.ID)) }
+				hx-swap="outerHTML" class="inline-form-card-compact">
+				<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+				<label>Title <input type="text" name="title" value={ l.Title } required/></label>
+				<div class="grid">
+					<label>Address 1 <input type="text" name="address_1" value={ l.Address1 }/></label>
+					<label>Address 2 <input type="text" name="address_2" value={ l.Address2 }/></label>
+				</div>
+				<div class="grid form-grid-address">
+					<label>City <input type="text" name="city" value={ l.City }/></label>
+					<label>State <input type="text" name="state" value={ l.State }/></label>
+					<label>ZIP <input type="text" name="zip_code" value={ l.ZipCode }/></label>
+				</div>
+				<label>Notes <input type="text" name="notes" value={ l.Notes }/></label>
+				<label><input type="checkbox" name="is_primary" checked?={ l.IsPrimary }/> Primary</label>
+				<button type="submit" class="small">Save</button>
+				<button type="button" class="outline small"
+					hx-get={ templ.URL(fmt.Sprintf("/customers/%d/locations", customerID)) }
+					hx-target="#locations-section"
+					hx-swap="outerHTML">Cancel</button>
+			</form>
+		</td>
+	</tr>
+}

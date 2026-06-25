@@ -15,6 +15,7 @@ import (
 type CustomerHandler struct {
 	svc         *services.CustomerService
 	contactSvc  *services.CustomerContactService
+	locationSvc *services.LocationService
 	tagSvc      *services.TagService
 	tagLinkSvc  *services.TagLinkService
 	defSvc      *services.CustomFieldDefinitionService
@@ -23,8 +24,8 @@ type CustomerHandler struct {
 	policySvc   *services.PolicyService
 }
 
-func NewCustomerHandler(svc *services.CustomerService, contactSvc *services.CustomerContactService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, fileSvc *services.FileService, activitySvc *services.ActivityService, policySvc *services.PolicyService) *CustomerHandler {
-	return &CustomerHandler{svc: svc, contactSvc: contactSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, fileSvc: fileSvc, activitySvc: activitySvc, policySvc: policySvc}
+func NewCustomerHandler(svc *services.CustomerService, contactSvc *services.CustomerContactService, locationSvc *services.LocationService, tagSvc *services.TagService, tagLinkSvc *services.TagLinkService, defSvc *services.CustomFieldDefinitionService, fileSvc *services.FileService, activitySvc *services.ActivityService, policySvc *services.PolicyService) *CustomerHandler {
+	return &CustomerHandler{svc: svc, contactSvc: contactSvc, locationSvc: locationSvc, tagSvc: tagSvc, tagLinkSvc: tagLinkSvc, defSvc: defSvc, fileSvc: fileSvc, activitySvc: activitySvc, policySvc: policySvc}
 }
 
 func (h *CustomerHandler) List(w http.ResponseWriter, r *http.Request) {
@@ -124,11 +125,6 @@ func (h *CustomerHandler) Create(w http.ResponseWriter, r *http.Request) {
 		BillingCity:     r.FormValue("billing_city"),
 		BillingState:    r.FormValue("billing_state"),
 		BillingZipCode:  r.FormValue("billing_zip_code"),
-		ServiceAddress1: r.FormValue("service_address_1"),
-		ServiceAddress2: r.FormValue("service_address_2"),
-		ServiceCity:     r.FormValue("service_city"),
-		ServiceState:    r.FormValue("service_state"),
-		ServiceZipCode:  r.FormValue("service_zip_code"),
 		CustomFields:    parseCustomFieldValues(r),
 	}
 	if params.Status == "" {
@@ -189,11 +185,6 @@ func (h *CustomerHandler) Update(w http.ResponseWriter, r *http.Request) {
 		BillingCity:     formPtr(r.FormValue("billing_city")),
 		BillingState:    formPtr(r.FormValue("billing_state")),
 		BillingZipCode:  formPtr(r.FormValue("billing_zip_code")),
-		ServiceAddress1: formPtr(r.FormValue("service_address_1")),
-		ServiceAddress2: formPtr(r.FormValue("service_address_2")),
-		ServiceCity:     formPtr(r.FormValue("service_city")),
-		ServiceState:    formPtr(r.FormValue("service_state")),
-		ServiceZipCode:  formPtr(r.FormValue("service_zip_code")),
 		CustomFields:    strPtr(parseCustomFieldValues(r)),
 	}
 	result, err := h.svc.Update(r.Context(), id, params)
@@ -279,11 +270,6 @@ func customerToDetail(c *ent.Customer) templates.CustomerDetail {
 		BillingCity:     c.BillingCity,
 		BillingState:    c.BillingState,
 		BillingZipCode:  c.BillingZipCode,
-		ServiceAddress1: c.ServiceAddress1,
-		ServiceAddress2: c.ServiceAddress2,
-		ServiceCity:     c.ServiceCity,
-		ServiceState:    c.ServiceState,
-		ServiceZipCode:  c.ServiceZipCode,
 	}
 	if c.DeletedAt != nil && !c.DeletedAt.IsZero() {
 		d.ArchivedAt = c.DeletedAt.Format("Jan 2, 2006")
@@ -352,6 +338,31 @@ func (h *CustomerHandler) ListContacts(w http.ResponseWriter, r *http.Request) {
 	templates.ContactsList(rows, id, r.URL.Query().Get("read_only") == "1").Render(r.Context(), w)
 }
 
+func (h *CustomerHandler) LocationOptions(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", 400)
+		return
+	}
+	if !h.canReadCustomer(r, id) {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	locations, _ := h.locationSvc.ListByCustomer(r.Context(), id)
+	selected, _ := strconv.ParseInt(r.URL.Query().Get("selected"), 10, 64)
+	templates.LocationOptions(locationRowsToOptions(locations), selected).Render(r.Context(), w)
+}
+
+func (h *CustomerHandler) ListLocations(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if !h.canReadCustomer(r, id) {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	locations, _ := h.locationSvc.ListByCustomer(r.Context(), id)
+	templates.LocationsList(locationRows(locations), id, r.URL.Query().Get("read_only") == "1").Render(r.Context(), w)
+}
+
 func (h *CustomerHandler) canReadCustomer(r *http.Request, customerID int64) bool {
 	u, ok := middleware.UserFromContext(r.Context())
 	return ok && u != nil && h.policySvc.CanAccessObject(r.Context(), u.ID, u.Role, "customer", customerID, policyRead)
@@ -360,6 +371,100 @@ func (h *CustomerHandler) canReadCustomer(r *http.Request, customerID int64) boo
 func (h *CustomerHandler) NewContactForm(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	templates.ContactForm(id).Render(r.Context(), w)
+}
+
+func (h *CustomerHandler) NewLocationForm(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	templates.LocationForm(id).Render(r.Context(), w)
+}
+
+func (h *CustomerHandler) CreateLocation(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	r.ParseForm()
+	l, err := h.locationSvc.CreateForCustomer(r.Context(), id, services.CustomerLocationCreateParams{
+		Title:     r.FormValue("title"),
+		Address1:  r.FormValue("address_1"),
+		Address2:  r.FormValue("address_2"),
+		City:      r.FormValue("city"),
+		State:     r.FormValue("state"),
+		ZipCode:   r.FormValue("zip_code"),
+		Notes:     r.FormValue("notes"),
+		IsPrimary: r.FormValue("is_primary") == "on",
+	})
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	u, _ := middleware.UserFromContext(r.Context())
+	if u != nil {
+		h.activitySvc.Record(r.Context(), u.ID, "location_created", "customer", id, map[string]interface{}{
+			"actor_name":  u.Name,
+			"entity_name": l.Title,
+		})
+	}
+	h.ListLocations(w, r)
+}
+
+func (h *CustomerHandler) EditLocationForm(w http.ResponseWriter, r *http.Request) {
+	custID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	lid, _ := strconv.ParseInt(chi.URLParam(r, "lid"), 10, 64)
+	l, err := h.locationSvc.GetByCustomer(r.Context(), custID, lid)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	templates.LocationEditRow(custID, locationRow(l)).Render(r.Context(), w)
+}
+
+func (h *CustomerHandler) UpdateLocation(w http.ResponseWriter, r *http.Request) {
+	custID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	lid, _ := strconv.ParseInt(chi.URLParam(r, "lid"), 10, 64)
+	r.ParseForm()
+	isPrimary := r.FormValue("is_primary") == "on"
+	l, err := h.locationSvc.UpdateCustomerLocation(r.Context(), custID, lid, services.CustomerLocationUpdateParams{
+		Title:     formPtr(r.FormValue("title")),
+		Address1:  formPtr(r.FormValue("address_1")),
+		Address2:  formPtr(r.FormValue("address_2")),
+		City:      formPtr(r.FormValue("city")),
+		State:     formPtr(r.FormValue("state")),
+		ZipCode:   formPtr(r.FormValue("zip_code")),
+		Notes:     formPtr(r.FormValue("notes")),
+		IsPrimary: &isPrimary,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	u, _ := middleware.UserFromContext(r.Context())
+	if u != nil {
+		h.activitySvc.Record(r.Context(), u.ID, "location_updated", "customer", custID, map[string]interface{}{
+			"actor_name":  u.Name,
+			"entity_name": l.Title,
+		})
+	}
+	templates.LocationViewRow(custID, locationRow(l), false).Render(r.Context(), w)
+}
+
+func (h *CustomerHandler) DeleteLocation(w http.ResponseWriter, r *http.Request) {
+	custID, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	lid, _ := strconv.ParseInt(chi.URLParam(r, "lid"), 10, 64)
+	l, err := h.locationSvc.GetByCustomer(r.Context(), custID, lid)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	u, _ := middleware.UserFromContext(r.Context())
+	if u != nil {
+		h.activitySvc.Record(r.Context(), u.ID, "location_deleted", "customer", custID, map[string]interface{}{
+			"actor_name":  u.Name,
+			"entity_name": l.Title,
+		})
+	}
+	if err := h.locationSvc.DeleteCustomerLocation(r.Context(), custID, lid); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	h.ListLocations(w, r)
 }
 
 func (h *CustomerHandler) CreateContact(w http.ResponseWriter, r *http.Request) {
@@ -525,4 +630,34 @@ func filesToRows(files []*ent.File) []templates.FileRow {
 		}
 	}
 	return rows
+}
+
+func locationRows(locations []*ent.Location) []templates.LocationRow {
+	rows := make([]templates.LocationRow, len(locations))
+	for i, l := range locations {
+		rows[i] = locationRow(l)
+	}
+	return rows
+}
+
+func locationRow(l *ent.Location) templates.LocationRow {
+	return templates.LocationRow{
+		ID:        l.ID,
+		Title:     l.Title,
+		Address1:  l.Address1,
+		Address2:  l.Address2,
+		City:      l.City,
+		State:     l.State,
+		ZipCode:   l.ZipCode,
+		Notes:     l.Notes,
+		IsPrimary: l.IsPrimary,
+	}
+}
+
+func locationRowsToOptions(locations []*ent.Location) []templates.SelectOption {
+	opts := make([]templates.SelectOption, len(locations))
+	for i, l := range locations {
+		opts[i] = templates.SelectOption{Value: l.ID, Label: l.Title}
+	}
+	return opts
 }

@@ -332,76 +332,6 @@ func (_u *CustomerUpdate) SetNillableBillingZipCode(v *string) *CustomerUpdate {
 	return _u
 }
 
-// SetServiceAddress1 sets the "service_address_1" field.
-func (_u *CustomerUpdate) SetServiceAddress1(v string) *CustomerUpdate {
-	_u.mutation.SetServiceAddress1(v)
-	return _u
-}
-
-// SetNillableServiceAddress1 sets the "service_address_1" field if the given value is not nil.
-func (_u *CustomerUpdate) SetNillableServiceAddress1(v *string) *CustomerUpdate {
-	if v != nil {
-		_u.SetServiceAddress1(*v)
-	}
-	return _u
-}
-
-// SetServiceAddress2 sets the "service_address_2" field.
-func (_u *CustomerUpdate) SetServiceAddress2(v string) *CustomerUpdate {
-	_u.mutation.SetServiceAddress2(v)
-	return _u
-}
-
-// SetNillableServiceAddress2 sets the "service_address_2" field if the given value is not nil.
-func (_u *CustomerUpdate) SetNillableServiceAddress2(v *string) *CustomerUpdate {
-	if v != nil {
-		_u.SetServiceAddress2(*v)
-	}
-	return _u
-}
-
-// SetServiceCity sets the "service_city" field.
-func (_u *CustomerUpdate) SetServiceCity(v string) *CustomerUpdate {
-	_u.mutation.SetServiceCity(v)
-	return _u
-}
-
-// SetNillableServiceCity sets the "service_city" field if the given value is not nil.
-func (_u *CustomerUpdate) SetNillableServiceCity(v *string) *CustomerUpdate {
-	if v != nil {
-		_u.SetServiceCity(*v)
-	}
-	return _u
-}
-
-// SetServiceState sets the "service_state" field.
-func (_u *CustomerUpdate) SetServiceState(v string) *CustomerUpdate {
-	_u.mutation.SetServiceState(v)
-	return _u
-}
-
-// SetNillableServiceState sets the "service_state" field if the given value is not nil.
-func (_u *CustomerUpdate) SetNillableServiceState(v *string) *CustomerUpdate {
-	if v != nil {
-		_u.SetServiceState(*v)
-	}
-	return _u
-}
-
-// SetServiceZipCode sets the "service_zip_code" field.
-func (_u *CustomerUpdate) SetServiceZipCode(v string) *CustomerUpdate {
-	_u.mutation.SetServiceZipCode(v)
-	return _u
-}
-
-// SetNillableServiceZipCode sets the "service_zip_code" field if the given value is not nil.
-func (_u *CustomerUpdate) SetNillableServiceZipCode(v *string) *CustomerUpdate {
-	if v != nil {
-		_u.SetServiceZipCode(*v)
-	}
-	return _u
-}
-
 // SetCustomFields sets the "custom_fields" field.
 func (_u *CustomerUpdate) SetCustomFields(v string) *CustomerUpdate {
 	_u.mutation.SetCustomFields(v)
@@ -582,21 +512,6 @@ func (_u *CustomerUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.BillingZipCode(); ok {
 		_spec.SetField(customer.FieldBillingZipCode, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceAddress1(); ok {
-		_spec.SetField(customer.FieldServiceAddress1, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceAddress2(); ok {
-		_spec.SetField(customer.FieldServiceAddress2, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceCity(); ok {
-		_spec.SetField(customer.FieldServiceCity, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceState(); ok {
-		_spec.SetField(customer.FieldServiceState, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceZipCode(); ok {
-		_spec.SetField(customer.FieldServiceZipCode, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.CustomFields(); ok {
 		_spec.SetField(customer.FieldCustomFields, field.TypeString, value)
@@ -934,76 +849,6 @@ func (_u *CustomerUpdateOne) SetNillableBillingZipCode(v *string) *CustomerUpdat
 	return _u
 }
 
-// SetServiceAddress1 sets the "service_address_1" field.
-func (_u *CustomerUpdateOne) SetServiceAddress1(v string) *CustomerUpdateOne {
-	_u.mutation.SetServiceAddress1(v)
-	return _u
-}
-
-// SetNillableServiceAddress1 sets the "service_address_1" field if the given value is not nil.
-func (_u *CustomerUpdateOne) SetNillableServiceAddress1(v *string) *CustomerUpdateOne {
-	if v != nil {
-		_u.SetServiceAddress1(*v)
-	}
-	return _u
-}
-
-// SetServiceAddress2 sets the "service_address_2" field.
-func (_u *CustomerUpdateOne) SetServiceAddress2(v string) *CustomerUpdateOne {
-	_u.mutation.SetServiceAddress2(v)
-	return _u
-}
-
-// SetNillableServiceAddress2 sets the "service_address_2" field if the given value is not nil.
-func (_u *CustomerUpdateOne) SetNillableServiceAddress2(v *string) *CustomerUpdateOne {
-	if v != nil {
-		_u.SetServiceAddress2(*v)
-	}
-	return _u
-}
-
-// SetServiceCity sets the "service_city" field.
-func (_u *CustomerUpdateOne) SetServiceCity(v string) *CustomerUpdateOne {
-	_u.mutation.SetServiceCity(v)
-	return _u
-}
-
-// SetNillableServiceCity sets the "service_city" field if the given value is not nil.
-func (_u *CustomerUpdateOne) SetNillableServiceCity(v *string) *CustomerUpdateOne {
-	if v != nil {
-		_u.SetServiceCity(*v)
-	}
-	return _u
-}
-
-// SetServiceState sets the "service_state" field.
-func (_u *CustomerUpdateOne) SetServiceState(v string) *CustomerUpdateOne {
-	_u.mutation.SetServiceState(v)
-	return _u
-}
-
-// SetNillableServiceState sets the "service_state" field if the given value is not nil.
-func (_u *CustomerUpdateOne) SetNillableServiceState(v *string) *CustomerUpdateOne {
-	if v != nil {
-		_u.SetServiceState(*v)
-	}
-	return _u
-}
-
-// SetServiceZipCode sets the "service_zip_code" field.
-func (_u *CustomerUpdateOne) SetServiceZipCode(v string) *CustomerUpdateOne {
-	_u.mutation.SetServiceZipCode(v)
-	return _u
-}
-
-// SetNillableServiceZipCode sets the "service_zip_code" field if the given value is not nil.
-func (_u *CustomerUpdateOne) SetNillableServiceZipCode(v *string) *CustomerUpdateOne {
-	if v != nil {
-		_u.SetServiceZipCode(*v)
-	}
-	return _u
-}
-
 // SetCustomFields sets the "custom_fields" field.
 func (_u *CustomerUpdateOne) SetCustomFields(v string) *CustomerUpdateOne {
 	_u.mutation.SetCustomFields(v)
@@ -1214,21 +1059,6 @@ func (_u *CustomerUpdateOne) sqlSave(ctx context.Context) (_node *Customer, err 
 	}
 	if value, ok := _u.mutation.BillingZipCode(); ok {
 		_spec.SetField(customer.FieldBillingZipCode, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceAddress1(); ok {
-		_spec.SetField(customer.FieldServiceAddress1, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceAddress2(); ok {
-		_spec.SetField(customer.FieldServiceAddress2, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceCity(); ok {
-		_spec.SetField(customer.FieldServiceCity, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceState(); ok {
-		_spec.SetField(customer.FieldServiceState, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.ServiceZipCode(); ok {
-		_spec.SetField(customer.FieldServiceZipCode, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.CustomFields(); ok {
 		_spec.SetField(customer.FieldCustomFields, field.TypeString, value)

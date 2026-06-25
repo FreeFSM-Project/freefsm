@@ -47,11 +47,11 @@ type ActivityPageData struct {
 
 func activityVerb(action string) string {
 	switch action {
-	case "created", "type_created", "status_created", "field_created", "tag_created", "user_created", "contact_created":
+	case "created", "type_created", "status_created", "field_created", "tag_created", "user_created", "contact_created", "location_created":
 		return "created"
-	case "updated", "type_updated", "status_updated", "field_updated", "tag_updated", "user_updated", "contact_updated":
+	case "updated", "type_updated", "status_updated", "field_updated", "tag_updated", "user_updated", "contact_updated", "location_updated":
 		return "updated"
-	case "deleted", "type_deleted", "status_deleted", "field_deleted", "tag_deleted", "contact_deleted":
+	case "deleted", "type_deleted", "status_deleted", "field_deleted", "tag_deleted", "contact_deleted", "location_deleted":
 		return "deleted"
 	case "archived":
 		return "archived"
@@ -108,11 +108,11 @@ func activityVerb(action string) string {
 
 func activityActionClass(action string) string {
 	switch action {
-	case "created", "type_created", "status_created", "field_created", "tag_created", "user_created", "contact_created":
+	case "created", "type_created", "status_created", "field_created", "tag_created", "user_created", "contact_created", "location_created":
 		return "activity-created"
-	case "updated", "type_updated", "status_updated", "field_updated", "tag_updated", "user_updated", "contact_updated", "settings_updated":
+	case "updated", "type_updated", "status_updated", "field_updated", "tag_updated", "user_updated", "contact_updated", "location_updated", "settings_updated":
 		return "activity-updated"
-	case "deleted", "type_deleted", "status_deleted", "field_deleted", "tag_deleted", "contact_deleted":
+	case "deleted", "type_deleted", "status_deleted", "field_deleted", "tag_deleted", "contact_deleted", "location_deleted":
 		return "activity-deleted"
 	case "archived":
 		return "activity-deleted"

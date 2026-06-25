@@ -32,11 +32,6 @@ type CustomerCreateParams struct {
 	BillingCity     string
 	BillingState    string
 	BillingZipCode  string
-	ServiceAddress1 string
-	ServiceAddress2 string
-	ServiceCity     string
-	ServiceState    string
-	ServiceZipCode  string
 	CustomFields    string
 }
 
@@ -55,11 +50,6 @@ type CustomerUpdateParams struct {
 	BillingCity     *string
 	BillingState    *string
 	BillingZipCode  *string
-	ServiceAddress1 *string
-	ServiceAddress2 *string
-	ServiceCity     *string
-	ServiceState    *string
-	ServiceZipCode  *string
 	CustomFields    *string
 }
 
@@ -149,11 +139,6 @@ func (s *CustomerService) Create(ctx context.Context, params CustomerCreateParam
 		SetBillingCity(params.BillingCity).
 		SetBillingState(params.BillingState).
 		SetBillingZipCode(params.BillingZipCode).
-		SetServiceAddress1(params.ServiceAddress1).
-		SetServiceAddress2(params.ServiceAddress2).
-		SetServiceCity(params.ServiceCity).
-		SetServiceState(params.ServiceState).
-		SetServiceZipCode(params.ServiceZipCode).
 		SetCustomFields(params.CustomFields).
 		Save(ctx)
 	if err != nil {
@@ -206,21 +191,6 @@ func (s *CustomerService) Update(ctx context.Context, id int64, params CustomerU
 	}
 	if params.BillingZipCode != nil {
 		u.SetBillingZipCode(*params.BillingZipCode)
-	}
-	if params.ServiceAddress1 != nil {
-		u.SetServiceAddress1(*params.ServiceAddress1)
-	}
-	if params.ServiceAddress2 != nil {
-		u.SetServiceAddress2(*params.ServiceAddress2)
-	}
-	if params.ServiceCity != nil {
-		u.SetServiceCity(*params.ServiceCity)
-	}
-	if params.ServiceState != nil {
-		u.SetServiceState(*params.ServiceState)
-	}
-	if params.ServiceZipCode != nil {
-		u.SetServiceZipCode(*params.ServiceZipCode)
 	}
 	if params.CustomFields != nil {
 		u.SetCustomFields(*params.CustomFields)

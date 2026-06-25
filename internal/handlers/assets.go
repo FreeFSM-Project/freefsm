@@ -17,6 +17,7 @@ type AssetHandler struct {
 	assetTypeSvc   *services.AssetTypeService
 	assetStatusSvc *services.AssetStatusService
 	customerSvc    *services.CustomerService
+	locationSvc    *services.LocationService
 	tagSvc         *services.TagService
 	tagLinkSvc     *services.TagLinkService
 	cfSvc          *services.CustomFieldDefinitionService
@@ -30,6 +31,7 @@ func NewAssetHandler(
 	assetTypeSvc *services.AssetTypeService,
 	assetStatusSvc *services.AssetStatusService,
 	customerSvc *services.CustomerService,
+	locationSvc *services.LocationService,
 	tagSvc *services.TagService,
 	tagLinkSvc *services.TagLinkService,
 	cfSvc *services.CustomFieldDefinitionService,
@@ -42,6 +44,7 @@ func NewAssetHandler(
 		assetTypeSvc:   assetTypeSvc,
 		assetStatusSvc: assetStatusSvc,
 		customerSvc:    customerSvc,
+		locationSvc:    locationSvc,
 		tagSvc:         tagSvc,
 		tagLinkSvc:     tagLinkSvc,
 		cfSvc:          cfSvc,
@@ -253,10 +256,12 @@ func (h *AssetHandler) Update(w http.ResponseWriter, r *http.Request) {
 		customers, _ := h.customerSvc.ListAll(r.Context())
 		assetTypes, _ := h.assetTypeSvc.List(r.Context())
 		assetStatuses, _ := h.assetStatusSvc.List(r.Context())
+		locations, _ := h.locationSvc.ListByCustomer(r.Context(), asset.CustomerID)
 		templates.AssetForm(templates.AssetFormPageData{
 			IsNew:         false,
 			Asset:         assetToDetail(asset, assetTypes, assetStatuses),
 			Customers:     customersToOptions(customers),
+			Locations:     locationsToOptions(locations),
 			AssetTypes:    assetTypesToOptions(assetTypes),
 			AssetStatuses: assetStatusesToOptions(assetStatuses),
 		}).Render(r.Context(), w)
@@ -394,10 +399,13 @@ func (h *AssetHandler) DetachTag(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AssetHandler) GetLocations(w http.ResponseWriter, r *http.Request) {
-	// For now, return empty locations since we don't have customer-specific locations
-	// This can be enhanced later to filter by customer
-	locations := []templates.SelectOption{}
-	templates.AssetLocationOptions(locations).Render(r.Context(), w)
+	customerID, _ := strconv.ParseInt(r.URL.Query().Get("customer_id"), 10, 64)
+	if customerID == 0 {
+		customerID, _ = strconv.ParseInt(r.FormValue("customer_id"), 10, 64)
+	}
+	selected, _ := strconv.ParseInt(r.URL.Query().Get("selected"), 10, 64)
+	locations, _ := h.locationSvc.ListByCustomer(r.Context(), customerID)
+	templates.AssetLocationOptions(locationsToOptions(locations), selected).Render(r.Context(), w)
 }
 
 func assetRow(a *ent.Asset) templates.AssetRow {

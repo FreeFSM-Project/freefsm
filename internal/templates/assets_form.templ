@@ -52,7 +52,7 @@ templ AssetForm(p AssetFormPageData) {
 				<div class="grid">
 					<label>
 						Customer
-						<select name="customer_id" required hx-get="/assets/locations" hx-target="#location-select" hx-trigger="change">
+						<select name="customer_id" id="asset-customer-select" required>
 							for _, c := range p.Customers {
 								<option value={ fmt.Sprintf("%d", c.Value) } selected?={ assetCustomerSelected(p.Asset, c.Value) }>{ c.Label }</option>
 							}
@@ -60,7 +60,7 @@ templ AssetForm(p AssetFormPageData) {
 					</label>
 					<label>
 						Location
-						<select name="location_id" id="location-select">
+						<select name="location_id" id="location-select" data-selected={ assetLocationValue(p.Asset) }>
 							<option value="0">No Location</option>
 							for _, l := range p.Locations {
 								<option value={ fmt.Sprintf("%d", l.Value) } selected?={ assetLocationSelected(p.Asset, l.Value) }>{ l.Label }</option>
@@ -93,14 +93,37 @@ templ AssetForm(p AssetFormPageData) {
 				<a href="/assets" role="button" class="outline">Cancel</a>
 			</div>
 		</form>
+		@templ.Raw(`<script>
+			const assetCustomer = document.getElementById('asset-customer-select');
+			const assetLocation = document.getElementById('location-select');
+			function loadAssetLocations(customerID) {
+				if (!assetLocation) return;
+				if (!customerID) { assetLocation.innerHTML = '<option value="0">No Location</option>'; return; }
+				const sel = assetLocation.dataset.selected || 0;
+				fetch('/assets/locations?customer_id=' + customerID + '&selected=' + sel)
+					.then(r => r.text())
+					.then(html => assetLocation.innerHTML = html);
+			}
+			if (assetCustomer && assetLocation) {
+				assetCustomer.addEventListener('change', function() { assetLocation.dataset.selected = 0; loadAssetLocations(this.value); });
+				if (assetCustomer.value && assetLocation.options.length <= 1) loadAssetLocations(assetCustomer.value);
+			}
+		</script>`)
 	}
 }
 
-templ AssetLocationOptions(options []SelectOption) {
+templ AssetLocationOptions(options []SelectOption, selectedID int64) {
 	<option value="0">No Location</option>
 	for _, o := range options {
-		<option value={ fmt.Sprintf("%d", o.Value) }>{ o.Label }</option>
+		<option value={ fmt.Sprintf("%d", o.Value) } selected?={ selectedID == o.Value }>{ o.Label }</option>
 	}
+}
+
+func assetLocationValue(asset *AssetDetail) string {
+	if asset == nil || asset.LocationID == nil {
+		return "0"
+	}
+	return fmt.Sprintf("%d", *asset.LocationID)
 }
 
 func assetFormValue(asset *AssetDetail, field string) string {

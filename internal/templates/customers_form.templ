@@ -88,31 +88,6 @@ templ CustomerForm(p CustomerFormPageData) {
 					</label>
 				</div>
 			</fieldset>
-			<fieldset>
-				<legend>Service Address</legend>
-				<label>
-					Address Line 1
-					<input type="text" name="service_address_1" value={ p.Customer.ServiceAddress1 }/>
-				</label>
-				<label>
-					Address Line 2
-					<input type="text" name="service_address_2" value={ p.Customer.ServiceAddress2 }/>
-				</label>
-				<div class="grid form-grid-address">
-					<label>
-						City
-						<input type="text" name="service_city" value={ p.Customer.ServiceCity }/>
-					</label>
-					<label>
-						State
-						<input type="text" name="service_state" value={ p.Customer.ServiceState }/>
-					</label>
-					<label>
-						ZIP
-						<input type="text" name="service_zip_code" value={ p.Customer.ServiceZipCode }/>
-					</label>
-				</div>
-			</fieldset>
 			<div class="entity-form-actions">
 				<button type="submit">Save</button>
 				<a href="/customers" role="button" class="outline">Cancel</a>
