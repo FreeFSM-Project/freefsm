@@ -506,6 +506,10 @@ html[data-theme="dark"] .theme-icon-moon {
   text-align: right;
 }
 
+.work-item-detail-prewrap {
+  white-space: pre-wrap;
+}
+
 .work-item-detail p {
   margin-bottom: 0.65rem;
 }
