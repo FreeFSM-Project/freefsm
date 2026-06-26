@@ -1665,9 +1665,16 @@ table:not(.calendar):not(.week-view):not(.day-view) tbody tr:hover {
   font-size: 0.82rem;
 }
 
-.dashboard-section-title {
-  margin: 1.25rem 0 0.5rem;
-  font-size: 1rem;
+.dashboard-widget-panel {
+  margin: 1.25rem 0 0;
+  padding: 0.75rem;
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-card-background-color, var(--pico-background-color));
+}
+
+.dashboard-widget-panel > .dashboard-card-top {
+  margin-bottom: 0.75rem;
 }
 
 .dashboard-today {

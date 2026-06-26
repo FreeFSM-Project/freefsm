@@ -107,70 +107,78 @@ templ DashboardPage(p DashboardData) {
 		</div>
 		for _, w := range p.Widgets {
 			if w.Type == "recent_activity" && canManageOperational(ctx) {
-				<h3 class="dashboard-section-title">Recent Activity</h3>
-				@DashboardWidgetControls(w, p.EditMode)
-				<div class="dashboard-work-queues">
-					<article class="dashboard-panel">
-						<header>Recent Jobs</header>
-						<table>
-							<thead><tr><th>Job</th><th>Customer</th><th>Date</th></tr></thead>
-							<tbody>
-								if len(p.Stats.RecentJobs) == 0 {
-									<tr><td colspan="3" class="dashboard-empty">No recent jobs</td></tr>
-								}
-								for _, j := range p.Stats.RecentJobs {
-									<tr><td><a href={ templ.URL(fmt.Sprintf("/jobs/%d", j.ID)) }>{ j.DisplayName }</a></td><td>{ j.Customer }</td><td><small>{ j.CreatedAt }</small></td></tr>
-								}
-							</tbody>
-						</table>
-					</article>
-					<article class="dashboard-panel">
-						<header>Recent Invoices</header>
-						<table>
-							<thead><tr><th>Invoice</th><th>Customer</th><th>Amount</th></tr></thead>
-							<tbody>
-								if len(p.Stats.RecentInvoices) == 0 {
-									<tr><td colspan="3" class="dashboard-empty">No recent invoices</td></tr>
-								}
-								for _, inv := range p.Stats.RecentInvoices {
-									<tr><td><a href={ templ.URL(fmt.Sprintf("/invoices/%d", inv.ID)) }>{ inv.Title }</a></td><td>{ inv.Customer }</td><td class="dashboard-amount">{ fmt.Sprintf("$%.2f", inv.Total) }</td></tr>
-								}
-							</tbody>
-						</table>
-					</article>
-					<article class="dashboard-panel">
-						<header>Recent Estimates</header>
-						<table>
-							<thead><tr><th>Estimate</th><th>Customer</th><th>Amount</th></tr></thead>
-							<tbody>
-								if len(p.Stats.RecentEstimates) == 0 {
-									<tr><td colspan="3" class="dashboard-empty">No recent estimates</td></tr>
-								}
-								for _, e := range p.Stats.RecentEstimates {
-									<tr><td><a href={ templ.URL(fmt.Sprintf("/estimates/%d", e.ID)) }>{ e.Title }</a></td><td>{ e.Customer }</td><td class="dashboard-amount">{ fmt.Sprintf("$%.2f", e.Total) }</td></tr>
-								}
-							</tbody>
-						</table>
-					</article>
-				</div>
+				<section class="dashboard-widget-panel">
+					@DashboardCardTop("Recent Activity", w, p.EditMode)
+					<div class="dashboard-work-queues">
+						<article class="dashboard-panel">
+							@DashboardSubcardTop("Recent Jobs")
+							<table>
+								<thead><tr><th>Job</th><th>Customer</th><th>Date</th></tr></thead>
+								<tbody>
+									if len(p.Stats.RecentJobs) == 0 {
+										<tr><td colspan="3" class="dashboard-empty">No recent jobs</td></tr>
+									}
+									for _, j := range p.Stats.RecentJobs {
+										<tr><td><a href={ templ.URL(fmt.Sprintf("/jobs/%d", j.ID)) }>{ j.DisplayName }</a></td><td>{ j.Customer }</td><td><small>{ j.CreatedAt }</small></td></tr>
+									}
+								</tbody>
+							</table>
+						</article>
+						<article class="dashboard-panel">
+							@DashboardSubcardTop("Recent Invoices")
+							<table>
+								<thead><tr><th>Invoice</th><th>Customer</th><th>Amount</th></tr></thead>
+								<tbody>
+									if len(p.Stats.RecentInvoices) == 0 {
+										<tr><td colspan="3" class="dashboard-empty">No recent invoices</td></tr>
+									}
+									for _, inv := range p.Stats.RecentInvoices {
+										<tr><td><a href={ templ.URL(fmt.Sprintf("/invoices/%d", inv.ID)) }>{ inv.Title }</a></td><td>{ inv.Customer }</td><td class="dashboard-amount">{ fmt.Sprintf("$%.2f", inv.Total) }</td></tr>
+									}
+								</tbody>
+							</table>
+						</article>
+						<article class="dashboard-panel">
+							@DashboardSubcardTop("Recent Estimates")
+							<table>
+								<thead><tr><th>Estimate</th><th>Customer</th><th>Amount</th></tr></thead>
+								<tbody>
+									if len(p.Stats.RecentEstimates) == 0 {
+										<tr><td colspan="3" class="dashboard-empty">No recent estimates</td></tr>
+									}
+									for _, e := range p.Stats.RecentEstimates {
+										<tr><td><a href={ templ.URL(fmt.Sprintf("/estimates/%d", e.ID)) }>{ e.Title }</a></td><td>{ e.Customer }</td><td class="dashboard-amount">{ fmt.Sprintf("$%.2f", e.Total) }</td></tr>
+									}
+								</tbody>
+							</table>
+						</article>
+					</div>
+				</section>
 			} else if w.Type == "financial_summary" && canManageOperational(ctx) {
-				<h3 class="dashboard-section-title">Financial Summary</h3>
-				@DashboardWidgetControls(w, p.EditMode)
-				<div class="dashboard-financials">
-					<article class="dashboard-stat"><header>Revenue This Month</header><p class="dashboard-metric dashboard-metric-sm">{ fmt.Sprintf("$%.2f", p.Stats.RevenueMonth) }</p></article>
-					<article class="dashboard-stat"><header>Outstanding Receivables</header><p class="dashboard-metric dashboard-metric-sm">{ fmt.Sprintf("$%.2f", p.Stats.OutstandingReceivables) }</p></article>
-					<article class="dashboard-stat">
-						<header>Overdue</header>
-						<p class="dashboard-metric dashboard-metric-sm">
-							if p.Stats.OverdueAmount > 0 {
-								<span class="dashboard-danger">{ fmt.Sprintf("$%.2f", p.Stats.OverdueAmount) }</span>
-							} else {
-								{ fmt.Sprintf("$%.2f", p.Stats.OverdueAmount) }
-							}
-						</p>
-						<p class="dashboard-meta">{ fmt.Sprintf("%d invoices", p.Stats.InvoicesOverdue) }</p>
-					</article>
-				</div>
+				<section class="dashboard-widget-panel">
+					@DashboardCardTop("Financial Summary", w, p.EditMode)
+					<div class="dashboard-financials">
+						<article class="dashboard-stat">
+							@DashboardSubcardTop("Revenue This Month")
+							<p class="dashboard-metric dashboard-metric-sm">{ fmt.Sprintf("$%.2f", p.Stats.RevenueMonth) }</p>
+						</article>
+						<article class="dashboard-stat">
+							@DashboardSubcardTop("Outstanding Receivables")
+							<p class="dashboard-metric dashboard-metric-sm">{ fmt.Sprintf("$%.2f", p.Stats.OutstandingReceivables) }</p>
+						</article>
+						<article class="dashboard-stat">
+							@DashboardSubcardTop("Overdue")
+							<p class="dashboard-metric dashboard-metric-sm">
+								if p.Stats.OverdueAmount > 0 {
+									<span class="dashboard-danger">{ fmt.Sprintf("$%.2f", p.Stats.OverdueAmount) }</span>
+								} else {
+									{ fmt.Sprintf("$%.2f", p.Stats.OverdueAmount) }
+								}
+							</p>
+							<p class="dashboard-meta">{ fmt.Sprintf("%d invoices", p.Stats.InvoicesOverdue) }</p>
+						</article>
+					</div>
+				</section>
 			}
 		}
 	}
@@ -180,6 +188,12 @@ templ DashboardCardTop(title string, w services.DashboardWidgetView, editMode bo
 	<div class="dashboard-card-top">
 		<header>{ title }</header>
 		@DashboardWidgetControls(w, editMode)
+	</div>
+}
+
+templ DashboardSubcardTop(title string) {
+	<div class="dashboard-card-top dashboard-subcard-top">
+		<header>{ title }</header>
 	</div>
 }
 
