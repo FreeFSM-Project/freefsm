@@ -1762,7 +1762,7 @@ table:not(.calendar):not(.week-view):not(.day-view) tbody tr:hover {
   display: grid;
   grid-template-columns: minmax(320px, 1.4fr) minmax(260px, 0.8fr);
   gap: 0.75rem;
-  align-items: start;
+  align-items: stretch;
   margin-bottom: 1.25rem;
 }
 
