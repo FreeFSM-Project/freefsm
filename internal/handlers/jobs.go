@@ -188,6 +188,63 @@ func (h *JobHandler) Show(w http.ResponseWriter, r *http.Request) {
 	templates.JobShow(d).Render(ctx, w)
 }
 
+func (h *JobHandler) UpdateStatus(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	u, ok := middleware.UserFromContext(r.Context())
+	if !ok || u == nil {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	if !h.policySvc.CanAccessObject(r.Context(), u.ID, u.Role, "job", id, policyRead) {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+	j, err := h.svc.GetByID(r.Context(), id)
+	if err != nil || j.DeletedAt != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", http.StatusBadRequest)
+		return
+	}
+	statusID, _ := strconv.ParseInt(r.FormValue("status_id"), 10, 64)
+	ok, err = h.statusSvc.BelongsToObjectType(r.Context(), statusID, "job")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if !ok {
+		http.Error(w, "invalid status", http.StatusBadRequest)
+		return
+	}
+	statuses := h.statusesForSelect(r.Context())
+	oldStatus := statusName(statuses, j.StatusID)
+	result, err := h.svc.Update(r.Context(), id, services.JobUpdateParams{StatusID: int64Ptr(statusID)})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	newStatus := statusName(statuses, result.StatusID)
+	h.activitySvc.Record(r.Context(), u.ID, "status_changed", "job", id, map[string]interface{}{
+		"entity_name": result.JobType,
+		"actor_name":  u.Name,
+		"old_status":  oldStatus,
+		"new_status":  newStatus,
+	})
+
+	if r.Header.Get("HX-Request") == "true" {
+		d := jobToDetail(result, statuses)
+		render(w, r, templates.JobStatusControl(d))
+		return
+	}
+	http.Redirect(w, r, fmt.Sprintf("/jobs/%d?flash=Status+updated", id), http.StatusSeeOther)
+}
+
 func (h *JobHandler) ClockIn(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -689,6 +746,7 @@ func jobToDetail(j *ent.Job, statuses []*ent.Status) templates.JobDetail {
 		StatusID:    statusID(j),
 		StatusName:  statusName(statuses, j.StatusID),
 		StatusColor: statusColor(statuses, j.StatusID),
+		Statuses:    statusOptions(statuses),
 		BillingType: j.BillingType,
 		Notes:       j.Notes,
 		TechNotes:   j.TechNotes,

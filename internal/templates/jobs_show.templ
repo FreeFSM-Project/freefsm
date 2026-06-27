@@ -67,7 +67,7 @@ templ JobShow(p JobDetail) {
 		<table class="work-item-detail-meta">
 			<tbody>
 				<tr><th>Customer</th><td><a href={ templ.URL(fmt.Sprintf("/customers/%d", p.CustomerID)) }>{ p.Customer }</a></td></tr>
-				<tr><th>Status</th><td><span class="status-badge" style={ badgeStyle(p.StatusColor) }>{ p.StatusName }</span></td></tr>
+				<tr><th>Status</th><td>@JobStatusControl(p)</td></tr>
 				if canManageOperational(ctx) {
 					<tr><th>Billing Type</th><td>{ p.BillingType }</td></tr>
 				}
@@ -166,5 +166,29 @@ templ JobShow(p JobDetail) {
 		</div>
 		<p class="work-item-detail-back"><a href="/jobs">&larr; Back to Jobs</a></p>
 		</div>
+	}
+}
+
+templ JobStatusControl(p JobDetail) {
+	if p.ArchivedAt == "" {
+		<form action={ templ.URL(fmt.Sprintf("/jobs/%d/status", p.ID)) } method="post" class="job-status-form">
+			<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
+			<select
+				name="status_id"
+				class="job-status-select"
+				style={ badgeStyle(p.StatusColor) }
+				hx-post={ templ.URL(fmt.Sprintf("/jobs/%d/status", p.ID)) }
+				hx-trigger="change"
+				hx-target="closest td"
+				hx-swap="innerHTML"
+				hx-include="closest form"
+			>
+				for _, s := range p.Statuses {
+					<option value={ fmt.Sprintf("%d", s.Value) } selected?={ p.StatusID == s.Value }>{ s.Label }</option>
+				}
+			</select>
+		</form>
+	} else {
+		<span class="status-badge" style={ badgeStyle(p.StatusColor) }>{ p.StatusName }</span>
 	}
 }

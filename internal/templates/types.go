@@ -353,6 +353,7 @@ type JobDetail struct {
 	StatusID                 int64
 	StatusName               string
 	StatusColor              string
+	Statuses                 []SelectOption
 	BillingType              string
 	StartTime                string
 	EndTime                  string
