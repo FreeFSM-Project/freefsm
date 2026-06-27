@@ -55,7 +55,7 @@ func GenerateInvoicePDF(w io.Writer, i *ent.Invoice, customer *ent.Customer, job
 
 	pdf := newDocumentPDF()
 	status, statusColor := statusForPDF(statuses, i.StatusID)
-	number := documentNumber("invoice", i.ID, cs)
+	number := FormatInvoiceNumber(i.InvoiceNumber, cs)
 	writeTopHeader(pdf, "INVOICE", number, status, statusColor, cs)
 	writeDetailRow(pdf, customer, job, asset, invoiceDetails(i, status))
 	writeDocumentNotes(pdf, i.Notes)

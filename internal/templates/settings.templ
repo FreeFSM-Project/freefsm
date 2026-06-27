@@ -70,6 +70,12 @@ templ SettingsPage(p SettingsPageData) {
 					<input type="text" name="invoice_prefix" value={ p.Settings.InvoicePrefix }/>
 				</label>
 				<label>
+					Next Invoice Number
+					<input type="number" name="next_invoice_number" min="1" value={ fmt.Sprintf("%d", p.Settings.NextInvoiceNumber) }/>
+				</label>
+			</div>
+			<div class="grid">
+				<label>
 					Estimate Prefix
 					<input type="text" name="estimate_prefix" value={ p.Settings.EstimatePrefix }/>
 				</label>

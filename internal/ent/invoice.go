@@ -17,6 +17,8 @@ type Invoice struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
+	// InvoiceNumber holds the value of the "invoice_number" field.
+	InvoiceNumber int64 `json:"invoice_number,omitempty"`
 	// CompanyID holds the value of the "company_id" field.
 	CompanyID *int64 `json:"company_id,omitempty"`
 	// CustomerID holds the value of the "customer_id" field.
@@ -59,7 +61,7 @@ func (*Invoice) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case invoice.FieldID, invoice.FieldCompanyID, invoice.FieldCustomerID, invoice.FieldJobID, invoice.FieldEstimateID, invoice.FieldStatusID:
+		case invoice.FieldID, invoice.FieldInvoiceNumber, invoice.FieldCompanyID, invoice.FieldCustomerID, invoice.FieldJobID, invoice.FieldEstimateID, invoice.FieldStatusID:
 			values[i] = new(sql.NullInt64)
 		case invoice.FieldTitle, invoice.FieldNotes, invoice.FieldTaxRate, invoice.FieldLineItems, invoice.FieldPayments, invoice.FieldDisplaySettings, invoice.FieldCustomFields:
 			values[i] = new(sql.NullString)
@@ -86,6 +88,12 @@ func (_m *Invoice) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int64(value.Int64)
+		case invoice.FieldInvoiceNumber:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field invoice_number", values[i])
+			} else if value.Valid {
+				_m.InvoiceNumber = value.Int64
+			}
 		case invoice.FieldCompanyID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field company_id", values[i])
@@ -230,6 +238,9 @@ func (_m *Invoice) String() string {
 	var builder strings.Builder
 	builder.WriteString("Invoice(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("invoice_number=")
+	builder.WriteString(fmt.Sprintf("%v", _m.InvoiceNumber))
+	builder.WriteString(", ")
 	if v := _m.CompanyID; v != nil {
 		builder.WriteString("company_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))

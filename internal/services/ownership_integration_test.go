@@ -215,6 +215,7 @@ func TestServicesClearOptionalLinkedIDsIntegration(t *testing.T) {
 	}
 
 	invoice := client.Invoice.Create().
+		SetInvoiceNumber(9001).
 		SetCustomerID(data.customerA.ID).
 		SetJobID(data.jobA.ID).
 		SetEstimateID(data.estimateA.ID).

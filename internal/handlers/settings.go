@@ -39,6 +39,11 @@ func (h *SettingsHandler) Show(w http.ResponseWriter, r *http.Request) {
 func (h *SettingsHandler) Save(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	dueDays, _ := strconv.Atoi(r.FormValue("default_due_days"))
+	nextInvoiceNumber, _ := strconv.ParseInt(strings.TrimSpace(r.FormValue("next_invoice_number")), 10, 64)
+	if nextInvoiceNumber < 1 {
+		http.Redirect(w, r, "/settings?flash=Next+invoice+number+must+be+at+least+1", http.StatusSeeOther)
+		return
+	}
 	smtpPort, _ := strconv.Atoi(r.FormValue("smtp_port"))
 	pwMinLen, _ := strconv.Atoi(r.FormValue("password_min_length"))
 	if pwMinLen < 6 {
@@ -77,6 +82,7 @@ func (h *SettingsHandler) Save(w http.ResponseWriter, r *http.Request) {
 		TaxID:                       r.FormValue("tax_id"),
 		DefaultTaxRate:              r.FormValue("default_tax_rate"),
 		InvoicePrefix:               r.FormValue("invoice_prefix"),
+		NextInvoiceNumber:           nextInvoiceNumber,
 		EstimatePrefix:              r.FormValue("estimate_prefix"),
 		DefaultDueDays:              dueDays,
 		SmtpHost:                    r.FormValue("smtp_host"),
@@ -140,6 +146,9 @@ func (h *SettingsHandler) Save(w http.ResponseWriter, r *http.Request) {
 			}
 			if oldSettings.InvoicePrefix != newSettings.InvoicePrefix {
 				changed = append(changed, "invoice_prefix")
+			}
+			if oldSettings.NextInvoiceNumber != newSettings.NextInvoiceNumber {
+				changed = append(changed, "next_invoice_number")
 			}
 			if oldSettings.EstimatePrefix != newSettings.EstimatePrefix {
 				changed = append(changed, "estimate_prefix")

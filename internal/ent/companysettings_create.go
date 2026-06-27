@@ -174,6 +174,20 @@ func (_c *CompanySettingsCreate) SetNillableInvoicePrefix(v *string) *CompanySet
 	return _c
 }
 
+// SetNextInvoiceNumber sets the "next_invoice_number" field.
+func (_c *CompanySettingsCreate) SetNextInvoiceNumber(v int64) *CompanySettingsCreate {
+	_c.mutation.SetNextInvoiceNumber(v)
+	return _c
+}
+
+// SetNillableNextInvoiceNumber sets the "next_invoice_number" field if the given value is not nil.
+func (_c *CompanySettingsCreate) SetNillableNextInvoiceNumber(v *int64) *CompanySettingsCreate {
+	if v != nil {
+		_c.SetNextInvoiceNumber(*v)
+	}
+	return _c
+}
+
 // SetEstimatePrefix sets the "estimate_prefix" field.
 func (_c *CompanySettingsCreate) SetEstimatePrefix(v string) *CompanySettingsCreate {
 	_c.mutation.SetEstimatePrefix(v)
@@ -619,6 +633,10 @@ func (_c *CompanySettingsCreate) defaults() {
 		v := companysettings.DefaultInvoicePrefix
 		_c.mutation.SetInvoicePrefix(v)
 	}
+	if _, ok := _c.mutation.NextInvoiceNumber(); !ok {
+		v := companysettings.DefaultNextInvoiceNumber
+		_c.mutation.SetNextInvoiceNumber(v)
+	}
 	if _, ok := _c.mutation.EstimatePrefix(); !ok {
 		v := companysettings.DefaultEstimatePrefix
 		_c.mutation.SetEstimatePrefix(v)
@@ -756,6 +774,9 @@ func (_c *CompanySettingsCreate) check() error {
 	}
 	if _, ok := _c.mutation.InvoicePrefix(); !ok {
 		return &ValidationError{Name: "invoice_prefix", err: errors.New(`ent: missing required field "CompanySettings.invoice_prefix"`)}
+	}
+	if _, ok := _c.mutation.NextInvoiceNumber(); !ok {
+		return &ValidationError{Name: "next_invoice_number", err: errors.New(`ent: missing required field "CompanySettings.next_invoice_number"`)}
 	}
 	if _, ok := _c.mutation.EstimatePrefix(); !ok {
 		return &ValidationError{Name: "estimate_prefix", err: errors.New(`ent: missing required field "CompanySettings.estimate_prefix"`)}
@@ -910,6 +931,10 @@ func (_c *CompanySettingsCreate) createSpec() (*CompanySettings, *sqlgraph.Creat
 	if value, ok := _c.mutation.InvoicePrefix(); ok {
 		_spec.SetField(companysettings.FieldInvoicePrefix, field.TypeString, value)
 		_node.InvoicePrefix = value
+	}
+	if value, ok := _c.mutation.NextInvoiceNumber(); ok {
+		_spec.SetField(companysettings.FieldNextInvoiceNumber, field.TypeInt64, value)
+		_node.NextInvoiceNumber = value
 	}
 	if value, ok := _c.mutation.EstimatePrefix(); ok {
 		_spec.SetField(companysettings.FieldEstimatePrefix, field.TypeString, value)

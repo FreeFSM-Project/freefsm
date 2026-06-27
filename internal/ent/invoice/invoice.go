@@ -13,6 +13,8 @@ const (
 	Label = "invoice"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldInvoiceNumber holds the string denoting the invoice_number field in the database.
+	FieldInvoiceNumber = "invoice_number"
 	// FieldCompanyID holds the string denoting the company_id field in the database.
 	FieldCompanyID = "company_id"
 	// FieldCustomerID holds the string denoting the customer_id field in the database.
@@ -54,6 +56,7 @@ const (
 // Columns holds all SQL columns for invoice fields.
 var Columns = []string{
 	FieldID,
+	FieldInvoiceNumber,
 	FieldCompanyID,
 	FieldCustomerID,
 	FieldJobID,
@@ -112,6 +115,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByInvoiceNumber orders the results by the invoice_number field.
+func ByInvoiceNumber(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldInvoiceNumber, opts...).ToFunc()
 }
 
 // ByCompanyID orders the results by the company_id field.

@@ -172,6 +172,7 @@ var (
 		{Name: "tax_id", Type: field.TypeString, Default: ""},
 		{Name: "default_tax_rate", Type: field.TypeString, Default: "0"},
 		{Name: "invoice_prefix", Type: field.TypeString, Default: "INV-"},
+		{Name: "next_invoice_number", Type: field.TypeInt64, Default: 1},
 		{Name: "estimate_prefix", Type: field.TypeString, Default: "EST-"},
 		{Name: "default_due_days", Type: field.TypeInt, Default: 30},
 		{Name: "smtp_host", Type: field.TypeString, Default: ""},
@@ -440,6 +441,7 @@ var (
 	// InvoicesColumns holds the columns for the "invoices" table.
 	InvoicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
+		{Name: "invoice_number", Type: field.TypeInt64, Nullable: true},
 		{Name: "company_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "customer_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "job_id", Type: field.TypeInt64, Nullable: true},
@@ -467,17 +469,22 @@ var (
 			{
 				Name:    "invoice_customer_id",
 				Unique:  false,
-				Columns: []*schema.Column{InvoicesColumns[2]},
+				Columns: []*schema.Column{InvoicesColumns[3]},
 			},
 			{
 				Name:    "invoice_job_id",
 				Unique:  false,
-				Columns: []*schema.Column{InvoicesColumns[3]},
+				Columns: []*schema.Column{InvoicesColumns[4]},
 			},
 			{
 				Name:    "invoice_status_id",
 				Unique:  false,
-				Columns: []*schema.Column{InvoicesColumns[5]},
+				Columns: []*schema.Column{InvoicesColumns[6]},
+			},
+			{
+				Name:    "invoice_company_id_invoice_number",
+				Unique:  true,
+				Columns: []*schema.Column{InvoicesColumns[2], InvoicesColumns[1]},
 			},
 		},
 	}

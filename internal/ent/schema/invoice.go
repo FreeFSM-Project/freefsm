@@ -23,6 +23,7 @@ func (Invoice) Annotations() []schema.Annotation {
 func (Invoice) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id"),
+		field.Int64("invoice_number").Optional(),
 		field.Int64("company_id").Optional().Nillable(),
 		field.Int64("customer_id").Optional().Nillable(),
 		field.Int64("job_id").Optional().Nillable(),
@@ -48,5 +49,6 @@ func (Invoice) Indexes() []ent.Index {
 		index.Fields("customer_id"),
 		index.Fields("job_id"),
 		index.Fields("status_id"),
+		index.Fields("company_id", "invoice_number").Unique(),
 	}
 }

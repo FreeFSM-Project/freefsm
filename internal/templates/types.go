@@ -467,6 +467,7 @@ type EstimateFormPageData struct {
 
 type InvoiceRow struct {
 	ID          int64
+	Number      int64
 	Title       string
 	Customer    string
 	CustomerID  int64
@@ -479,6 +480,7 @@ type InvoiceRow struct {
 
 type InvoiceDetail struct {
 	ID           int64
+	Number       int64
 	CustomerID   int64
 	Customer     string
 	JobID        int64
@@ -735,6 +737,13 @@ func invoiceFormCancelURL(p InvoiceFormPageData) string {
 	return "/invoices"
 }
 
+func invoiceFormNumberValue(p InvoiceFormPageData) string {
+	if p.Invoice == nil || p.Invoice.Number == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%d", p.Invoice.Number)
+}
+
 func paymentsTotal(payments []services.Payment) float64 {
 	var total float64
 	for _, p := range payments {
@@ -765,6 +774,10 @@ func invoicePrefix(ctx context.Context) string {
 		return "INV-"
 	}
 	return cs.InvoicePrefix
+}
+
+func invoiceNumber(ctx context.Context, number int64) string {
+	return services.FormatInvoiceNumber(number, middleware.CompanyFromContext(ctx))
 }
 
 func estimatePrefix(ctx context.Context) string {

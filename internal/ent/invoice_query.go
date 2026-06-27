@@ -262,12 +262,12 @@ func (_q *InvoiceQuery) Clone() *InvoiceQuery {
 // Example:
 //
 //	var v []struct {
-//		CompanyID int64 `json:"company_id,omitempty"`
+//		InvoiceNumber int64 `json:"invoice_number,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Invoice.Query().
-//		GroupBy(invoice.FieldCompanyID).
+//		GroupBy(invoice.FieldInvoiceNumber).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *InvoiceQuery) GroupBy(field string, fields ...string) *InvoiceGroupBy {
@@ -285,11 +285,11 @@ func (_q *InvoiceQuery) GroupBy(field string, fields ...string) *InvoiceGroupBy 
 // Example:
 //
 //	var v []struct {
-//		CompanyID int64 `json:"company_id,omitempty"`
+//		InvoiceNumber int64 `json:"invoice_number,omitempty"`
 //	}
 //
 //	client.Invoice.Query().
-//		Select(invoice.FieldCompanyID).
+//		Select(invoice.FieldInvoiceNumber).
 //		Scan(ctx, &v)
 func (_q *InvoiceQuery) Select(fields ...string) *InvoiceSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

@@ -39,6 +39,8 @@ type CompanySettings struct {
 	DefaultTaxRate string `json:"default_tax_rate,omitempty"`
 	// InvoicePrefix holds the value of the "invoice_prefix" field.
 	InvoicePrefix string `json:"invoice_prefix,omitempty"`
+	// NextInvoiceNumber holds the value of the "next_invoice_number" field.
+	NextInvoiceNumber int64 `json:"next_invoice_number,omitempty"`
 	// EstimatePrefix holds the value of the "estimate_prefix" field.
 	EstimatePrefix string `json:"estimate_prefix,omitempty"`
 	// DefaultDueDays holds the value of the "default_due_days" field.
@@ -101,7 +103,7 @@ func (*CompanySettings) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case companysettings.FieldPasswordRequireUppercase, companysettings.FieldPasswordRequireLowercase, companysettings.FieldPasswordRequireDigit, companysettings.FieldPasswordRequireSpecial, companysettings.FieldPdfShowLineItemDescriptions:
 			values[i] = new(sql.NullBool)
-		case companysettings.FieldID, companysettings.FieldCompanyID, companysettings.FieldDefaultDueDays, companysettings.FieldSMTPPort, companysettings.FieldPasswordMinLength:
+		case companysettings.FieldID, companysettings.FieldCompanyID, companysettings.FieldNextInvoiceNumber, companysettings.FieldDefaultDueDays, companysettings.FieldSMTPPort, companysettings.FieldPasswordMinLength:
 			values[i] = new(sql.NullInt64)
 		case companysettings.FieldBusinessName, companysettings.FieldAddress, companysettings.FieldCity, companysettings.FieldState, companysettings.FieldZip, companysettings.FieldPhone, companysettings.FieldEmail, companysettings.FieldTaxID, companysettings.FieldDefaultTaxRate, companysettings.FieldInvoicePrefix, companysettings.FieldEstimatePrefix, companysettings.FieldSMTPHost, companysettings.FieldSMTPUser, companysettings.FieldSMTPPassword, companysettings.FieldSMTPFrom, companysettings.FieldInvoiceEmailSubject, companysettings.FieldInvoiceEmailBody, companysettings.FieldEstimateEmailSubject, companysettings.FieldEstimateEmailBody, companysettings.FieldTimezone, companysettings.FieldInvoiceColor, companysettings.FieldInvoiceFooter, companysettings.FieldInvoiceLogoPath, companysettings.FieldInvoicePaymentTerms, companysettings.FieldMapTileURL, companysettings.FieldGeocoderURL:
 			values[i] = new(sql.NullString)
@@ -194,6 +196,12 @@ func (_m *CompanySettings) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field invoice_prefix", values[i])
 			} else if value.Valid {
 				_m.InvoicePrefix = value.String
+			}
+		case companysettings.FieldNextInvoiceNumber:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field next_invoice_number", values[i])
+			} else if value.Valid {
+				_m.NextInvoiceNumber = value.Int64
 			}
 		case companysettings.FieldEstimatePrefix:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -421,6 +429,9 @@ func (_m *CompanySettings) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("invoice_prefix=")
 	builder.WriteString(_m.InvoicePrefix)
+	builder.WriteString(", ")
+	builder.WriteString("next_invoice_number=")
+	builder.WriteString(fmt.Sprintf("%v", _m.NextInvoiceNumber))
 	builder.WriteString(", ")
 	builder.WriteString("estimate_prefix=")
 	builder.WriteString(_m.EstimatePrefix)

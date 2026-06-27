@@ -3,9 +3,11 @@ package services
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/MartialM1nd/freefsm/internal/ent"
+	"github.com/MartialM1nd/freefsm/internal/ent/companysettings"
 	"github.com/MartialM1nd/freefsm/internal/ent/invoice"
 )
 
@@ -18,31 +20,33 @@ func NewInvoiceService(client *ent.Client) *InvoiceService {
 }
 
 type InvoiceCreateParams struct {
-	CustomerID   int64
-	JobID        int64
-	EstimateID   int64
-	StatusID     int64
-	Title        string
-	Notes        string
-	InvoiceDate  time.Time
-	DueDate      time.Time
-	TaxRate      string
-	LineItems    []LineItem
-	CustomFields string
+	InvoiceNumber *int64
+	CustomerID    int64
+	JobID         int64
+	EstimateID    int64
+	StatusID      int64
+	Title         string
+	Notes         string
+	InvoiceDate   time.Time
+	DueDate       time.Time
+	TaxRate       string
+	LineItems     []LineItem
+	CustomFields  string
 }
 
 type InvoiceUpdateParams struct {
-	CustomerID   *int64
-	JobID        *int64
-	EstimateID   *int64
-	StatusID     *int64
-	Title        *string
-	Notes        *string
-	InvoiceDate  *time.Time
-	DueDate      *time.Time
-	TaxRate      *string
-	LineItems    *[]LineItem
-	CustomFields *string
+	InvoiceNumber *int64
+	CustomerID    *int64
+	JobID         *int64
+	EstimateID    *int64
+	StatusID      *int64
+	Title         *string
+	Notes         *string
+	InvoiceDate   *time.Time
+	DueDate       *time.Time
+	TaxRate       *string
+	LineItems     *[]LineItem
+	CustomFields  *string
 }
 
 func (s *InvoiceService) List(ctx context.Context, search string, statusID int64, page, perPage int) ([]*ent.Invoice, int, error) {
@@ -148,6 +152,9 @@ func (s *InvoiceService) Create(ctx context.Context, params InvoiceCreateParams)
 	if params.StatusID > 0 {
 		b.SetStatusID(params.StatusID)
 	}
+	if err := s.assignInvoiceNumber(ctx, b, params.InvoiceNumber); err != nil {
+		return nil, err
+	}
 
 	i, err := b.Save(ctx)
 	if err != nil {
@@ -181,6 +188,15 @@ func (s *InvoiceService) Update(ctx context.Context, id int64, params InvoiceUpd
 	}
 
 	u := s.client.Invoice.UpdateOneID(id)
+	if params.InvoiceNumber != nil {
+		if err := s.validateInvoiceNumber(ctx, current.CompanyID, id, *params.InvoiceNumber); err != nil {
+			return nil, err
+		}
+		u.SetInvoiceNumber(*params.InvoiceNumber)
+		if err := s.bumpNextInvoiceNumber(ctx, current.CompanyID, *params.InvoiceNumber); err != nil {
+			return nil, err
+		}
+	}
 
 	if params.CustomerID != nil {
 		u.SetCustomerID(*params.CustomerID)
@@ -229,6 +245,78 @@ func (s *InvoiceService) Update(ctx context.Context, id int64, params InvoiceUpd
 		return nil, fmt.Errorf("update invoice %d: %w", id, err)
 	}
 	return i, nil
+}
+
+func (s *InvoiceService) assignInvoiceNumber(ctx context.Context, b *ent.InvoiceCreate, requested *int64) error {
+	cs, err := s.client.CompanySettings.Query().First(ctx)
+	if err != nil {
+		return fmt.Errorf("load company settings: %w", err)
+	}
+	if cs.CompanyID != nil {
+		b.SetCompanyID(*cs.CompanyID)
+	}
+	companyID := cs.CompanyID
+	number := cs.NextInvoiceNumber
+	if requested != nil {
+		number = *requested
+	}
+	if err := s.validateInvoiceNumber(ctx, companyID, 0, number); err != nil {
+		return err
+	}
+	b.SetInvoiceNumber(number)
+	return s.bumpNextInvoiceNumber(ctx, companyID, number)
+}
+
+func (s *InvoiceService) validateInvoiceNumber(ctx context.Context, companyID *int64, excludeID, number int64) error {
+	if number <= 0 {
+		return fmt.Errorf("invoice number must be greater than zero")
+	}
+	q := s.client.Invoice.Query().Where(invoice.InvoiceNumberEQ(number))
+	if companyID != nil {
+		q = q.Where(invoice.CompanyIDEQ(*companyID))
+	} else {
+		q = q.Where(invoice.CompanyIDIsNil())
+	}
+	if excludeID > 0 {
+		q = q.Where(invoice.IDNEQ(excludeID))
+	}
+	exists, err := q.Exist(ctx)
+	if err != nil {
+		return fmt.Errorf("check invoice number: %w", err)
+	}
+	if exists {
+		return fmt.Errorf("invoice number %d is already in use", number)
+	}
+	return nil
+}
+
+func (s *InvoiceService) bumpNextInvoiceNumber(ctx context.Context, companyID *int64, used int64) error {
+	q := s.client.CompanySettings.Query()
+	if companyID != nil {
+		q = q.Where(companysettings.CompanyIDEQ(*companyID))
+	} else {
+		q = q.Where(companysettings.CompanyIDIsNil())
+	}
+	cs, err := q.First(ctx)
+	if err != nil {
+		return fmt.Errorf("load company settings: %w", err)
+	}
+	if used < cs.NextInvoiceNumber {
+		return nil
+	}
+	_, err = s.client.CompanySettings.UpdateOneID(cs.ID).SetNextInvoiceNumber(used + 1).Save(ctx)
+	if err != nil {
+		return fmt.Errorf("update next invoice number: %w", err)
+	}
+	return nil
+}
+
+func FormatInvoiceNumber(invoiceNumber int64, cs *ent.CompanySettings) string {
+	prefix := "INV-"
+	if cs != nil && strings.TrimSpace(cs.InvoicePrefix) != "" {
+		prefix = strings.TrimSpace(cs.InvoicePrefix)
+	}
+	return fmt.Sprintf("%s%05d", prefix, invoiceNumber)
 }
 
 func (s *InvoiceService) Delete(ctx context.Context, id int64) error {
@@ -325,9 +413,15 @@ func (s *InvoiceService) CreateFromEstimate(ctx context.Context, estimateID int6
 	if err := tx.Estimate.DeleteOneID(estimateID).Exec(ctx); err != nil {
 		return nil, fmt.Errorf("delete estimate %d: %w", estimateID, err)
 	}
+	cs, err := tx.CompanySettings.Query().First(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("load company settings: %w", err)
+	}
+	invoiceNumber := cs.NextInvoiceNumber
 
-	i, err := tx.Invoice.Create().
+	b := tx.Invoice.Create().
 		SetID(estimateID).
+		SetInvoiceNumber(invoiceNumber).
 		SetTitle(e.Title).
 		SetNotes(e.Notes).
 		SetTaxRate(e.TaxRate).
@@ -336,10 +430,16 @@ func (s *InvoiceService) CreateFromEstimate(ctx context.Context, estimateID int6
 		SetInvoiceDate(now).
 		SetDueDate(now.AddDate(0, 0, 30)).
 		SetNillableCustomerID(custID).
-		SetNillableJobID(jobID).
-		Save(ctx)
+		SetNillableJobID(jobID)
+	if cs.CompanyID != nil {
+		b.SetCompanyID(*cs.CompanyID)
+	}
+	i, err := b.Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("create invoice: %w", err)
+	}
+	if _, err := tx.CompanySettings.UpdateOneID(cs.ID).SetNextInvoiceNumber(invoiceNumber + 1).Save(ctx); err != nil {
+		return nil, fmt.Errorf("update next invoice number: %w", err)
 	}
 
 	if err := tx.Commit(); err != nil {

@@ -20,6 +20,20 @@ type InvoiceCreate struct {
 	hooks    []Hook
 }
 
+// SetInvoiceNumber sets the "invoice_number" field.
+func (_c *InvoiceCreate) SetInvoiceNumber(v int64) *InvoiceCreate {
+	_c.mutation.SetInvoiceNumber(v)
+	return _c
+}
+
+// SetNillableInvoiceNumber sets the "invoice_number" field if the given value is not nil.
+func (_c *InvoiceCreate) SetNillableInvoiceNumber(v *int64) *InvoiceCreate {
+	if v != nil {
+		_c.SetInvoiceNumber(*v)
+	}
+	return _c
+}
+
 // SetCompanyID sets the "company_id" field.
 func (_c *InvoiceCreate) SetCompanyID(v int64) *InvoiceCreate {
 	_c.mutation.SetCompanyID(v)
@@ -387,6 +401,10 @@ func (_c *InvoiceCreate) createSpec() (*Invoice, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := _c.mutation.InvoiceNumber(); ok {
+		_spec.SetField(invoice.FieldInvoiceNumber, field.TypeInt64, value)
+		_node.InvoiceNumber = value
 	}
 	if value, ok := _c.mutation.CompanyID(); ok {
 		_spec.SetField(invoice.FieldCompanyID, field.TypeInt64, value)

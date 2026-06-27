@@ -33,6 +33,7 @@ func (CompanySettings) Fields() []ent.Field {
 		field.String("tax_id").Default(""),
 		field.String("default_tax_rate").Default("0"),
 		field.String("invoice_prefix").Default("INV-"),
+		field.Int64("next_invoice_number").Default(1),
 		field.String("estimate_prefix").Default("EST-"),
 		field.Int("default_due_days").Default(30),
 		field.String("smtp_host").Default(""),

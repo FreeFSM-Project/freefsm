@@ -29,6 +29,7 @@ type CompanySettingsParams struct {
 	TaxID                       string
 	DefaultTaxRate              string
 	InvoicePrefix               string
+	NextInvoiceNumber           int64
 	EstimatePrefix              string
 	DefaultDueDays              int
 	SmtpHost                    string
@@ -70,6 +71,7 @@ func (s *CompanySettingsService) Save(ctx context.Context, p CompanySettingsPara
 		SetTaxID(p.TaxID).
 		SetDefaultTaxRate(p.DefaultTaxRate).
 		SetInvoicePrefix(p.InvoicePrefix).
+		SetNextInvoiceNumber(p.NextInvoiceNumber).
 		SetEstimatePrefix(p.EstimatePrefix).
 		SetDefaultDueDays(p.DefaultDueDays).
 		SetSMTPHost(p.SmtpHost).

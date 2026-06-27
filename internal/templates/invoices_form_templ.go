@@ -184,141 +184,164 @@ func InvoiceForm(p InvoiceFormPageData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</select></label><div class=\"grid\"><label>Title <small class=\"required-marker\">*</small> <input type=\"text\" name=\"title\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</select></label><div class=\"grid\"><label>Invoice Number <input type=\"number\" name=\"invoice_number\" min=\"1\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var10 string
-			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Invoice.Title)
+			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.ResolveAttributeValue(invoiceFormNumberValue(p))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 34, Col: 60}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 34, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var10)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" required autofocus> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" placeholder=\"Leave blank for next number\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if !p.IsNew {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, " required")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "></label> <label>Title <small class=\"required-marker\">*</small> <input type=\"text\" name=\"title\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var11 string
+			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Invoice.Title)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 38, Col: 60}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var11)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" required autofocus> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if p.Errors["title"] != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<small class=\"error-msg\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				var templ_7745c5c3_Var11 string
-				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(p.Errors["title"])
-				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 36, Col: 50}
-				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</small>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</label> <label>Status <select name=\"status_id\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			for _, s := range p.Statuses {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<option value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<small class=\"error-msg\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
-				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", s.Value))
+				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(p.Errors["title"])
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 43, Col: 49}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 40, Col: 50}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var12)
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\"")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				if p.Invoice.StatusID == s.Value {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, " selected")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</small>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, ">")
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</label> <label>Status <select name=\"status_id\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, s := range p.Statuses {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<option value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var13 string
-				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(s.Label)
+				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.ResolveAttributeValue(fmt.Sprintf("%d", s.Value))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 43, Col: 105}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 47, Col: 49}
 				}
-				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</option>")
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var13)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if p.Invoice.StatusID == s.Value {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " selected")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, ">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var14 string
+				templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(s.Label)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 47, Col: 105}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</option>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</select></label></div><div class=\"grid\"><label>Invoice Date <input type=\"date\" name=\"invoice_date\" value=\"")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var14 string
-			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Invoice.InvoiceDate)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 51, Col: 73}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var14)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "\"></label> <label>Due Date <input type=\"date\" name=\"due_date\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</select></label></div><div class=\"grid\"><label>Invoice Date <input type=\"date\" name=\"invoice_date\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var15 string
-			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Invoice.DueDate)
+			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Invoice.InvoiceDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 55, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 55, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var15)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "\"></label></div><label>Tax Rate <input type=\"text\" name=\"tax_rate\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "\"></label> <label>Due Date <input type=\"date\" name=\"due_date\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var16 string
-			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Invoice.TaxRate)
+			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Invoice.DueDate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 60, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 59, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var16)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\" placeholder=\"e.g. 8.25%\"></label> <label>Notes <textarea name=\"notes\" rows=\"3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "\"></label></div><label>Tax Rate <input type=\"text\" name=\"tax_rate\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var17 string
-			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(p.Invoice.Notes)
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(p.Invoice.TaxRate)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 64, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 64, Col: 64}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "</textarea></label>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" placeholder=\"e.g. 8.25%\"></label> <label>Notes <textarea name=\"notes\" rows=\"3\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var18 string
+			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(p.Invoice.Notes)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 68, Col: 53}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</textarea></label>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -334,20 +357,20 @@ func InvoiceForm(p InvoiceFormPageData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<script>\n\t\t\t\tfunction registerLineItemEditor() {\n\t\t\t\t\tAlpine.data('lineItemEditor', () => {\n\t\t\t\t\t\tconst catalog = JSON.parse(document.getElementById('items-catalog').textContent || '[]');\n\t\t\t\t\t\tconst existing = JSON.parse(document.getElementById('existing-items').textContent || '[]');\n\t\t\t\t\t\tconst makeItem = () => ({ item_id: 0, title: '', description: '', unit_price: 0, quantity: 1, taxable: false, tax_rate: '', discount: 0, surcharge: 0 });\n\t\t\t\t\t\texisting.forEach(i => {\n\t\t\t\t\t\t\tif (!i.quantity) i.quantity = 1;\n\t\t\t\t\t\t\ti.item_id = Number(i.item_id) || 0;\n\t\t\t\t\t\t\tif (!i.item_id && i.title) {\n\t\t\t\t\t\t\t\tconst c = catalog.find(f => f.name === i.title);\n\t\t\t\t\t\t\t\tif (c) i.item_id = Number(c.id) || 0;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\t\t\t\t\t\treturn {\n\t\t\t\t\t\t\titems: existing.length ? existing : [makeItem()],\n\t\t\t\t\t\t\tcatalog: catalog,\n\t\t\t\t\t\t\tadd() { this.items.push(makeItem()); },\n\t\t\t\t\t\t\tremove(index) { this.items.splice(index, 1); },\n\t\t\t\t\t\t\tselectItem(index, itemID) {\n\t\t\t\t\t\t\t\tthis.items[index].item_id = Number(itemID) || 0;\n\t\t\t\t\t\t\t\tconst c = catalog.find(f => f.id == itemID);\n\t\t\t\t\t\t\t\tif (c) { this.items[index].title = c.name; this.items[index].description = c.description; this.items[index].unit_price = c.unit_price; this.items[index].taxable = c.taxable; this.items[index].tax_rate = c.tax_rate; }\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tlineTotal(item) { return (item.unit_price * item.quantity) - (item.discount || 0) + (item.surcharge || 0); },\n\t\t\t\t\t\t\tget subtotal() { return this.items.reduce((s, i) => s + (i.unit_price * i.quantity), 0); },\n\t\t\t\t\t\t\tget tax() { return this.items.reduce((s, i) => { if (i.taxable && i.tax_rate) { const r = parseFloat(i.tax_rate) || 0; return s + (i.unit_price * i.quantity * r / 100); } return s; }, 0); },\n\t\t\t\t\t\t\tget total() { return this.subtotal + this.tax - this.items.reduce((s, i) => s + (i.discount || 0), 0) + this.items.reduce((s, i) => s + (i.surcharge || 0), 0); },\n\t\t\t\t\t\t\tget json() { return JSON.stringify(this.items.filter(i => i.item_id > 0 || i.title).map(i => ({ item_id: Number(i.item_id) || 0, title: i.title, description: i.description, unit_price: Number(i.unit_price) || 0, quantity: Number(i.quantity) || 1, taxable: Boolean(i.taxable), tax_rate: i.tax_rate, discount: Number(i.discount) || 0, surcharge: Number(i.surcharge) || 0 }))); },\n\t\t\t\t\t\t};\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t\tif (window.Alpine) { registerLineItemEditor(); } else { document.addEventListener('alpine:init', registerLineItemEditor); }\n\t\t\t</script><fieldset x-data=\"lineItemEditor()\"><legend>Line Items</legend><table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Tax</th><th>Total</th><th></th></tr></thead> <tbody><template x-for=\"(item, index) in items\" :key=\"index\"><tr><td><select x-model.number=\"item.item_id\" x-init=\"$nextTick(() => { $el.value = String(item.item_id || 0) })\" @change=\"selectItem(index, $el.value)\"><option value=\"0\">Select item...</option><template x-for=\"c in catalog\" :key=\"c.id\"><option :value=\"c.id\" :selected=\"Number(c.id) === Number(item.item_id)\" x-text=\"c.name\"></option></template></select></td><td><input type=\"number\" x-model=\"item.quantity\" min=\"1\" class=\"input-width-70\"></td><td><input type=\"number\" x-model=\"item.unit_price\" step=\"0.01\" class=\"input-width-100\"></td><td><template x-if=\"item.taxable && item.tax_rate\"><span x-text=\"'Yes'\"></span></template><template x-if=\"!item.taxable || !item.tax_rate\"><span x-text=\"'No'\"></span></template></td><td><span x-text=\"lineTotal(item).toFixed(2)\"></span></td><td><button @click.prevent=\"remove(index)\" class=\"outline contrast small\">X</button></td></tr></template></tbody></table><button @click.prevent=\"add()\" class=\"outline\">+ Add Item</button><div class=\"line-item-totals\"><p>Subtotal: $<span x-text=\"subtotal.toFixed(2)\"></span></p><p>Tax: $<span x-text=\"tax.toFixed(2)\"></span></p><p><strong>Total: $<span x-text=\"total.toFixed(2)\"></span></strong></p></div><input type=\"hidden\" name=\"line_items\" :value=\"json\"></fieldset><div class=\"entity-form-actions\"><button type=\"submit\">Save</button> <a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<script>\n\t\t\t\tfunction registerLineItemEditor() {\n\t\t\t\t\tAlpine.data('lineItemEditor', () => {\n\t\t\t\t\t\tconst catalog = JSON.parse(document.getElementById('items-catalog').textContent || '[]');\n\t\t\t\t\t\tconst existing = JSON.parse(document.getElementById('existing-items').textContent || '[]');\n\t\t\t\t\t\tconst makeItem = () => ({ item_id: 0, title: '', description: '', unit_price: 0, quantity: 1, taxable: false, tax_rate: '', discount: 0, surcharge: 0 });\n\t\t\t\t\t\texisting.forEach(i => {\n\t\t\t\t\t\t\tif (!i.quantity) i.quantity = 1;\n\t\t\t\t\t\t\ti.item_id = Number(i.item_id) || 0;\n\t\t\t\t\t\t\tif (!i.item_id && i.title) {\n\t\t\t\t\t\t\t\tconst c = catalog.find(f => f.name === i.title);\n\t\t\t\t\t\t\t\tif (c) i.item_id = Number(c.id) || 0;\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t});\n\t\t\t\t\t\treturn {\n\t\t\t\t\t\t\titems: existing.length ? existing : [makeItem()],\n\t\t\t\t\t\t\tcatalog: catalog,\n\t\t\t\t\t\t\tadd() { this.items.push(makeItem()); },\n\t\t\t\t\t\t\tremove(index) { this.items.splice(index, 1); },\n\t\t\t\t\t\t\tselectItem(index, itemID) {\n\t\t\t\t\t\t\t\tthis.items[index].item_id = Number(itemID) || 0;\n\t\t\t\t\t\t\t\tconst c = catalog.find(f => f.id == itemID);\n\t\t\t\t\t\t\t\tif (c) { this.items[index].title = c.name; this.items[index].description = c.description; this.items[index].unit_price = c.unit_price; this.items[index].taxable = c.taxable; this.items[index].tax_rate = c.tax_rate; }\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tlineTotal(item) { return (item.unit_price * item.quantity) - (item.discount || 0) + (item.surcharge || 0); },\n\t\t\t\t\t\t\tget subtotal() { return this.items.reduce((s, i) => s + (i.unit_price * i.quantity), 0); },\n\t\t\t\t\t\t\tget tax() { return this.items.reduce((s, i) => { if (i.taxable && i.tax_rate) { const r = parseFloat(i.tax_rate) || 0; return s + (i.unit_price * i.quantity * r / 100); } return s; }, 0); },\n\t\t\t\t\t\t\tget total() { return this.subtotal + this.tax - this.items.reduce((s, i) => s + (i.discount || 0), 0) + this.items.reduce((s, i) => s + (i.surcharge || 0), 0); },\n\t\t\t\t\t\t\tget json() { return JSON.stringify(this.items.filter(i => i.item_id > 0 || i.title).map(i => ({ item_id: Number(i.item_id) || 0, title: i.title, description: i.description, unit_price: Number(i.unit_price) || 0, quantity: Number(i.quantity) || 1, taxable: Boolean(i.taxable), tax_rate: i.tax_rate, discount: Number(i.discount) || 0, surcharge: Number(i.surcharge) || 0 }))); },\n\t\t\t\t\t\t};\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t\tif (window.Alpine) { registerLineItemEditor(); } else { document.addEventListener('alpine:init', registerLineItemEditor); }\n\t\t\t</script><fieldset x-data=\"lineItemEditor()\"><legend>Line Items</legend><table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Tax</th><th>Total</th><th></th></tr></thead> <tbody><template x-for=\"(item, index) in items\" :key=\"index\"><tr><td><select x-model.number=\"item.item_id\" x-init=\"$nextTick(() => { $el.value = String(item.item_id || 0) })\" @change=\"selectItem(index, $el.value)\"><option value=\"0\">Select item...</option><template x-for=\"c in catalog\" :key=\"c.id\"><option :value=\"c.id\" :selected=\"Number(c.id) === Number(item.item_id)\" x-text=\"c.name\"></option></template></select></td><td><input type=\"number\" x-model=\"item.quantity\" min=\"1\" class=\"input-width-70\"></td><td><input type=\"number\" x-model=\"item.unit_price\" step=\"0.01\" class=\"input-width-100\"></td><td><template x-if=\"item.taxable && item.tax_rate\"><span x-text=\"'Yes'\"></span></template><template x-if=\"!item.taxable || !item.tax_rate\"><span x-text=\"'No'\"></span></template></td><td><span x-text=\"lineTotal(item).toFixed(2)\"></span></td><td><button @click.prevent=\"remove(index)\" class=\"outline contrast small\">X</button></td></tr></template></tbody></table><button @click.prevent=\"add()\" class=\"outline\">+ Add Item</button><div class=\"line-item-totals\"><p>Subtotal: $<span x-text=\"subtotal.toFixed(2)\"></span></p><p>Tax: $<span x-text=\"tax.toFixed(2)\"></span></p><p><strong>Total: $<span x-text=\"total.toFixed(2)\"></span></strong></p></div><input type=\"hidden\" name=\"line_items\" :value=\"json\"></fieldset><div class=\"entity-form-actions\"><button type=\"submit\">Save</button> <a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var18 templ.SafeURL
-			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(invoiceFormCancelURL(p)))
+			var templ_7745c5c3_Var19 templ.SafeURL
+			templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(invoiceFormCancelURL(p)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 153, Col: 48}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/invoices_form.templ`, Line: 157, Col: 48}
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\" role=\"button\" class=\"outline\">Cancel</a></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "\" role=\"button\" class=\"outline\">Cancel</a></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

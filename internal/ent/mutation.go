@@ -4313,6 +4313,8 @@ type CompanySettingsMutation struct {
 	tax_id                          *string
 	default_tax_rate                *string
 	invoice_prefix                  *string
+	next_invoice_number             *int64
+	addnext_invoice_number          *int64
 	estimate_prefix                 *string
 	default_due_days                *int
 	adddefault_due_days             *int
@@ -4880,6 +4882,62 @@ func (m *CompanySettingsMutation) OldInvoicePrefix(ctx context.Context) (v strin
 // ResetInvoicePrefix resets all changes to the "invoice_prefix" field.
 func (m *CompanySettingsMutation) ResetInvoicePrefix() {
 	m.invoice_prefix = nil
+}
+
+// SetNextInvoiceNumber sets the "next_invoice_number" field.
+func (m *CompanySettingsMutation) SetNextInvoiceNumber(i int64) {
+	m.next_invoice_number = &i
+	m.addnext_invoice_number = nil
+}
+
+// NextInvoiceNumber returns the value of the "next_invoice_number" field in the mutation.
+func (m *CompanySettingsMutation) NextInvoiceNumber() (r int64, exists bool) {
+	v := m.next_invoice_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNextInvoiceNumber returns the old "next_invoice_number" field's value of the CompanySettings entity.
+// If the CompanySettings object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CompanySettingsMutation) OldNextInvoiceNumber(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNextInvoiceNumber is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNextInvoiceNumber requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNextInvoiceNumber: %w", err)
+	}
+	return oldValue.NextInvoiceNumber, nil
+}
+
+// AddNextInvoiceNumber adds i to the "next_invoice_number" field.
+func (m *CompanySettingsMutation) AddNextInvoiceNumber(i int64) {
+	if m.addnext_invoice_number != nil {
+		*m.addnext_invoice_number += i
+	} else {
+		m.addnext_invoice_number = &i
+	}
+}
+
+// AddedNextInvoiceNumber returns the value that was added to the "next_invoice_number" field in this mutation.
+func (m *CompanySettingsMutation) AddedNextInvoiceNumber() (r int64, exists bool) {
+	v := m.addnext_invoice_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetNextInvoiceNumber resets all changes to the "next_invoice_number" field.
+func (m *CompanySettingsMutation) ResetNextInvoiceNumber() {
+	m.next_invoice_number = nil
+	m.addnext_invoice_number = nil
 }
 
 // SetEstimatePrefix sets the "estimate_prefix" field.
@@ -5912,7 +5970,7 @@ func (m *CompanySettingsMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CompanySettingsMutation) Fields() []string {
-	fields := make([]string, 0, 37)
+	fields := make([]string, 0, 38)
 	if m.company_id != nil {
 		fields = append(fields, companysettings.FieldCompanyID)
 	}
@@ -5945,6 +6003,9 @@ func (m *CompanySettingsMutation) Fields() []string {
 	}
 	if m.invoice_prefix != nil {
 		fields = append(fields, companysettings.FieldInvoicePrefix)
+	}
+	if m.next_invoice_number != nil {
+		fields = append(fields, companysettings.FieldNextInvoiceNumber)
 	}
 	if m.estimate_prefix != nil {
 		fields = append(fields, companysettings.FieldEstimatePrefix)
@@ -6054,6 +6115,8 @@ func (m *CompanySettingsMutation) Field(name string) (ent.Value, bool) {
 		return m.DefaultTaxRate()
 	case companysettings.FieldInvoicePrefix:
 		return m.InvoicePrefix()
+	case companysettings.FieldNextInvoiceNumber:
+		return m.NextInvoiceNumber()
 	case companysettings.FieldEstimatePrefix:
 		return m.EstimatePrefix()
 	case companysettings.FieldDefaultDueDays:
@@ -6137,6 +6200,8 @@ func (m *CompanySettingsMutation) OldField(ctx context.Context, name string) (en
 		return m.OldDefaultTaxRate(ctx)
 	case companysettings.FieldInvoicePrefix:
 		return m.OldInvoicePrefix(ctx)
+	case companysettings.FieldNextInvoiceNumber:
+		return m.OldNextInvoiceNumber(ctx)
 	case companysettings.FieldEstimatePrefix:
 		return m.OldEstimatePrefix(ctx)
 	case companysettings.FieldDefaultDueDays:
@@ -6274,6 +6339,13 @@ func (m *CompanySettingsMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetInvoicePrefix(v)
+		return nil
+	case companysettings.FieldNextInvoiceNumber:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNextInvoiceNumber(v)
 		return nil
 	case companysettings.FieldEstimatePrefix:
 		v, ok := value.(string)
@@ -6468,6 +6540,9 @@ func (m *CompanySettingsMutation) AddedFields() []string {
 	if m.addcompany_id != nil {
 		fields = append(fields, companysettings.FieldCompanyID)
 	}
+	if m.addnext_invoice_number != nil {
+		fields = append(fields, companysettings.FieldNextInvoiceNumber)
+	}
 	if m.adddefault_due_days != nil {
 		fields = append(fields, companysettings.FieldDefaultDueDays)
 	}
@@ -6487,6 +6562,8 @@ func (m *CompanySettingsMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case companysettings.FieldCompanyID:
 		return m.AddedCompanyID()
+	case companysettings.FieldNextInvoiceNumber:
+		return m.AddedNextInvoiceNumber()
 	case companysettings.FieldDefaultDueDays:
 		return m.AddedDefaultDueDays()
 	case companysettings.FieldSMTPPort:
@@ -6508,6 +6585,13 @@ func (m *CompanySettingsMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddCompanyID(v)
+		return nil
+	case companysettings.FieldNextInvoiceNumber:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddNextInvoiceNumber(v)
 		return nil
 	case companysettings.FieldDefaultDueDays:
 		v, ok := value.(int)
@@ -6598,6 +6682,9 @@ func (m *CompanySettingsMutation) ResetField(name string) error {
 		return nil
 	case companysettings.FieldInvoicePrefix:
 		m.ResetInvoicePrefix()
+		return nil
+	case companysettings.FieldNextInvoiceNumber:
+		m.ResetNextInvoiceNumber()
 		return nil
 	case companysettings.FieldEstimatePrefix:
 		m.ResetEstimatePrefix()
@@ -13920,35 +14007,37 @@ func (m *FileMutation) ResetEdge(name string) error {
 // InvoiceMutation represents an operation that mutates the Invoice nodes in the graph.
 type InvoiceMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *int64
-	company_id       *int64
-	addcompany_id    *int64
-	customer_id      *int64
-	addcustomer_id   *int64
-	job_id           *int64
-	addjob_id        *int64
-	estimate_id      *int64
-	addestimate_id   *int64
-	status_id        *int64
-	addstatus_id     *int64
-	title            *string
-	notes            *string
-	invoice_date     *time.Time
-	due_date         *time.Time
-	tax_rate         *string
-	line_items       *string
-	payments         *string
-	display_settings *string
-	custom_fields    *string
-	deleted_at       *time.Time
-	created_at       *time.Time
-	updated_at       *time.Time
-	clearedFields    map[string]struct{}
-	done             bool
-	oldValue         func(context.Context) (*Invoice, error)
-	predicates       []predicate.Invoice
+	op                Op
+	typ               string
+	id                *int64
+	invoice_number    *int64
+	addinvoice_number *int64
+	company_id        *int64
+	addcompany_id     *int64
+	customer_id       *int64
+	addcustomer_id    *int64
+	job_id            *int64
+	addjob_id         *int64
+	estimate_id       *int64
+	addestimate_id    *int64
+	status_id         *int64
+	addstatus_id      *int64
+	title             *string
+	notes             *string
+	invoice_date      *time.Time
+	due_date          *time.Time
+	tax_rate          *string
+	line_items        *string
+	payments          *string
+	display_settings  *string
+	custom_fields     *string
+	deleted_at        *time.Time
+	created_at        *time.Time
+	updated_at        *time.Time
+	clearedFields     map[string]struct{}
+	done              bool
+	oldValue          func(context.Context) (*Invoice, error)
+	predicates        []predicate.Invoice
 }
 
 var _ ent.Mutation = (*InvoiceMutation)(nil)
@@ -14053,6 +14142,76 @@ func (m *InvoiceMutation) IDs(ctx context.Context) ([]int64, error) {
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
+}
+
+// SetInvoiceNumber sets the "invoice_number" field.
+func (m *InvoiceMutation) SetInvoiceNumber(i int64) {
+	m.invoice_number = &i
+	m.addinvoice_number = nil
+}
+
+// InvoiceNumber returns the value of the "invoice_number" field in the mutation.
+func (m *InvoiceMutation) InvoiceNumber() (r int64, exists bool) {
+	v := m.invoice_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInvoiceNumber returns the old "invoice_number" field's value of the Invoice entity.
+// If the Invoice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *InvoiceMutation) OldInvoiceNumber(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInvoiceNumber is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInvoiceNumber requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInvoiceNumber: %w", err)
+	}
+	return oldValue.InvoiceNumber, nil
+}
+
+// AddInvoiceNumber adds i to the "invoice_number" field.
+func (m *InvoiceMutation) AddInvoiceNumber(i int64) {
+	if m.addinvoice_number != nil {
+		*m.addinvoice_number += i
+	} else {
+		m.addinvoice_number = &i
+	}
+}
+
+// AddedInvoiceNumber returns the value that was added to the "invoice_number" field in this mutation.
+func (m *InvoiceMutation) AddedInvoiceNumber() (r int64, exists bool) {
+	v := m.addinvoice_number
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearInvoiceNumber clears the value of the "invoice_number" field.
+func (m *InvoiceMutation) ClearInvoiceNumber() {
+	m.invoice_number = nil
+	m.addinvoice_number = nil
+	m.clearedFields[invoice.FieldInvoiceNumber] = struct{}{}
+}
+
+// InvoiceNumberCleared returns if the "invoice_number" field was cleared in this mutation.
+func (m *InvoiceMutation) InvoiceNumberCleared() bool {
+	_, ok := m.clearedFields[invoice.FieldInvoiceNumber]
+	return ok
+}
+
+// ResetInvoiceNumber resets all changes to the "invoice_number" field.
+func (m *InvoiceMutation) ResetInvoiceNumber() {
+	m.invoice_number = nil
+	m.addinvoice_number = nil
+	delete(m.clearedFields, invoice.FieldInvoiceNumber)
 }
 
 // SetCompanyID sets the "company_id" field.
@@ -14884,7 +15043,10 @@ func (m *InvoiceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *InvoiceMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 18)
+	if m.invoice_number != nil {
+		fields = append(fields, invoice.FieldInvoiceNumber)
+	}
 	if m.company_id != nil {
 		fields = append(fields, invoice.FieldCompanyID)
 	}
@@ -14944,6 +15106,8 @@ func (m *InvoiceMutation) Fields() []string {
 // schema.
 func (m *InvoiceMutation) Field(name string) (ent.Value, bool) {
 	switch name {
+	case invoice.FieldInvoiceNumber:
+		return m.InvoiceNumber()
 	case invoice.FieldCompanyID:
 		return m.CompanyID()
 	case invoice.FieldCustomerID:
@@ -14987,6 +15151,8 @@ func (m *InvoiceMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *InvoiceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
+	case invoice.FieldInvoiceNumber:
+		return m.OldInvoiceNumber(ctx)
 	case invoice.FieldCompanyID:
 		return m.OldCompanyID(ctx)
 	case invoice.FieldCustomerID:
@@ -15030,6 +15196,13 @@ func (m *InvoiceMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *InvoiceMutation) SetField(name string, value ent.Value) error {
 	switch name {
+	case invoice.FieldInvoiceNumber:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInvoiceNumber(v)
+		return nil
 	case invoice.FieldCompanyID:
 		v, ok := value.(int64)
 		if !ok {
@@ -15157,6 +15330,9 @@ func (m *InvoiceMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *InvoiceMutation) AddedFields() []string {
 	var fields []string
+	if m.addinvoice_number != nil {
+		fields = append(fields, invoice.FieldInvoiceNumber)
+	}
 	if m.addcompany_id != nil {
 		fields = append(fields, invoice.FieldCompanyID)
 	}
@@ -15180,6 +15356,8 @@ func (m *InvoiceMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *InvoiceMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case invoice.FieldInvoiceNumber:
+		return m.AddedInvoiceNumber()
 	case invoice.FieldCompanyID:
 		return m.AddedCompanyID()
 	case invoice.FieldCustomerID:
@@ -15199,6 +15377,13 @@ func (m *InvoiceMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *InvoiceMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case invoice.FieldInvoiceNumber:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddInvoiceNumber(v)
+		return nil
 	case invoice.FieldCompanyID:
 		v, ok := value.(int64)
 		if !ok {
@@ -15242,6 +15427,9 @@ func (m *InvoiceMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *InvoiceMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(invoice.FieldInvoiceNumber) {
+		fields = append(fields, invoice.FieldInvoiceNumber)
+	}
 	if m.FieldCleared(invoice.FieldCompanyID) {
 		fields = append(fields, invoice.FieldCompanyID)
 	}
@@ -15274,6 +15462,9 @@ func (m *InvoiceMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *InvoiceMutation) ClearField(name string) error {
 	switch name {
+	case invoice.FieldInvoiceNumber:
+		m.ClearInvoiceNumber()
+		return nil
 	case invoice.FieldCompanyID:
 		m.ClearCompanyID()
 		return nil
@@ -15300,6 +15491,9 @@ func (m *InvoiceMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *InvoiceMutation) ResetField(name string) error {
 	switch name {
+	case invoice.FieldInvoiceNumber:
+		m.ResetInvoiceNumber()
+		return nil
 	case invoice.FieldCompanyID:
 		m.ResetCompanyID()
 		return nil

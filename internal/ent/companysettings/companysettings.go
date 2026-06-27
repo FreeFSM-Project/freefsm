@@ -35,6 +35,8 @@ const (
 	FieldDefaultTaxRate = "default_tax_rate"
 	// FieldInvoicePrefix holds the string denoting the invoice_prefix field in the database.
 	FieldInvoicePrefix = "invoice_prefix"
+	// FieldNextInvoiceNumber holds the string denoting the next_invoice_number field in the database.
+	FieldNextInvoiceNumber = "next_invoice_number"
 	// FieldEstimatePrefix holds the string denoting the estimate_prefix field in the database.
 	FieldEstimatePrefix = "estimate_prefix"
 	// FieldDefaultDueDays holds the string denoting the default_due_days field in the database.
@@ -105,6 +107,7 @@ var Columns = []string{
 	FieldTaxID,
 	FieldDefaultTaxRate,
 	FieldInvoicePrefix,
+	FieldNextInvoiceNumber,
 	FieldEstimatePrefix,
 	FieldDefaultDueDays,
 	FieldSMTPHost,
@@ -164,6 +167,8 @@ var (
 	DefaultDefaultTaxRate string
 	// DefaultInvoicePrefix holds the default value on creation for the "invoice_prefix" field.
 	DefaultInvoicePrefix string
+	// DefaultNextInvoiceNumber holds the default value on creation for the "next_invoice_number" field.
+	DefaultNextInvoiceNumber int64
 	// DefaultEstimatePrefix holds the default value on creation for the "estimate_prefix" field.
 	DefaultEstimatePrefix string
 	// DefaultDefaultDueDays holds the default value on creation for the "default_due_days" field.
@@ -281,6 +286,11 @@ func ByDefaultTaxRate(opts ...sql.OrderTermOption) OrderOption {
 // ByInvoicePrefix orders the results by the invoice_prefix field.
 func ByInvoicePrefix(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldInvoicePrefix, opts...).ToFunc()
+}
+
+// ByNextInvoiceNumber orders the results by the next_invoice_number field.
+func ByNextInvoiceNumber(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNextInvoiceNumber, opts...).ToFunc()
 }
 
 // ByEstimatePrefix orders the results by the estimate_prefix field.

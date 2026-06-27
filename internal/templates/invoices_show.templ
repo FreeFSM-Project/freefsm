@@ -3,7 +3,7 @@ package templates
 import "fmt"
 
 templ InvoiceShow(p InvoiceDetail) {
-	@Layout(invoicePrefix(ctx)+fmt.Sprintf("%05d", p.ID)+": "+p.Title) {
+	@Layout(invoiceNumber(ctx, p.Number)+": "+p.Title) {
 		<div class="work-item-detail">
 		if p.ArchivedAt == "" {
 			<div class="work-item-detail-actions">
@@ -44,6 +44,7 @@ templ InvoiceShow(p InvoiceDetail) {
 		<table class="work-item-detail-meta">
 			<tbody>
 				<tr><th>Customer</th><td><a href={ templ.URL(fmt.Sprintf("/customers/%d", p.CustomerID)) }>{ p.Customer }</a></td></tr>
+				<tr><th>Invoice Number</th><td>{ invoiceNumber(ctx, p.Number) }</td></tr>
 				if p.AssetID > 0 {
 					<tr><th>Asset</th><td><a href={ templ.URL(fmt.Sprintf("/assets/%d", p.AssetID)) }>{ p.AssetName }</a></td></tr>
 				}

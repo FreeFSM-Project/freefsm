@@ -109,6 +109,11 @@ func InvoicePrefix(v string) predicate.CompanySettings {
 	return predicate.CompanySettings(sql.FieldEQ(FieldInvoicePrefix, v))
 }
 
+// NextInvoiceNumber applies equality check predicate on the "next_invoice_number" field. It's identical to NextInvoiceNumberEQ.
+func NextInvoiceNumber(v int64) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldNextInvoiceNumber, v))
+}
+
 // EstimatePrefix applies equality check predicate on the "estimate_prefix" field. It's identical to EstimatePrefixEQ.
 func EstimatePrefix(v string) predicate.CompanySettings {
 	return predicate.CompanySettings(sql.FieldEQ(FieldEstimatePrefix, v))
@@ -937,6 +942,46 @@ func InvoicePrefixEqualFold(v string) predicate.CompanySettings {
 // InvoicePrefixContainsFold applies the ContainsFold predicate on the "invoice_prefix" field.
 func InvoicePrefixContainsFold(v string) predicate.CompanySettings {
 	return predicate.CompanySettings(sql.FieldContainsFold(FieldInvoicePrefix, v))
+}
+
+// NextInvoiceNumberEQ applies the EQ predicate on the "next_invoice_number" field.
+func NextInvoiceNumberEQ(v int64) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldEQ(FieldNextInvoiceNumber, v))
+}
+
+// NextInvoiceNumberNEQ applies the NEQ predicate on the "next_invoice_number" field.
+func NextInvoiceNumberNEQ(v int64) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNEQ(FieldNextInvoiceNumber, v))
+}
+
+// NextInvoiceNumberIn applies the In predicate on the "next_invoice_number" field.
+func NextInvoiceNumberIn(vs ...int64) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldIn(FieldNextInvoiceNumber, vs...))
+}
+
+// NextInvoiceNumberNotIn applies the NotIn predicate on the "next_invoice_number" field.
+func NextInvoiceNumberNotIn(vs ...int64) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldNotIn(FieldNextInvoiceNumber, vs...))
+}
+
+// NextInvoiceNumberGT applies the GT predicate on the "next_invoice_number" field.
+func NextInvoiceNumberGT(v int64) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGT(FieldNextInvoiceNumber, v))
+}
+
+// NextInvoiceNumberGTE applies the GTE predicate on the "next_invoice_number" field.
+func NextInvoiceNumberGTE(v int64) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldGTE(FieldNextInvoiceNumber, v))
+}
+
+// NextInvoiceNumberLT applies the LT predicate on the "next_invoice_number" field.
+func NextInvoiceNumberLT(v int64) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLT(FieldNextInvoiceNumber, v))
+}
+
+// NextInvoiceNumberLTE applies the LTE predicate on the "next_invoice_number" field.
+func NextInvoiceNumberLTE(v int64) predicate.CompanySettings {
+	return predicate.CompanySettings(sql.FieldLTE(FieldNextInvoiceNumber, v))
 }
 
 // EstimatePrefixEQ applies the EQ predicate on the "estimate_prefix" field.

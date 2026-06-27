@@ -2,8 +2,11 @@ package handlers
 
 import (
 	"bytes"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/MartialM1nd/freefsm/internal/ent"
 	"github.com/MartialM1nd/freefsm/internal/templates"
@@ -88,4 +91,21 @@ func formPtr(v string) *string {
 		return nil
 	}
 	return &v
+}
+
+func parseOptionalPositiveInt64(v, label string) (*int64, error) {
+	v = strings.TrimSpace(v)
+	if v == "" {
+		return nil, nil
+	}
+	return parseRequiredPositiveInt64(v, label)
+}
+
+func parseRequiredPositiveInt64(v, label string) (*int64, error) {
+	v = strings.TrimSpace(v)
+	n, err := strconv.ParseInt(v, 10, 64)
+	if err != nil || n <= 0 {
+		return nil, fmt.Errorf("%s must be a positive number", label)
+	}
+	return &n, nil
 }

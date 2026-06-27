@@ -195,6 +195,27 @@ func (_u *CompanySettingsUpdate) SetNillableInvoicePrefix(v *string) *CompanySet
 	return _u
 }
 
+// SetNextInvoiceNumber sets the "next_invoice_number" field.
+func (_u *CompanySettingsUpdate) SetNextInvoiceNumber(v int64) *CompanySettingsUpdate {
+	_u.mutation.ResetNextInvoiceNumber()
+	_u.mutation.SetNextInvoiceNumber(v)
+	return _u
+}
+
+// SetNillableNextInvoiceNumber sets the "next_invoice_number" field if the given value is not nil.
+func (_u *CompanySettingsUpdate) SetNillableNextInvoiceNumber(v *int64) *CompanySettingsUpdate {
+	if v != nil {
+		_u.SetNextInvoiceNumber(*v)
+	}
+	return _u
+}
+
+// AddNextInvoiceNumber adds value to the "next_invoice_number" field.
+func (_u *CompanySettingsUpdate) AddNextInvoiceNumber(v int64) *CompanySettingsUpdate {
+	_u.mutation.AddNextInvoiceNumber(v)
+	return _u
+}
+
 // SetEstimatePrefix sets the "estimate_prefix" field.
 func (_u *CompanySettingsUpdate) SetEstimatePrefix(v string) *CompanySettingsUpdate {
 	_u.mutation.SetEstimatePrefix(v)
@@ -647,6 +668,12 @@ func (_u *CompanySettingsUpdate) sqlSave(ctx context.Context) (_node int, err er
 	if value, ok := _u.mutation.InvoicePrefix(); ok {
 		_spec.SetField(companysettings.FieldInvoicePrefix, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.NextInvoiceNumber(); ok {
+		_spec.SetField(companysettings.FieldNextInvoiceNumber, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedNextInvoiceNumber(); ok {
+		_spec.AddField(companysettings.FieldNextInvoiceNumber, field.TypeInt64, value)
+	}
 	if value, ok := _u.mutation.EstimatePrefix(); ok {
 		_spec.SetField(companysettings.FieldEstimatePrefix, field.TypeString, value)
 	}
@@ -915,6 +942,27 @@ func (_u *CompanySettingsUpdateOne) SetNillableInvoicePrefix(v *string) *Company
 	if v != nil {
 		_u.SetInvoicePrefix(*v)
 	}
+	return _u
+}
+
+// SetNextInvoiceNumber sets the "next_invoice_number" field.
+func (_u *CompanySettingsUpdateOne) SetNextInvoiceNumber(v int64) *CompanySettingsUpdateOne {
+	_u.mutation.ResetNextInvoiceNumber()
+	_u.mutation.SetNextInvoiceNumber(v)
+	return _u
+}
+
+// SetNillableNextInvoiceNumber sets the "next_invoice_number" field if the given value is not nil.
+func (_u *CompanySettingsUpdateOne) SetNillableNextInvoiceNumber(v *int64) *CompanySettingsUpdateOne {
+	if v != nil {
+		_u.SetNextInvoiceNumber(*v)
+	}
+	return _u
+}
+
+// AddNextInvoiceNumber adds value to the "next_invoice_number" field.
+func (_u *CompanySettingsUpdateOne) AddNextInvoiceNumber(v int64) *CompanySettingsUpdateOne {
+	_u.mutation.AddNextInvoiceNumber(v)
 	return _u
 }
 
@@ -1399,6 +1447,12 @@ func (_u *CompanySettingsUpdateOne) sqlSave(ctx context.Context) (_node *Company
 	}
 	if value, ok := _u.mutation.InvoicePrefix(); ok {
 		_spec.SetField(companysettings.FieldInvoicePrefix, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.NextInvoiceNumber(); ok {
+		_spec.SetField(companysettings.FieldNextInvoiceNumber, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedNextInvoiceNumber(); ok {
+		_spec.AddField(companysettings.FieldNextInvoiceNumber, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.EstimatePrefix(); ok {
 		_spec.SetField(companysettings.FieldEstimatePrefix, field.TypeString, value)

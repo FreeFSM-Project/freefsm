@@ -73,12 +73,14 @@ func TestFileServiceTargetExistsRejectsArchivedTargets(t *testing.T) {
 			name:       "invoice",
 			objectType: "invoice",
 			activeID: client.Invoice.Create().
+				SetInvoiceNumber(9001).
 				SetCustomerID(activeCustomer.ID).
 				SetTitle("Active Invoice").
 				SetInvoiceDate(now).
 				SetDueDate(now).
 				SaveX(ctx).ID,
 			archivedID: client.Invoice.Create().
+				SetInvoiceNumber(9002).
 				SetCustomerID(activeCustomer.ID).
 				SetTitle("Archived Invoice").
 				SetInvoiceDate(now).

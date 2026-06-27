@@ -295,6 +295,7 @@ func Seed(ctx context.Context, client *ent.Client) error {
 		liJSON, _ := json.Marshal(lineItems)
 
 		invCreate := client.Invoice.Create().
+			SetInvoiceNumber(int64(i + 1)).
 			SetTitle(d.Title).
 			SetCustomerID(customers[d.CustIdx].ID).
 			SetJobID(jobs[d.JobIdx].ID).

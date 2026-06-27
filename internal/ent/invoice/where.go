@@ -54,6 +54,11 @@ func IDLTE(id int64) predicate.Invoice {
 	return predicate.Invoice(sql.FieldLTE(FieldID, id))
 }
 
+// InvoiceNumber applies equality check predicate on the "invoice_number" field. It's identical to InvoiceNumberEQ.
+func InvoiceNumber(v int64) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEQ(FieldInvoiceNumber, v))
+}
+
 // CompanyID applies equality check predicate on the "company_id" field. It's identical to CompanyIDEQ.
 func CompanyID(v int64) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldCompanyID, v))
@@ -137,6 +142,56 @@ func CreatedAt(v time.Time) predicate.Invoice {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Invoice {
 	return predicate.Invoice(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// InvoiceNumberEQ applies the EQ predicate on the "invoice_number" field.
+func InvoiceNumberEQ(v int64) predicate.Invoice {
+	return predicate.Invoice(sql.FieldEQ(FieldInvoiceNumber, v))
+}
+
+// InvoiceNumberNEQ applies the NEQ predicate on the "invoice_number" field.
+func InvoiceNumberNEQ(v int64) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNEQ(FieldInvoiceNumber, v))
+}
+
+// InvoiceNumberIn applies the In predicate on the "invoice_number" field.
+func InvoiceNumberIn(vs ...int64) predicate.Invoice {
+	return predicate.Invoice(sql.FieldIn(FieldInvoiceNumber, vs...))
+}
+
+// InvoiceNumberNotIn applies the NotIn predicate on the "invoice_number" field.
+func InvoiceNumberNotIn(vs ...int64) predicate.Invoice {
+	return predicate.Invoice(sql.FieldNotIn(FieldInvoiceNumber, vs...))
+}
+
+// InvoiceNumberGT applies the GT predicate on the "invoice_number" field.
+func InvoiceNumberGT(v int64) predicate.Invoice {
+	return predicate.Invoice(sql.FieldGT(FieldInvoiceNumber, v))
+}
+
+// InvoiceNumberGTE applies the GTE predicate on the "invoice_number" field.
+func InvoiceNumberGTE(v int64) predicate.Invoice {
+	return predicate.Invoice(sql.FieldGTE(FieldInvoiceNumber, v))
+}
+
+// InvoiceNumberLT applies the LT predicate on the "invoice_number" field.
+func InvoiceNumberLT(v int64) predicate.Invoice {
+	return predicate.Invoice(sql.FieldLT(FieldInvoiceNumber, v))
+}
+
+// InvoiceNumberLTE applies the LTE predicate on the "invoice_number" field.
+func InvoiceNumberLTE(v int64) predicate.Invoice {
+	return predicate.Invoice(sql.FieldLTE(FieldInvoiceNumber, v))
+}
+
+// InvoiceNumberIsNil applies the IsNil predicate on the "invoice_number" field.
+func InvoiceNumberIsNil() predicate.Invoice {
+	return predicate.Invoice(sql.FieldIsNull(FieldInvoiceNumber))
+}
+
+// InvoiceNumberNotNil applies the NotNil predicate on the "invoice_number" field.
+func InvoiceNumberNotNil() predicate.Invoice {
+	return predicate.Invoice(sql.FieldNotNull(FieldInvoiceNumber))
 }
 
 // CompanyIDEQ applies the EQ predicate on the "company_id" field.

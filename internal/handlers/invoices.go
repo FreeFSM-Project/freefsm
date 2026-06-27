@@ -191,6 +191,11 @@ func (h *InvoiceHandler) Create(w http.ResponseWriter, r *http.Request) {
 	jobID, _ := strconv.ParseInt(r.FormValue("job_id"), 10, 64)
 	statusID, _ := strconv.ParseInt(r.FormValue("status_id"), 10, 64)
 	lineItems, _ := services.ParseLineItems(r.FormValue("line_items"))
+	invoiceNumber, err := parseOptionalPositiveInt64(r.FormValue("invoice_number"), "invoice number")
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
 	taxRate := r.FormValue("tax_rate")
 	if taxRate == "" {
 		taxRate = "0"
@@ -198,16 +203,17 @@ func (h *InvoiceHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	loc := middleware.CompanyLocation(r.Context())
 	params := services.InvoiceCreateParams{
-		CustomerID:   custID,
-		JobID:        jobID,
-		StatusID:     statusID,
-		Title:        r.FormValue("title"),
-		Notes:        r.FormValue("notes"),
-		InvoiceDate:  parseDate(r.FormValue("invoice_date"), loc),
-		DueDate:      parseDate(r.FormValue("due_date"), loc),
-		TaxRate:      taxRate,
-		LineItems:    lineItems,
-		CustomFields: parseCustomFieldValues(r),
+		InvoiceNumber: invoiceNumber,
+		CustomerID:    custID,
+		JobID:         jobID,
+		StatusID:      statusID,
+		Title:         r.FormValue("title"),
+		Notes:         r.FormValue("notes"),
+		InvoiceDate:   parseDate(r.FormValue("invoice_date"), loc),
+		DueDate:       parseDate(r.FormValue("due_date"), loc),
+		TaxRate:       taxRate,
+		LineItems:     lineItems,
+		CustomFields:  parseCustomFieldValues(r),
 	}
 	if params.LineItems == nil {
 		params.LineItems = []services.LineItem{}
@@ -252,6 +258,11 @@ func (h *InvoiceHandler) Update(w http.ResponseWriter, r *http.Request) {
 	jobID, _ := strconv.ParseInt(r.FormValue("job_id"), 10, 64)
 	statusID, _ := strconv.ParseInt(r.FormValue("status_id"), 10, 64)
 	lineItems, _ := services.ParseLineItems(r.FormValue("line_items"))
+	invoiceNumber, err := parseRequiredPositiveInt64(r.FormValue("invoice_number"), "invoice number")
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
 	taxRate := r.FormValue("tax_rate")
 	taxRatePtr := formPtr(taxRate)
 	if taxRate == "" {
@@ -260,12 +271,13 @@ func (h *InvoiceHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := services.InvoiceUpdateParams{
-		CustomerID: int64Ptr(custID),
-		JobID:      &jobID,
-		StatusID:   int64Ptr(statusID),
-		Title:      formPtr(r.FormValue("title")),
-		Notes:      formPtr(r.FormValue("notes")),
-		TaxRate:    taxRatePtr,
+		InvoiceNumber: invoiceNumber,
+		CustomerID:    int64Ptr(custID),
+		JobID:         &jobID,
+		StatusID:      int64Ptr(statusID),
+		Title:         formPtr(r.FormValue("title")),
+		Notes:         formPtr(r.FormValue("notes")),
+		TaxRate:       taxRatePtr,
 	}
 	loc := middleware.CompanyLocation(r.Context())
 	if d := r.FormValue("invoice_date"); d != "" {
@@ -433,6 +445,7 @@ func (h *InvoiceHandler) formDataFromInvoice(ctx context.Context, i *ent.Invoice
 func invoiceToDetail(i *ent.Invoice, statuses []*ent.Status) templates.InvoiceDetail {
 	d := templates.InvoiceDetail{
 		ID:          i.ID,
+		Number:      i.InvoiceNumber,
 		CustomerID:  invCustID(i),
 		StatusID:    invStatusID(i),
 		StatusName:  statusName(statuses, i.StatusID),
@@ -459,6 +472,7 @@ func invoiceToDetail(i *ent.Invoice, statuses []*ent.Status) templates.InvoiceDe
 func invoiceRow(i *ent.Invoice, statuses []*ent.Status, custMap map[int64]string) templates.InvoiceRow {
 	r := templates.InvoiceRow{
 		ID:          i.ID,
+		Number:      i.InvoiceNumber,
 		Title:       i.Title,
 		CustomerID:  invCustID(i),
 		Customer:    custMap[invCustID(i)],
@@ -818,7 +832,7 @@ func (h *InvoiceHandler) invoicePDFDocument(ctx context.Context, id int64) (docu
 		customerName = customer.DisplayName
 	}
 	jobName, jobType, jobSubtitle := documentJobFields(job)
-	number := fmt.Sprintf("INV-%05d", id)
+	number := services.FormatInvoiceNumber(i.InvoiceNumber, middleware.CompanyFromContext(ctx))
 	date := time.Now().In(middleware.CompanyLocation(ctx)).Format("Jan 2, 2006")
 	return documentPDF{Filename: number + ".pdf", Data: data, Title: i.Title, Number: number, CustomerEmail: to, CustomerName: customerName, JobName: jobName, JobType: jobType, JobSubtitle: jobSubtitle, Date: date, Archived: i.DeletedAt != nil}, nil
 }

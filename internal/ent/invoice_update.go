@@ -28,6 +28,33 @@ func (_u *InvoiceUpdate) Where(ps ...predicate.Invoice) *InvoiceUpdate {
 	return _u
 }
 
+// SetInvoiceNumber sets the "invoice_number" field.
+func (_u *InvoiceUpdate) SetInvoiceNumber(v int64) *InvoiceUpdate {
+	_u.mutation.ResetInvoiceNumber()
+	_u.mutation.SetInvoiceNumber(v)
+	return _u
+}
+
+// SetNillableInvoiceNumber sets the "invoice_number" field if the given value is not nil.
+func (_u *InvoiceUpdate) SetNillableInvoiceNumber(v *int64) *InvoiceUpdate {
+	if v != nil {
+		_u.SetInvoiceNumber(*v)
+	}
+	return _u
+}
+
+// AddInvoiceNumber adds value to the "invoice_number" field.
+func (_u *InvoiceUpdate) AddInvoiceNumber(v int64) *InvoiceUpdate {
+	_u.mutation.AddInvoiceNumber(v)
+	return _u
+}
+
+// ClearInvoiceNumber clears the value of the "invoice_number" field.
+func (_u *InvoiceUpdate) ClearInvoiceNumber() *InvoiceUpdate {
+	_u.mutation.ClearInvoiceNumber()
+	return _u
+}
+
 // SetCompanyID sets the "company_id" field.
 func (_u *InvoiceUpdate) SetCompanyID(v int64) *InvoiceUpdate {
 	_u.mutation.ResetCompanyID()
@@ -365,6 +392,15 @@ func (_u *InvoiceUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.InvoiceNumber(); ok {
+		_spec.SetField(invoice.FieldInvoiceNumber, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedInvoiceNumber(); ok {
+		_spec.AddField(invoice.FieldInvoiceNumber, field.TypeInt64, value)
+	}
+	if _u.mutation.InvoiceNumberCleared() {
+		_spec.ClearField(invoice.FieldInvoiceNumber, field.TypeInt64)
+	}
 	if value, ok := _u.mutation.CompanyID(); ok {
 		_spec.SetField(invoice.FieldCompanyID, field.TypeInt64, value)
 	}
@@ -464,6 +500,33 @@ type InvoiceUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *InvoiceMutation
+}
+
+// SetInvoiceNumber sets the "invoice_number" field.
+func (_u *InvoiceUpdateOne) SetInvoiceNumber(v int64) *InvoiceUpdateOne {
+	_u.mutation.ResetInvoiceNumber()
+	_u.mutation.SetInvoiceNumber(v)
+	return _u
+}
+
+// SetNillableInvoiceNumber sets the "invoice_number" field if the given value is not nil.
+func (_u *InvoiceUpdateOne) SetNillableInvoiceNumber(v *int64) *InvoiceUpdateOne {
+	if v != nil {
+		_u.SetInvoiceNumber(*v)
+	}
+	return _u
+}
+
+// AddInvoiceNumber adds value to the "invoice_number" field.
+func (_u *InvoiceUpdateOne) AddInvoiceNumber(v int64) *InvoiceUpdateOne {
+	_u.mutation.AddInvoiceNumber(v)
+	return _u
+}
+
+// ClearInvoiceNumber clears the value of the "invoice_number" field.
+func (_u *InvoiceUpdateOne) ClearInvoiceNumber() *InvoiceUpdateOne {
+	_u.mutation.ClearInvoiceNumber()
+	return _u
 }
 
 // SetCompanyID sets the "company_id" field.
@@ -832,6 +895,15 @@ func (_u *InvoiceUpdateOne) sqlSave(ctx context.Context) (_node *Invoice, err er
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.InvoiceNumber(); ok {
+		_spec.SetField(invoice.FieldInvoiceNumber, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedInvoiceNumber(); ok {
+		_spec.AddField(invoice.FieldInvoiceNumber, field.TypeInt64, value)
+	}
+	if _u.mutation.InvoiceNumberCleared() {
+		_spec.ClearField(invoice.FieldInvoiceNumber, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.CompanyID(); ok {
 		_spec.SetField(invoice.FieldCompanyID, field.TypeInt64, value)
