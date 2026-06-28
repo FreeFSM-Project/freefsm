@@ -374,6 +374,10 @@ func (h *InvoiceHandler) Finalize(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invoice status 'Invoiced' not found", 500)
 		return
 	}
+	if !h.invoiceHasStatus(r.Context(), i, "Draft") {
+		http.Error(w, "only draft invoices can be finalized", http.StatusConflict)
+		return
+	}
 	defaultDueDays := 30
 	if cs := middleware.CompanyFromContext(r.Context()); cs != nil {
 		defaultDueDays = cs.DefaultDueDays
@@ -443,13 +447,15 @@ func (h *InvoiceHandler) formDataFromInvoice(ctx context.Context, i *ent.Invoice
 }
 
 func invoiceToDetail(i *ent.Invoice, statuses []*ent.Status) templates.InvoiceDetail {
+	statusName := statusName(statuses, i.StatusID)
 	d := templates.InvoiceDetail{
 		ID:          i.ID,
 		Number:      i.InvoiceNumber,
 		CustomerID:  invCustID(i),
 		StatusID:    invStatusID(i),
-		StatusName:  statusName(statuses, i.StatusID),
+		StatusName:  statusName,
 		StatusColor: statusColor(statuses, i.StatusID),
+		CanFinalize: strings.EqualFold(statusName, "Draft"),
 		Title:       i.Title,
 		Notes:       i.Notes,
 		TaxRate:     i.TaxRate,

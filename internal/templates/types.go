@@ -493,6 +493,7 @@ type InvoiceDetail struct {
 	StatusID     int64
 	StatusName   string
 	StatusColor  string
+	CanFinalize  bool
 	Title        string
 	Notes        string
 	InvoiceDate  string

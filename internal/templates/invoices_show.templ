@@ -8,10 +8,12 @@ templ InvoiceShow(p InvoiceDetail) {
 		if p.ArchivedAt == "" {
 			<div class="work-item-detail-actions">
 			<div class="work-item-detail-action-group">
+			if p.CanFinalize {
 				<form action={ templ.URL(fmt.Sprintf("/invoices/%d/finalize", p.ID)) } method="post" onsubmit="return confirm('Finalize this invoice? This will set the invoice and due dates from current settings.')">
 					<input type="hidden" name="csrf_token" value={ csrfToken(ctx) }/>
 					<button type="submit" class="outline">Finalize Invoice</button>
 				</form>
+			}
 				<a href={ templ.URL(fmt.Sprintf("/invoices/%d/pdf/preview", p.ID)) } role="button" class="outline">PDF</a>
 				<a href={ templ.URL(fmt.Sprintf("/invoices/%d/edit", p.ID)) } role="button" class="outline" aria-label={ fmt.Sprintf("Edit %s", p.Title) }>Edit</a>
 				<form action={ templ.URL(fmt.Sprintf("/invoices/%d/delete", p.ID)) } method="post" onsubmit="return confirm('Delete this invoice?')">
