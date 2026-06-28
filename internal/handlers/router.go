@@ -139,6 +139,7 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 		r.Route("/items", func(r chi.Router) {
 			r.With(middleware.DispatcherOrAdmin).Get("/", itemHandler.List)
 			r.With(middleware.DispatcherOrAdmin).Get("/activity", activityHandler.ListByType("item"))
+			r.With(middleware.DispatcherOrAdmin).Post("/inline", itemHandler.CreateInline)
 			r.Post("/", itemHandler.Create)
 			r.With(middleware.DispatcherOrAdmin).Get("/{id}", func(w http.ResponseWriter, r *http.Request) {
 				if chi.URLParam(r, "id") == "new" {

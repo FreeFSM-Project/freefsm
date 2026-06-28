@@ -60,6 +60,7 @@ templ InvoiceShow(p InvoiceDetail) {
 				<thead>
 					<tr>
 						<th>Item</th>
+						<th>Description</th>
 						<th>Qty</th>
 						<th>Price</th>
 						<th>Tax</th>
@@ -70,6 +71,7 @@ templ InvoiceShow(p InvoiceDetail) {
 					for _, li := range p.LineItems {
 						<tr>
 							<td>{ li.Title }</td>
+							<td>{ li.Description }</td>
 							<td>{ fmt.Sprintf("%d", li.Quantity) }</td>
 							<td>{ fmt.Sprintf("$%.2f", li.UnitPrice) }</td>
 							<td>

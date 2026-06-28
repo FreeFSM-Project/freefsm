@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -110,6 +111,54 @@ func (h *ItemHandler) Create(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	http.Redirect(w, r, "/items?flash=Item+created", http.StatusSeeOther)
+}
+
+func (h *ItemHandler) CreateInline(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "invalid form", 400)
+		return
+	}
+
+	result, err := h.svc.Create(r.Context(), services.ItemCreateParams{
+		Name:           r.FormValue("name"),
+		Type:           "product",
+		UnitPrice:      parseFloat(r.FormValue("unit_price")),
+		Taxable:        r.FormValue("taxable") == "true",
+		TaxRate:        r.FormValue("tax_rate"),
+		TrackInventory: false,
+		Description:    r.FormValue("description"),
+		IsActive:       true,
+	})
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	u, _ := middleware.UserFromContext(r.Context())
+	if u != nil {
+		h.activitySvc.Record(r.Context(), u.ID, "created", "item", result.ID, map[string]interface{}{
+			"entity_name": result.Name,
+			"actor_name":  u.Name,
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(struct {
+		ID          int64   `json:"id"`
+		Name        string  `json:"name"`
+		Description string  `json:"description"`
+		UnitPrice   float64 `json:"unit_price"`
+		Taxable     bool    `json:"taxable"`
+		TaxRate     string  `json:"tax_rate"`
+	}{
+		ID:          result.ID,
+		Name:        result.Name,
+		Description: result.Description,
+		UnitPrice:   result.UnitPrice,
+		Taxable:     result.Taxable,
+		TaxRate:     result.TaxRate,
+	})
 }
 
 func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {

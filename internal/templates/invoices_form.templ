@@ -76,6 +76,7 @@ templ InvoiceForm(p InvoiceFormPageData) {
 						const catalog = JSON.parse(document.getElementById('items-catalog').textContent || '[]');
 						const existing = JSON.parse(document.getElementById('existing-items').textContent || '[]');
 						const makeItem = () => ({ item_id: 0, title: '', description: '', unit_price: 0, quantity: 1, taxable: false, tax_rate: '', discount: 0, surcharge: 0 });
+						const makeNewItem = () => ({ name: '', description: '', unit_price: 0, taxable: false, tax_rate: '' });
 						existing.forEach(i => {
 							if (!i.quantity) i.quantity = 1;
 							i.item_id = Number(i.item_id) || 0;
@@ -87,12 +88,53 @@ templ InvoiceForm(p InvoiceFormPageData) {
 						return {
 							items: existing.length ? existing : [makeItem()],
 							catalog: catalog,
+							newItem: makeNewItem(),
+							showCreateItem: false,
+							creatingItem: false,
+							createItemError: '',
 							add() { this.items.push(makeItem()); },
 							remove(index) { this.items.splice(index, 1); },
+							applyCatalogItem(item, c) {
+								item.item_id = Number(c.id) || 0;
+								item.title = c.name;
+								item.description = c.description || '';
+								item.unit_price = Number(c.unit_price) || 0;
+								item.taxable = Boolean(c.taxable);
+								item.tax_rate = c.tax_rate || '';
+							},
 							selectItem(index, itemID) {
 								this.items[index].item_id = Number(itemID) || 0;
 								const c = catalog.find(f => f.id == itemID);
-								if (c) { this.items[index].title = c.name; this.items[index].description = c.description; this.items[index].unit_price = c.unit_price; this.items[index].taxable = c.taxable; this.items[index].tax_rate = c.tax_rate; }
+								if (c) this.applyCatalogItem(this.items[index], c);
+							},
+							async createItem() {
+								this.createItemError = '';
+								if (!this.newItem.name.trim()) {
+									this.createItemError = 'Item name is required.';
+									return;
+								}
+								this.creatingItem = true;
+								try {
+									const body = new URLSearchParams();
+									body.set('name', this.newItem.name);
+									body.set('description', this.newItem.description || '');
+									body.set('unit_price', this.newItem.unit_price || 0);
+									body.set('taxable', this.newItem.taxable ? 'true' : 'false');
+									body.set('tax_rate', this.newItem.tax_rate || '');
+									const csrf = document.querySelector('meta[name="csrf-token"]');
+									const res = await fetch('/items/inline', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-Token': csrf ? csrf.content : '' }, body });
+									if (!res.ok) throw new Error((await res.text()) || 'Unable to create item.');
+									const created = await res.json();
+									this.catalog.push(created);
+									const item = makeItem();
+									this.applyCatalogItem(item, created);
+									this.items.push(item);
+									this.newItem = makeNewItem();
+								} catch (err) {
+									this.createItemError = err.message || 'Unable to create item.';
+								} finally {
+									this.creatingItem = false;
+								}
 							},
 							lineTotal(item) { return (item.unit_price * item.quantity) - (item.discount || 0) + (item.surcharge || 0); },
 							get subtotal() { return this.items.reduce((s, i) => s + (i.unit_price * i.quantity), 0); },
@@ -110,6 +152,7 @@ templ InvoiceForm(p InvoiceFormPageData) {
 					<thead>
 						<tr>
 							<th>Item</th>
+							<th>Description</th>
 							<th>Qty</th>
 							<th>Price</th>
 							<th>Tax</th>
@@ -128,6 +171,7 @@ templ InvoiceForm(p InvoiceFormPageData) {
 										</template>
 									</select>
 								</td>
+								<td><textarea x-model="item.description" rows="2" placeholder="Line item description"></textarea></td>
 								<td><input type="number" x-model="item.quantity" min="1" class="input-width-70"></td>
 								<td><input type="number" x-model="item.unit_price" step="0.01" class="input-width-100"></td>
 								<td>
@@ -144,7 +188,37 @@ templ InvoiceForm(p InvoiceFormPageData) {
 						</template>
 					</tbody>
 				</table>
-				<button @click.prevent="add()" class="outline">+ Add Item</button>
+				<div class="line-item-actions">
+					<button @click.prevent="add()" class="outline">Add Item</button>
+					<button @click.prevent="showCreateItem = !showCreateItem" class="outline" x-text="showCreateItem ? 'Cancel' : 'Create Item'"></button>
+				</div>
+				<div x-show="showCreateItem">
+					<div class="grid">
+						<label>
+							Name
+							<input type="text" x-model="newItem.name" placeholder="Item name"/>
+						</label>
+						<label>
+							Unit Price
+							<input type="number" x-model="newItem.unit_price" step="0.01" min="0"/>
+						</label>
+					</div>
+					<label>
+						Description
+						<textarea x-model="newItem.description" rows="2"></textarea>
+					</label>
+					<div class="grid">
+						<label>
+							<input type="checkbox" x-model="newItem.taxable"/> Taxable
+						</label>
+						<label>
+							Tax Rate
+							<input type="text" x-model="newItem.tax_rate" placeholder="e.g. 8.25"/>
+						</label>
+					</div>
+					<small class="error-msg" x-text="createItemError" x-show="createItemError"></small>
+					<button @click.prevent="createItem()" class="outline" :aria-busy="creatingItem" x-text="creatingItem ? 'Creating...' : 'Create Item'"></button>
+				</div>
 				<div class="line-item-totals">
 					<p>Subtotal: $<span x-text="subtotal.toFixed(2)"></span></p>
 					<p>Tax: $<span x-text="tax.toFixed(2)"></span></p>

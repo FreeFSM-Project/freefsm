@@ -18,7 +18,7 @@ func NewItemService(client *ent.Client) *ItemService {
 }
 
 func (s *ItemService) ListActive(ctx context.Context) ([]*ent.Item, error) {
-	return s.client.Item.Query().Where(item.IsActive(true)).Order(ent.Asc(item.FieldName)).All(ctx)
+	return s.client.Item.Query().Where(item.IsActive(true), item.DeletedAtIsNil()).Order(ent.Asc(item.FieldName)).All(ctx)
 }
 
 type ItemCreateParams struct {
