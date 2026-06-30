@@ -207,6 +207,8 @@ func New(db *pgxpool.Pool, entClient *ent.Client, sessions *services.SessionServ
 			r.Post("/jobs", jobHandler.Create)
 			r.With(requireActiveObject(entClient, "job")).Get("/jobs/{id}/edit", jobHandler.Update)
 			r.With(requireActiveObject(entClient, "job")).Post("/jobs/{id}", jobHandler.Update)
+			r.With(requireActiveObject(entClient, "job")).Post("/jobs/{id}/create-next-occurrence", jobHandler.CreateNextOccurrence)
+			r.With(requireActiveObject(entClient, "job")).Post("/jobs/{id}/cancel-next-occurrence", jobHandler.CancelNextOccurrence)
 			r.With(requireActiveObject(entClient, "job")).Post("/jobs/{id}/delete", jobHandler.Delete)
 			r.With(requireActiveObject(entClient, "job")).Post("/jobs/{id}/subtasks/{idx}/toggle", jobHandler.ToggleSubtask)
 			r.Post("/schedule/dispatch", scheduleHandler.DispatchUpdate)

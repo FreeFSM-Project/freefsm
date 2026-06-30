@@ -118,6 +118,7 @@ func (h *JobHandler) Show(w http.ResponseWriter, r *http.Request) {
 	}
 	statuses := h.statusesForSelect(r.Context())
 	d := jobToDetail(j, statuses)
+	d.NextOccurrenceStart = time.Now().In(middleware.CompanyLocation(r.Context())).Format("2006-01-02T15:04")
 	if j.CustomerID > 0 {
 		customer, _ := h.custSvc.GetByID(r.Context(), j.CustomerID)
 		if customer != nil {
@@ -401,6 +402,43 @@ func (h *JobHandler) Create(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/jobs?flash=Job+created", http.StatusSeeOther)
 }
 
+func (h *JobHandler) CreateNextOccurrence(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	loc := middleware.CompanyLocation(r.Context())
+	nextStart := time.Now().In(loc)
+	result, err := h.svc.CreateNextOccurrence(r.Context(), id, nextStart)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	u, _ := middleware.UserFromContext(r.Context())
+	if u != nil {
+		h.activitySvc.Record(r.Context(), u.ID, "created_next_occurrence", "job", result.ID, map[string]interface{}{
+			"entity_name":   result.JobType,
+			"actor_name":    u.Name,
+			"source_job_id": id,
+		})
+	}
+	http.Redirect(w, r, fmt.Sprintf("/jobs/%d/edit?pending_next_occurrence=1&flash=Next+occurrence+created", result.ID), http.StatusSeeOther)
+}
+
+func (h *JobHandler) CancelNextOccurrence(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	if err := h.svc.Delete(r.Context(), id); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/jobs?flash=Next+occurrence+cancelled", http.StatusSeeOther)
+}
+
 func (h *JobHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -415,6 +453,7 @@ func (h *JobHandler) Update(w http.ResponseWriter, r *http.Request) {
 		}
 		statuses := h.statusesForSelect(r.Context())
 		fd := h.formDataFromJob(r.Context(), j, statuses)
+		fd.PendingNextOccurrence = r.URL.Query().Get("pending_next_occurrence") == "1"
 		templates.JobForm(fd).Render(r.Context(), w)
 		return
 	}

@@ -358,6 +358,7 @@ type JobDetail struct {
 	StartTime                string
 	EndTime                  string
 	DueDate                  string
+	NextOccurrenceStart      string
 	Notes                    string
 	TechNotes                string
 	FileList                 FileListPageData
@@ -399,6 +400,7 @@ type JobFormPageData struct {
 	ExistingAssignmentsJSON string
 	ExistingSubtasksJSON    string
 	CustomFields            []CustomFieldDisplay
+	PendingNextOccurrence   bool
 }
 
 func customerFormTitle(isNew bool) string {

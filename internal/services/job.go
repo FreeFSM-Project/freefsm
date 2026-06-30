@@ -9,6 +9,8 @@ import (
 	"github.com/MartialM1nd/freefsm/internal/ent"
 	"github.com/MartialM1nd/freefsm/internal/ent/job"
 	"github.com/MartialM1nd/freefsm/internal/ent/jobassignment"
+	"github.com/MartialM1nd/freefsm/internal/ent/status"
+	"github.com/MartialM1nd/freefsm/internal/ent/statusworkflow"
 	"github.com/MartialM1nd/freefsm/internal/ent/user"
 )
 
@@ -300,6 +302,122 @@ func (s *JobService) Create(ctx context.Context, params JobCreateParams) (*ent.J
 		return nil, err
 	}
 	return j, nil
+}
+
+func (s *JobService) CreateNextOccurrence(ctx context.Context, sourceID int64, nextStart time.Time) (*ent.Job, error) {
+	if nextStart.IsZero() {
+		return nil, fmt.Errorf("next occurrence start time is required")
+	}
+	source, err := s.GetByID(ctx, sourceID)
+	if err != nil {
+		return nil, err
+	}
+	newStatusID, err := s.newJobStatusID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var delta time.Duration
+	if source.StartTime != nil && !source.StartTime.IsZero() {
+		delta = nextStart.Sub(*source.StartTime)
+	}
+
+	assignments, err := s.Assignments(ctx, source.ID)
+	if err != nil {
+		return nil, err
+	}
+	if len(assignments) == 0 {
+		assignments = ParseAssignments(source.Assignments)
+	}
+	lineItems, err := ParseLineItems(source.LineItems)
+	if err != nil {
+		return nil, fmt.Errorf("parse source job line items: %w", err)
+	}
+
+	params := JobCreateParams{
+		CustomerID:        source.CustomerID,
+		ProjectID:         int64Value(source.ProjectID),
+		LocationID:        int64Value(source.LocationID),
+		CustomerContactID: int64Value(source.CustomerContactID),
+		AssetID:           int64Value(source.AssetID),
+		JobType:           source.JobType,
+		Subtitle:          source.Subtitle,
+		StatusID:          newStatusID,
+		BillingType:       source.BillingType,
+		StartTime:         nextStart,
+		EndTime:           shiftedTime(source.EndTime, delta),
+		DueDate:           shiftedTime(source.DueDate, delta),
+		ArrivalStart:      shiftedTime(source.ArrivalWindowStart, delta),
+		ArrivalEnd:        shiftedTime(source.ArrivalWindowEnd, delta),
+		Notes:             source.Notes,
+		TechNotes:         source.TechNotes,
+		LineItems:         lineItems,
+		Visits:            shiftVisits(ParseVisits(source.Visits), source.StartTime, nextStart),
+		Assignments:       assignments,
+		Subtasks:          resetSubtasks(ParseSubtasks(source.Subtasks)),
+		CustomFields:      source.CustomFields,
+	}
+	if source.StartTime == nil || source.StartTime.IsZero() {
+		params.EndTime = time.Time{}
+		params.DueDate = time.Time{}
+		params.ArrivalStart = time.Time{}
+		params.ArrivalEnd = time.Time{}
+	}
+	return s.Create(ctx, params)
+}
+
+func (s *JobService) newJobStatusID(ctx context.Context) (int64, error) {
+	st, err := s.client.Status.Query().
+		Where(
+			status.NameEqualFold("New"),
+			status.HasWorkflowWith(statusworkflow.ObjectTypeEQ("job")),
+		).
+		Only(ctx)
+	if err != nil {
+		return 0, fmt.Errorf("find New job status: %w", err)
+	}
+	return st.ID, nil
+}
+
+func shiftedTime(t *time.Time, delta time.Duration) time.Time {
+	if t == nil || t.IsZero() {
+		return time.Time{}
+	}
+	return t.Add(delta)
+}
+
+func resetSubtasks(subtasks []JobSubtask) []JobSubtask {
+	for i := range subtasks {
+		subtasks[i].Completed = false
+	}
+	return subtasks
+}
+
+func shiftVisits(visits []JobVisit, sourceStart *time.Time, nextStart time.Time) []JobVisit {
+	if len(visits) == 0 || sourceStart == nil || sourceStart.IsZero() || nextStart.IsZero() {
+		return visits
+	}
+	dateDelta := daysBetween(sourceStart.In(nextStart.Location()), nextStart)
+	if dateDelta == 0 {
+		return visits
+	}
+	for i := range visits {
+		if visits[i].Date == "" {
+			continue
+		}
+		visitDate, err := time.Parse("2006-01-02", visits[i].Date)
+		if err != nil {
+			continue
+		}
+		visits[i].Date = visitDate.AddDate(0, 0, dateDelta).Format("2006-01-02")
+	}
+	return visits
+}
+
+func daysBetween(from, to time.Time) int {
+	fromDate := time.Date(from.Year(), from.Month(), from.Day(), 0, 0, 0, 0, time.UTC)
+	toDate := time.Date(to.Year(), to.Month(), to.Day(), 0, 0, 0, 0, time.UTC)
+	return int(toDate.Sub(fromDate).Hours() / 24)
 }
 
 func (s *JobService) Update(ctx context.Context, id int64, params JobUpdateParams) (*ent.Job, error) {

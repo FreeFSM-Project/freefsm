@@ -177,7 +177,11 @@ templ JobForm(p JobFormPageData) {
 			</fieldset>
 			<div class="entity-form-actions">
 				<button type="submit">Save</button>
-				<a href="/jobs" role="button" class="outline">Cancel</a>
+				if p.PendingNextOccurrence {
+					<button type="submit" class="outline" formaction={ templ.URL(fmt.Sprintf("/jobs/%d/cancel-next-occurrence", p.Job.ID)) } formmethod="post" formnovalidate>Cancel</button>
+				} else {
+					<a href="/jobs" role="button" class="outline">Cancel</a>
+				}
 			</div>
 		</form>
 		@templ.Raw(`<script>
