@@ -1001,6 +1001,13 @@ func badgeStyle(color string) string {
 	return "background:" + hexToRGBA(color, 0.15) + ";color:" + color + ";border-color:" + color
 }
 
+func scheduleJobAccentStyle(color string) string {
+	if color == "" {
+		return ""
+	}
+	return "border-left-color:" + color + ";background:" + hexToRGBA(color, 0.08)
+}
+
 func today(ctx context.Context) string {
 	return time.Now().In(middleware.CompanyLocation(ctx)).Format("2006-01-02")
 }
@@ -1042,7 +1049,9 @@ type CalendarJob struct {
 	Duration    int
 	JobType     string
 	Customer    string
+	Address     string
 	Time        string
+	TimeRange   string
 	Date        string
 	DateISO     string
 	StatusName  string
@@ -1125,8 +1134,6 @@ type SchedulePageData struct {
 	PrevDate        string
 	NextDate        string
 	Date            string
-	StartDate       string
-	EndDate         string
 	IsMonth         bool
 	IsWeek          bool
 	IsDay           bool

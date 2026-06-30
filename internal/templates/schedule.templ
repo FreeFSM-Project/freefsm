@@ -32,7 +32,13 @@ templ SchedulePage(p SchedulePageData) {
 					<div class="schedule-toolbar-periods" aria-hidden="true"></div>
 				}
 				<div class="schedule-title-nav">
-					if p.IsMonth {
+					if p.IsList {
+						<div class="schedule-date-arrows">
+							<a href={ templ.URL(fmt.Sprintf("/schedule?tab=list&period=%s&date=%s", p.Period, p.PrevDate)) } role="button" class="outline">&larr;</a>
+							<a href={ templ.URL(fmt.Sprintf("/schedule?tab=list&period=%s&date=%s", p.Period, p.NextDate)) } role="button" class="outline">&rarr;</a>
+						</div>
+						<h3>{ p.Title }</h3>
+					} else if p.IsMonth {
 						<div class="schedule-date-arrows">
 							<a href={ templ.URL(fmt.Sprintf("/schedule?tab=calendar&period=month&year=%d&month=%d", p.PrevYear, p.PrevMonth)) } role="button" class="outline">&larr;</a>
 							<a href={ templ.URL(fmt.Sprintf("/schedule?tab=calendar&period=month&year=%d&month=%d", p.NextYear, p.NextMonth)) } role="button" class="outline">&rarr;</a>
@@ -97,7 +103,7 @@ templ SchedulePage(p SchedulePageData) {
 				});
 			</script>
 		}
-		if p.IsMonth || p.IsWeek || p.IsDay {
+		if p.IsMonth || p.IsWeek || p.IsDay || (p.IsList && p.Period == "week") {
 			<script>
 				function scheduleCalendarDrag(event) {
 					event.dataTransfer.setData('text/plain', event.currentTarget.dataset.jobId);
@@ -141,17 +147,9 @@ templ SchedulePage(p SchedulePageData) {
 }
 
 templ listView(p SchedulePageData) {
-	<form action="/schedule" method="get" class="schedule-list-filter">
-		<input type="hidden" name="view" value="list"/>
-		<input type="hidden" name="period" value={ p.Period }/>
-		<label>Start
-			<input type="date" name="start" value={ p.StartDate }/>
-		</label>
-		<label>End
-			<input type="date" name="end" value={ p.EndDate }/>
-		</label>
-		<button type="submit">Apply</button>
-	</form>
+	if p.Period == "week" {
+		@scheduleListWeekView(p)
+	} else {
 	<table>
 		<thead>
 			<tr>
@@ -177,6 +175,31 @@ templ listView(p SchedulePageData) {
 			}
 		</tbody>
 	</table>
+	}
+}
+
+templ scheduleListWeekView(p SchedulePageData) {
+	<div class="schedule-list-week-wrapper">
+		<div class="schedule-list-week">
+			for _, day := range p.Days {
+				<div class={ "schedule-list-week-header", "today", day.IsToday }>
+					{ day.DayName }<br/><strong>{ fmt.Sprintf("%d", day.DayNum) }</strong>
+				</div>
+			}
+			for _, day := range p.Days {
+				<div class={ "schedule-list-week-day", "calendar-drop-slot", "today", day.IsToday } data-date={ day.Date } ondragover="scheduleCalendarDragOver(event)" ondragleave="scheduleCalendarDragLeave(event)" ondrop="scheduleCalendarDrop(event, this)">
+					for _, j := range day.Jobs {
+						<a href={ templ.URL(fmt.Sprintf("/jobs/%d", j.ID)) } class="schedule-list-week-card" draggable="true" data-job-id={ fmt.Sprintf("%d", j.ID) } data-date={ j.DateISO } data-duration={ fmt.Sprintf("%d", j.Duration) } ondragstart="scheduleCalendarDrag(event)" style={ scheduleJobAccentStyle(j.StatusColor) }>
+							<span class="schedule-list-week-card-time">{ j.TimeRange }</span>
+							<strong class="schedule-list-week-card-title">{ j.JobType }</strong>
+							<span class="schedule-list-week-card-meta">{ j.Customer }</span>
+							<span class="schedule-list-week-card-address">{ j.Address }</span>
+						</a>
+					}
+				</div>
+			}
+		</div>
+	</div>
 }
 
 templ monthView(p SchedulePageData) {

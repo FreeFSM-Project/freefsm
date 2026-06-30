@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -279,41 +280,27 @@ func (h *ScheduleHandler) Week(w http.ResponseWriter, r *http.Request) {
 
 func (h *ScheduleHandler) List(w http.ResponseWriter, r *http.Request) {
 	loc := middleware.CompanyLocation(r.Context())
-	now := time.Now().In(loc)
 	period := parsePeriod(r, "month")
-	start := parseDateParam(r, "start", loc)
-	if r.URL.Query().Get("start") == "" {
-		start = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc)
-		switch period {
-		case "day":
-		case "week":
-			start, _ = weekRange(start, loc)
-		default:
-			start = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, loc)
-		}
-	}
-	end := parseDateParam(r, "end", loc)
-	if r.URL.Query().Get("end") == "" {
-		switch period {
-		case "day":
-			end = start.AddDate(0, 0, 1).Add(-time.Second)
-		case "week":
-			_, end = weekRange(start, loc)
-		default:
-			end = start.AddDate(0, 1, 0).Add(-time.Second)
-		}
-	}
+	date := parseDateParam(r, "date", loc)
+	start, end := dispatchRange(period, date, loc)
+	prev, next := dispatchPrevNext(period, date)
 
 	jobs, _ := h.jobsByDateRange(r, start, end)
+	jobsData := h.calendarJobs(r, jobs)
+	var days []templates.ScheduleDay
+	if period == "week" {
+		days = h.listWeekDays(r, jobs, start, end, loc)
+	}
 	data := templates.SchedulePageData{
-		Title:     fmt.Sprintf("%s - %s", displayDate(r.Context(), start), displayDate(r.Context(), end)),
-		Tab:       "list",
-		Jobs:      h.calendarJobs(r, jobs),
-		Date:      start.Format("2006-01-02"),
-		StartDate: start.Format("2006-01-02"),
-		EndDate:   end.Format("2006-01-02"),
-		Period:    period,
-		IsList:    true,
+		Title:    scheduleTitle(r.Context(), period, date, start),
+		Tab:      "list",
+		Days:     days,
+		Jobs:     jobsData,
+		PrevDate: prev.Format("2006-01-02"),
+		NextDate: next.Format("2006-01-02"),
+		Date:     date.Format("2006-01-02"),
+		Period:   period,
+		IsList:   true,
 	}
 	templates.SchedulePage(data).Render(r.Context(), w)
 }
@@ -600,6 +587,87 @@ func (h *ScheduleHandler) calendarJobs(r *http.Request, jobs []*ent.Job) []templ
 	return calJobs
 }
 
+func (h *ScheduleHandler) listWeekDays(r *http.Request, jobs []*ent.Job, start, end time.Time, loc *time.Location) []templates.ScheduleDay {
+	custMap := h.customerMapForJobs(r, jobs)
+	statuses, _ := h.statusSvc.ByObjectType(r.Context(), "job")
+	locations := h.locationMapForJobs(r, jobs)
+
+	days := make([]templates.ScheduleDay, 0, 7)
+	for d := start; !d.After(end); d = d.AddDate(0, 0, 1) {
+		day := templates.ScheduleDay{
+			Date:    d.Format("2006-01-02"),
+			DayName: d.Format("Mon"),
+			DayNum:  d.Day(),
+			IsToday: isToday(d, loc),
+		}
+
+		dayJobs := make([]*ent.Job, 0)
+		for _, j := range jobs {
+			if j.StartTime == nil || j.StartTime.IsZero() {
+				continue
+			}
+			jobStart := j.StartTime.In(loc)
+			if jobStart.Year() == d.Year() && jobStart.YearDay() == d.YearDay() {
+				dayJobs = append(dayJobs, j)
+			}
+		}
+		sort.SliceStable(dayJobs, func(i, j int) bool {
+			return dayJobs[i].StartTime.In(loc).Before(dayJobs[j].StartTime.In(loc))
+		})
+		for _, j := range dayJobs {
+			day.Jobs = append(day.Jobs, listWeekCalendarJob(r.Context(), j, custMap, statuses, locations, loc))
+		}
+		days = append(days, day)
+	}
+	return days
+}
+
+func (h *ScheduleHandler) locationMapForJobs(r *http.Request, jobs []*ent.Job) map[int64]*ent.Location {
+	ids := make([]int64, 0)
+	seen := make(map[int64]struct{})
+	for _, j := range jobs {
+		if j.LocationID == nil || *j.LocationID <= 0 {
+			continue
+		}
+		if _, ok := seen[*j.LocationID]; ok {
+			continue
+		}
+		seen[*j.LocationID] = struct{}{}
+		ids = append(ids, *j.LocationID)
+	}
+	locations, _ := h.locSvc.ListByIDs(r.Context(), ids)
+	byID := make(map[int64]*ent.Location, len(locations))
+	for _, l := range locations {
+		byID[l.ID] = l
+	}
+	return byID
+}
+
+func listWeekCalendarJob(ctx context.Context, j *ent.Job, custMap map[int64]string, statuses []*ent.Status, locations map[int64]*ent.Location, loc *time.Location) templates.CalendarJob {
+	cj := calendarJob(ctx, j, custMap, statuses)
+	cj.TimeRange = scheduleJobTimeRange(ctx, j)
+	if j.LocationID != nil {
+		if l := locations[*j.LocationID]; l != nil {
+			cj.Address = services.LocationAddress(l)
+		}
+	}
+	if j.StartTime != nil && !j.StartTime.IsZero() {
+		cj.Hour = j.StartTime.In(loc).Hour()
+	}
+	return cj
+}
+
+func scheduleJobTimeRange(ctx context.Context, j *ent.Job) string {
+	if j.StartTime == nil || j.StartTime.IsZero() {
+		return ""
+	}
+	start := displayTime(ctx, *j.StartTime)
+	if j.EndTime == nil || j.EndTime.IsZero() {
+		return start
+	}
+	return fmt.Sprintf("%s-%s", start, displayTime(ctx, *j.EndTime))
+}
+
 func (h *ScheduleHandler) mapJobs(r *http.Request, jobs []*ent.Job) ([]templates.CalendarJob, string) {
 	if len(jobs) == 0 {
 		return nil, "No scheduled jobs are in the current month."
@@ -739,6 +807,15 @@ func dispatchTitle(ctx context.Context, period string, start, end time.Time) str
 		return fmt.Sprintf("Dispatch: %s", scheduleMonthYearTitle(start))
 	default:
 		return fmt.Sprintf("Dispatch: %s", displayDate(ctx, start))
+	}
+}
+
+func scheduleTitle(ctx context.Context, period string, date, start time.Time) string {
+	switch period {
+	case "month", "week":
+		return scheduleMonthYearTitle(start)
+	default:
+		return displayDate(ctx, date)
 	}
 }
 
