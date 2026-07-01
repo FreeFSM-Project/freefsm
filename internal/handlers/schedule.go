@@ -333,14 +333,18 @@ func (h *ScheduleHandler) List(w http.ResponseWriter, r *http.Request) {
 	jobs, _ := h.jobsByDateRange(r, start, end)
 	jobsData := h.calendarJobs(r, jobs)
 	var days []templates.ScheduleDay
+	var weeks []templates.WeekData
 	if period == "week" {
 		days = h.listWeekDays(r, jobs, start, end, loc)
 	} else if period == "day" {
 		jobsData = h.listDayJobs(r, jobs, loc)
+	} else {
+		weeks = buildMonthGrid(start.Year(), start.Month(), jobsData, loc)
 	}
 	data := templates.SchedulePageData{
 		Title:    scheduleTitle(r.Context(), period, date, start),
 		Tab:      "list",
+		Weeks:    weeks,
 		Days:     days,
 		Jobs:     jobsData,
 		PrevDate: prev.Format("2006-01-02"),
