@@ -998,14 +998,14 @@ func hexToRGBA(hex string, alpha float64) string {
 }
 
 func badgeStyle(color string) string {
-	return "background:" + hexToRGBA(color, 0.15) + ";color:" + color + ";border-color:" + color
+	return "background:" + hexToRGBA(color, 0.10) + ";color:" + color + ";border-color:" + color
 }
 
 func scheduleJobAccentStyle(color string) string {
 	if color == "" {
 		return ""
 	}
-	return "border-left-color:" + color + ";background:" + hexToRGBA(color, 0.08)
+	return "border-left-color:" + color + ";background:" + hexToRGBA(color, 0.30)
 }
 
 func dispatchScheduledJobClass(period string) string {
@@ -1015,9 +1015,12 @@ func dispatchScheduledJobClass(period string) string {
 	return "dispatch-card dispatch-scheduled dispatch-scheduled-card"
 }
 
-func dispatchScheduledJobStyle(color string) string {
+func dispatchScheduledJobStyle(color, period string) string {
 	if color == "" {
 		return ""
+	}
+	if period != "month" {
+		return scheduleJobAccentStyle(color)
 	}
 	return "background:" + color + ";border-color:" + color + ";color:" + readableTextColor(color)
 }
@@ -1054,7 +1057,7 @@ func assigneeBadgeStyle(color string) string {
 	if color == "" {
 		return ""
 	}
-	return "background:" + hexToRGBA(color, 0.16) + ";border-color:" + color + ";color:" + color
+	return "background:" + hexToRGBA(color, 0.25) + ";border-color:" + color + ";color:" + color
 }
 
 func today(ctx context.Context) string {

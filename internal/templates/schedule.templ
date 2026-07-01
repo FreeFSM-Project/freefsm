@@ -321,7 +321,7 @@ templ dispatchView(p SchedulePageData) {
 							for _, cell := range row.Cells {
 			<td class="dispatch-slot" data-user-id={ fmt.Sprintf("%d", row.Tech.ID) } data-date={ cell.Column.Date } data-hour={ func() string { if p.Period == "day" { return fmt.Sprintf("%d", cell.Column.Hour) } else { return "" } }() } ondragover="scheduleDispatchDragOver(event)" ondragleave="scheduleDispatchDragLeave(event)" ondrop="scheduleDispatchDrop(event, this)">
 									for _, j := range cell.Jobs {
-										<a href={ templ.URL(fmt.Sprintf("/jobs/%d", j.ID)) } class={ dispatchScheduledJobClass(p.Period) } draggable="true" data-job-id={ fmt.Sprintf("%d", j.ID) } data-duration={ fmt.Sprintf("%d", j.Duration) } data-hour={ fmt.Sprintf("%d", j.Hour) } ondragstart="scheduleDispatchDrag(event)" style={ dispatchScheduledJobStyle(j.StatusColor) } title={ dispatchScheduledJobLabel(j) } aria-label={ dispatchScheduledJobLabel(j) }>
+										<a href={ templ.URL(fmt.Sprintf("/jobs/%d", j.ID)) } class={ dispatchScheduledJobClass(p.Period) } draggable="true" data-job-id={ fmt.Sprintf("%d", j.ID) } data-duration={ fmt.Sprintf("%d", j.Duration) } data-hour={ fmt.Sprintf("%d", j.Hour) } ondragstart="scheduleDispatchDrag(event)" style={ dispatchScheduledJobStyle(j.StatusColor, p.Period) } title={ dispatchScheduledJobLabel(j) } aria-label={ dispatchScheduledJobLabel(j) }>
 											if p.Period != "month" {
 												<strong>{ j.JobType }</strong>
 												<small>{ j.Customer }</small>
