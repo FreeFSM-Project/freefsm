@@ -393,18 +393,24 @@ func (h *ScheduleHandler) Dispatch(w http.ResponseWriter, r *http.Request) {
 
 func (h *ScheduleHandler) Map(w http.ResponseWriter, r *http.Request) {
 	loc := middleware.CompanyLocation(r.Context())
-	now := time.Now().In(loc)
-	start, end := monthRange(now.Year(), now.Month(), loc)
+	date := parseDateParam(r, "date", loc)
+	start := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, loc)
+	end := start.AddDate(0, 0, 1).Add(-time.Second)
 	jobs, _ := h.jobsByDateRange(r, start, end)
-	mapJobs, emptyMessage := h.mapJobs(r, jobs)
+	jobsData := h.listDayJobs(r, jobs, loc)
+	mapJobs, emptyMessage := h.mapJobs(r, jobs, jobsData)
+	prev := date.AddDate(0, 0, -1)
+	next := date.AddDate(0, 0, 1)
 	data := templates.SchedulePageData{
-		Title:           "Schedule Map",
+		Title:           displayDate(r.Context(), date),
 		Tab:             "map",
-		Period:          "month",
-		Jobs:            h.calendarJobs(r, jobs),
+		Period:          "day",
+		Jobs:            jobsData,
 		MapJobs:         mapJobs,
 		MapEmptyMessage: emptyMessage,
-		Date:            now.Format("2006-01-02"),
+		PrevDate:        prev.Format("2006-01-02"),
+		NextDate:        next.Format("2006-01-02"),
+		Date:            date.Format("2006-01-02"),
 		TileURL:         h.mapTileURL(r),
 		IsMap:           true,
 	}
@@ -810,9 +816,9 @@ func scheduleJobEndTime(ctx context.Context, j *ent.Job) string {
 	return displayTime(ctx, *j.EndTime)
 }
 
-func (h *ScheduleHandler) mapJobs(r *http.Request, jobs []*ent.Job) ([]templates.CalendarJob, string) {
+func (h *ScheduleHandler) mapJobs(r *http.Request, jobs []*ent.Job, calJobs []templates.CalendarJob) ([]templates.CalendarJob, string) {
 	if len(jobs) == 0 {
-		return nil, "No scheduled jobs are in the current month."
+		return nil, "No scheduled jobs are on the selected day."
 	}
 	locationIDs := make([]int64, 0, len(jobs))
 	seen := make(map[int64]struct{})
@@ -829,7 +835,7 @@ func (h *ScheduleHandler) mapJobs(r *http.Request, jobs []*ent.Job) ([]templates
 		locationIDs = append(locationIDs, *j.LocationID)
 	}
 	if jobsWithLocation == 0 {
-		return nil, "Scheduled jobs in this month do not have linked locations yet. Add a job location to show them on the map."
+		return nil, "Scheduled jobs on the selected day do not have linked locations yet. Add a job location to show them on the map."
 	}
 	locations, _ := h.locSvc.ListByIDs(r.Context(), locationIDs)
 	locByID := make(map[int64]*ent.Location, len(locations))
@@ -855,14 +861,21 @@ func (h *ScheduleHandler) mapJobs(r *http.Request, jobs []*ent.Job) ([]templates
 		}
 		locByID[l.ID] = l
 	}
-	calJobs := h.calendarJobs(r, jobs)
 	mapJobs := make([]templates.CalendarJob, 0, len(calJobs))
-	for i, j := range jobs {
+	calJobIndexes := make(map[int64]int, len(calJobs))
+	for i, j := range calJobs {
+		calJobIndexes[j.ID] = i
+	}
+	for _, j := range jobs {
 		if j.LocationID == nil {
 			continue
 		}
 		l := locByID[*j.LocationID]
 		if l == nil || l.Latitude == nil || l.Longitude == nil {
+			continue
+		}
+		i, ok := calJobIndexes[j.ID]
+		if !ok {
 			continue
 		}
 		calJobs[i].Lat = *l.Latitude

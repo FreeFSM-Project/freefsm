@@ -13,7 +13,7 @@ templ SchedulePage(p SchedulePageData) {
 					if canManageOperational(ctx) {
 						<a href={ templ.URL("/schedule?tab=dispatch&period="+func() string { if p.Period != "" { return p.Period } else { return "day" } }()+"&date="+p.Date) } role="button" class={ scheduleTabClass(p.Tab == "dispatch") }>Dispatch</a>
 					}
-					<a href="/schedule?tab=map" role="button" class={ scheduleTabClass(p.Tab == "map") }>Map</a>
+					<a href={ templ.URL("/schedule?tab=map&period=day&date="+p.Date) } role="button" class={ scheduleTabClass(p.Tab == "map") }>Map</a>
 					if canManageOperational(ctx) {
 						<a href="/jobs/new" role="button">New Job</a>
 					}
@@ -54,6 +54,12 @@ templ SchedulePage(p SchedulePageData) {
 						<div class="schedule-date-arrows">
 							<a href={ templ.URL("/schedule?tab=dispatch&period="+p.Period+"&date="+p.PrevDate) } role="button" class="outline">&larr;</a>
 							<a href={ templ.URL("/schedule?tab=dispatch&period="+p.Period+"&date="+p.NextDate) } role="button" class="outline">&rarr;</a>
+						</div>
+						<h3>{ p.Title }</h3>
+					} else if p.IsMap {
+						<div class="schedule-date-arrows">
+							<a href={ templ.URL("/schedule?tab=map&period=day&date="+p.PrevDate) } role="button" class="outline">&larr;</a>
+							<a href={ templ.URL("/schedule?tab=map&period=day&date="+p.NextDate) } role="button" class="outline">&rarr;</a>
 						</div>
 						<h3>{ p.Title }</h3>
 					} else {
@@ -377,13 +383,38 @@ templ dispatchView(p SchedulePageData) {
 }
 
 templ mapView(p SchedulePageData) {
-	<div id="schedule-map" data-tile-url={ p.TileURL } class="schedule-map"></div>
+	<div class="schedule-map-layout">
+		<aside class="schedule-map-list" aria-label="Jobs for selected day">
+			<header>
+				<strong>Jobs</strong>
+			</header>
+			if len(p.Jobs) == 0 {
+				<p class="schedule-empty-cell">No scheduled jobs found for the selected day.</p>
+			}
+			for _, j := range p.Jobs {
+				<a href={ templ.URL(fmt.Sprintf("/jobs/%d", j.ID)) } class="schedule-map-list-card" style={ scheduleJobAccentStyle(j.StatusColor) }>
+					<span class="schedule-map-list-time">{ j.TimeRange }</span>
+					<strong>{ j.JobType }</strong>
+					<span>{ j.Customer }</span>
+					if j.Address != "" {
+						<small>{ j.Address }</small>
+					}
+					if j.Lat == 0 && j.Lng == 0 {
+						<small class="schedule-map-list-muted">No map coordinates yet</small>
+					}
+				</a>
+			}
+		</aside>
+		<div class="schedule-map-panel">
+			<div id="schedule-map" data-tile-url={ p.TileURL } class="schedule-map"></div>
+			if len(p.MapJobs) == 0 {
+				<p class="schedule-map-empty">{ p.MapEmptyMessage }</p>
+			}
+		</div>
+	</div>
 	<div id="schedule-map-markers" hidden>
 		for _, j := range p.MapJobs {
-			<div data-lat={ fmt.Sprintf("%f", j.Lat) } data-lng={ fmt.Sprintf("%f", j.Lng) } data-title={ j.JobType } data-customer={ j.Customer } data-url={ fmt.Sprintf("/jobs/%d", j.ID) }></div>
+			<div data-lat={ fmt.Sprintf("%f", j.Lat) } data-lng={ fmt.Sprintf("%f", j.Lng) } data-title={ j.JobType } data-customer={ j.Customer } data-url={ fmt.Sprintf("/jobs/%d", j.ID) } data-status-color={ j.StatusColor } data-status-name={ j.StatusName }></div>
 		}
 	</div>
-	if len(p.MapJobs) == 0 {
-		<p class="schedule-map-empty">{ p.MapEmptyMessage }</p>
-	}
 }

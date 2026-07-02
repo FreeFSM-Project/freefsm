@@ -1569,6 +1569,68 @@ html[data-theme="dark"] .theme-icon-moon {
   border-radius: var(--pico-border-radius);
 }
 
+.schedule-map-layout {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.9fr) minmax(0, 1.6fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.schedule-map-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.schedule-map-list header {
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+}
+
+.schedule-map-list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--pico-muted-border-color);
+  border-left: 0.35rem solid var(--pico-primary);
+  border-radius: var(--pico-border-radius);
+  color: var(--pico-color);
+  text-decoration: none;
+}
+
+.schedule-map-list-card:hover {
+  text-decoration: none;
+  filter: brightness(0.98);
+}
+
+.schedule-map-list-card span,
+.schedule-map-list-card small {
+  color: var(--pico-muted-color);
+}
+
+.schedule-map-list-time {
+  font-size: 0.78rem;
+}
+
+.schedule-map-list-muted {
+  font-style: italic;
+}
+
+.schedule-map-marker {
+  background: transparent;
+  border: 0;
+}
+
+.schedule-map-marker span {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
 .schedule-map-empty {
   margin-top: 0.75rem;
   color: var(--pico-muted-color);
@@ -1680,6 +1742,10 @@ html[data-theme="dark"] .theme-icon-moon {
   .schedule-list-day-invoice {
     grid-area: invoice;
     justify-self: end;
+  }
+
+  .schedule-map-layout {
+    grid-template-columns: 1fr;
   }
 }
 

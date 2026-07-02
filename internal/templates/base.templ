@@ -72,6 +72,14 @@ templ Layout(title string, children ...templ.Component) {
 							var lng = parseFloat(el.dataset.lng);
 							if (!isFinite(lat) || !isFinite(lng) || (lat === 0 && lng === 0)) return;
 							bounds.push([lat, lng]);
+							var statusColor = el.dataset.statusColor || '#2563EB';
+							var icon = L.divIcon({
+								className: 'schedule-map-marker',
+								html: '<span data-status-color="' + statusColor.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" data-status-name="' + (el.dataset.statusName || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '" style="background:' + statusColor.replace(/[^#a-zA-Z0-9(),.%\s-]/g, '') + '"></span>',
+								iconSize: [22, 22],
+								iconAnchor: [11, 11],
+								popupAnchor: [0, -11]
+							});
 							var popup = document.createElement('div');
 							var link = document.createElement('a');
 							link.href = el.dataset.url;
@@ -81,7 +89,7 @@ templ Layout(title string, children ...templ.Component) {
 							popup.appendChild(link);
 							popup.appendChild(document.createElement('br'));
 							popup.appendChild(document.createTextNode(el.dataset.customer || ''));
-							L.marker([lat, lng]).addTo(map).bindPopup(popup);
+							L.marker([lat, lng], { icon: icon }).addTo(map).bindPopup(popup);
 						});
 						if (bounds.length) map.fitBounds(bounds, { padding: [24, 24] });
 					});

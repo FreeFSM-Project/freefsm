@@ -224,14 +224,14 @@ func Layout(title string, children ...templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" defer></script><script>\n\t\t\t\tdocument.addEventListener('htmx:afterSettle', function(evt) {\n\t\t\t\t\tif (window.Alpine && evt.detail && evt.detail.elt) {\n\t\t\t\t\t\tAlpine.initTree(evt.detail.elt);\n\t\t\t\t\t}\n\t\t\t\t\tinitScheduleMap();\n\t\t\t\t});\n\t\t\t</script><script>\n\t\t\t\tfunction loadLeaflet(callback) {\n\t\t\t\t\tif (window.L) {\n\t\t\t\t\t\tcallback();\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\tif (window.__freefsmLeafletLoading) {\n\t\t\t\t\t\twindow.__freefsmLeafletCallbacks = window.__freefsmLeafletCallbacks || [];\n\t\t\t\t\t\twindow.__freefsmLeafletCallbacks.push(callback);\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\twindow.__freefsmLeafletLoading = true;\n\t\t\t\t\twindow.__freefsmLeafletCallbacks = [callback];\n\t\t\t\t\tvar script = document.createElement('script');\n\t\t\t\t\tscript.src = '/static/third_party/leaflet/leaflet.js?v=' + encodeURIComponent(document.documentElement.dataset.staticVersion || 'dev');\n\t\t\t\t\tscript.onload = function() {\n\t\t\t\t\t\twindow.__freefsmLeafletLoading = false;\n\t\t\t\t\t\t(window.__freefsmLeafletCallbacks || []).splice(0).forEach(function(fn) { fn(); });\n\t\t\t\t\t};\n\t\t\t\t\tdocument.head.appendChild(script);\n\t\t\t\t}\n\t\t\t\tfunction initScheduleMap() {\n\t\t\t\t\tvar mapEl = document.getElementById('schedule-map');\n\t\t\t\t\tif (!mapEl || mapEl.dataset.initialized === 'true') return;\n\t\t\t\t\tloadLeaflet(function() {\n\t\t\t\t\t\tif (!window.L || !document.body.contains(mapEl) || mapEl.dataset.initialized === 'true') return;\n\t\t\t\t\t\tmapEl.dataset.initialized = 'true';\n\t\t\t\t\t\tvar map = L.map(mapEl).setView([39.8283, -98.5795], 4);\n\t\t\t\t\t\tL.tileLayer(mapEl.dataset.tileUrl, {\n\t\t\t\t\t\t\tmaxZoom: 19,\n\t\t\t\t\t\t\tattribution: '&copy; OpenStreetMap contributors'\n\t\t\t\t\t\t}).addTo(map);\n\t\t\t\t\t\tvar bounds = [];\n\t\t\t\t\t\tdocument.querySelectorAll('#schedule-map-markers [data-lat]').forEach(function(el) {\n\t\t\t\t\t\t\tvar lat = parseFloat(el.dataset.lat);\n\t\t\t\t\t\t\tvar lng = parseFloat(el.dataset.lng);\n\t\t\t\t\t\t\tif (!isFinite(lat) || !isFinite(lng) || (lat === 0 && lng === 0)) return;\n\t\t\t\t\t\t\tbounds.push([lat, lng]);\n\t\t\t\t\t\t\tvar popup = document.createElement('div');\n\t\t\t\t\t\t\tvar link = document.createElement('a');\n\t\t\t\t\t\t\tlink.href = el.dataset.url;\n\t\t\t\t\t\t\tvar strong = document.createElement('strong');\n\t\t\t\t\t\t\tstrong.textContent = el.dataset.title || 'Job';\n\t\t\t\t\t\t\tlink.appendChild(strong);\n\t\t\t\t\t\t\tpopup.appendChild(link);\n\t\t\t\t\t\t\tpopup.appendChild(document.createElement('br'));\n\t\t\t\t\t\t\tpopup.appendChild(document.createTextNode(el.dataset.customer || ''));\n\t\t\t\t\t\t\tL.marker([lat, lng]).addTo(map).bindPopup(popup);\n\t\t\t\t\t\t});\n\t\t\t\t\t\tif (bounds.length) map.fitBounds(bounds, { padding: [24, 24] });\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t\tfunction toggleTheme() {\n\t\t\t\t\tvar html = document.documentElement;\n\t\t\t\t\tvar current = html.getAttribute('data-theme');\n\t\t\t\t\tvar next = current === 'dark' ? 'light' : 'dark';\n\t\t\t\t\thtml.setAttribute('data-theme', next);\n\t\t\t\t\tdocument.cookie = 'theme=' + next + ';path=/;max-age=31536000';\n\t\t\t\t}\n\t\t\t\tfunction closeSidebar() {\n\t\t\t\t\tdocument.getElementById('sidebar').classList.remove('open');\n\t\t\t\t}\n\t\t\t\t// Close sidebar when clicking a link inside it (mobile)\n\t\t\t\tdocument.addEventListener('click', function(e) {\n\t\t\t\t\tvar sidebar = document.getElementById('sidebar');\n\t\t\t\t\tif (sidebar && sidebar.classList.contains('open')) {\n\t\t\t\t\t\tvar link = e.target.closest('nav a, .dropdown a');\n\t\t\t\t\t\tif (link) {\n\t\t\t\t\t\t\tcloseSidebar();\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', initScheduleMap);\n\t\t\t</script></head><body hx-boost=\"true\"><aside class=\"sidebar\" id=\"sidebar\"><div class=\"sidebar-brand\"><img src=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" defer></script><script>\n\t\t\t\tdocument.addEventListener('htmx:afterSettle', function(evt) {\n\t\t\t\t\tif (window.Alpine && evt.detail && evt.detail.elt) {\n\t\t\t\t\t\tAlpine.initTree(evt.detail.elt);\n\t\t\t\t\t}\n\t\t\t\t\tinitScheduleMap();\n\t\t\t\t});\n\t\t\t</script><script>\n\t\t\t\tfunction loadLeaflet(callback) {\n\t\t\t\t\tif (window.L) {\n\t\t\t\t\t\tcallback();\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\tif (window.__freefsmLeafletLoading) {\n\t\t\t\t\t\twindow.__freefsmLeafletCallbacks = window.__freefsmLeafletCallbacks || [];\n\t\t\t\t\t\twindow.__freefsmLeafletCallbacks.push(callback);\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\twindow.__freefsmLeafletLoading = true;\n\t\t\t\t\twindow.__freefsmLeafletCallbacks = [callback];\n\t\t\t\t\tvar script = document.createElement('script');\n\t\t\t\t\tscript.src = '/static/third_party/leaflet/leaflet.js?v=' + encodeURIComponent(document.documentElement.dataset.staticVersion || 'dev');\n\t\t\t\t\tscript.onload = function() {\n\t\t\t\t\t\twindow.__freefsmLeafletLoading = false;\n\t\t\t\t\t\t(window.__freefsmLeafletCallbacks || []).splice(0).forEach(function(fn) { fn(); });\n\t\t\t\t\t};\n\t\t\t\t\tdocument.head.appendChild(script);\n\t\t\t\t}\n\t\t\t\tfunction initScheduleMap() {\n\t\t\t\t\tvar mapEl = document.getElementById('schedule-map');\n\t\t\t\t\tif (!mapEl || mapEl.dataset.initialized === 'true') return;\n\t\t\t\t\tloadLeaflet(function() {\n\t\t\t\t\t\tif (!window.L || !document.body.contains(mapEl) || mapEl.dataset.initialized === 'true') return;\n\t\t\t\t\t\tmapEl.dataset.initialized = 'true';\n\t\t\t\t\t\tvar map = L.map(mapEl).setView([39.8283, -98.5795], 4);\n\t\t\t\t\t\tL.tileLayer(mapEl.dataset.tileUrl, {\n\t\t\t\t\t\t\tmaxZoom: 19,\n\t\t\t\t\t\t\tattribution: '&copy; OpenStreetMap contributors'\n\t\t\t\t\t\t}).addTo(map);\n\t\t\t\t\t\tvar bounds = [];\n\t\t\t\t\t\tdocument.querySelectorAll('#schedule-map-markers [data-lat]').forEach(function(el) {\n\t\t\t\t\t\t\tvar lat = parseFloat(el.dataset.lat);\n\t\t\t\t\t\t\tvar lng = parseFloat(el.dataset.lng);\n\t\t\t\t\t\t\tif (!isFinite(lat) || !isFinite(lng) || (lat === 0 && lng === 0)) return;\n\t\t\t\t\t\t\tbounds.push([lat, lng]);\n\t\t\t\t\t\t\tvar statusColor = el.dataset.statusColor || '#2563EB';\n\t\t\t\t\t\t\tvar icon = L.divIcon({\n\t\t\t\t\t\t\t\tclassName: 'schedule-map-marker',\n\t\t\t\t\t\t\t\thtml: '<span data-status-color=\"' + statusColor.replace(/&/g, '&amp;').replace(/\"/g, '&quot;') + '\" data-status-name=\"' + (el.dataset.statusName || '').replace(/&/g, '&amp;').replace(/\"/g, '&quot;') + '\" style=\"background:' + statusColor.replace(/[^#a-zA-Z0-9(),.%\\s-]/g, '') + '\"></span>',\n\t\t\t\t\t\t\t\ticonSize: [22, 22],\n\t\t\t\t\t\t\t\ticonAnchor: [11, 11],\n\t\t\t\t\t\t\t\tpopupAnchor: [0, -11]\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\tvar popup = document.createElement('div');\n\t\t\t\t\t\t\tvar link = document.createElement('a');\n\t\t\t\t\t\t\tlink.href = el.dataset.url;\n\t\t\t\t\t\t\tvar strong = document.createElement('strong');\n\t\t\t\t\t\t\tstrong.textContent = el.dataset.title || 'Job';\n\t\t\t\t\t\t\tlink.appendChild(strong);\n\t\t\t\t\t\t\tpopup.appendChild(link);\n\t\t\t\t\t\t\tpopup.appendChild(document.createElement('br'));\n\t\t\t\t\t\t\tpopup.appendChild(document.createTextNode(el.dataset.customer || ''));\n\t\t\t\t\t\t\tL.marker([lat, lng], { icon: icon }).addTo(map).bindPopup(popup);\n\t\t\t\t\t\t});\n\t\t\t\t\t\tif (bounds.length) map.fitBounds(bounds, { padding: [24, 24] });\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t\tfunction toggleTheme() {\n\t\t\t\t\tvar html = document.documentElement;\n\t\t\t\t\tvar current = html.getAttribute('data-theme');\n\t\t\t\t\tvar next = current === 'dark' ? 'light' : 'dark';\n\t\t\t\t\thtml.setAttribute('data-theme', next);\n\t\t\t\t\tdocument.cookie = 'theme=' + next + ';path=/;max-age=31536000';\n\t\t\t\t}\n\t\t\t\tfunction closeSidebar() {\n\t\t\t\t\tdocument.getElementById('sidebar').classList.remove('open');\n\t\t\t\t}\n\t\t\t\t// Close sidebar when clicking a link inside it (mobile)\n\t\t\t\tdocument.addEventListener('click', function(e) {\n\t\t\t\t\tvar sidebar = document.getElementById('sidebar');\n\t\t\t\t\tif (sidebar && sidebar.classList.contains('open')) {\n\t\t\t\t\t\tvar link = e.target.closest('nav a, .dropdown a');\n\t\t\t\t\t\tif (link) {\n\t\t\t\t\t\t\tcloseSidebar();\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t\tdocument.addEventListener('DOMContentLoaded', initScheduleMap);\n\t\t\t</script></head><body hx-boost=\"true\"><aside class=\"sidebar\" id=\"sidebar\"><div class=\"sidebar-brand\"><img src=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var17 string
 		templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.ResolveAttributeValue(templ.URL(staticAsset("/static/img/gear.png")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 115, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 123, Col: 62}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var17)
 		if templ_7745c5c3_Err != nil {
@@ -244,7 +244,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(companyBrandName(companyFromCtx(ctx)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 116, Col: 52}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 124, Col: 52}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -523,7 +523,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 		var templ_7745c5c3_Var41 string
 		templ_7745c5c3_Var41, templ_7745c5c3_Err = templ.JoinStringErrs(appVersion())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 159, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 167, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var41))
 		if templ_7745c5c3_Err != nil {
@@ -536,7 +536,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 		var templ_7745c5c3_Var42 string
 		templ_7745c5c3_Var42, templ_7745c5c3_Err = templ.JoinStringErrs(pageTitleFromPath(ctx))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 166, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 174, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var42))
 		if templ_7745c5c3_Err != nil {
@@ -554,7 +554,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 			var templ_7745c5c3_Var43 string
 			templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(getUser(ctx).Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 187, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 195, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 			if templ_7745c5c3_Err != nil {
@@ -567,7 +567,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 			var templ_7745c5c3_Var44 string
 			templ_7745c5c3_Var44, templ_7745c5c3_Err = templ.ResolveAttributeValue(csrfToken(ctx))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 193, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 201, Col: 71}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var44)
 			if templ_7745c5c3_Err != nil {
@@ -590,7 +590,7 @@ func Layout(title string, children ...templ.Component) templ.Component {
 			var templ_7745c5c3_Var45 string
 			templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(getFlash(ctx))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 204, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/base.templ`, Line: 212, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 			if templ_7745c5c3_Err != nil {
