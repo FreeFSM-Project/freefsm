@@ -121,8 +121,8 @@ templ JobForm(p JobFormPageData) {
 						<template x-for="(v, idx) in items" :key="idx">
 							<tr>
 								<td><input type="date" x-model="v.date"></td>
-								<td><input type="time" x-model="v.start_time"></td>
-								<td><input type="time" x-model="v.end_time"></td>
+								<td><input type="time" step="900" x-model="v.start_time"></td>
+								<td><input type="time" step="900" x-model="v.end_time"></td>
 								<td><input type="text" x-model="v.notes"></td>
 								<td><button @click.prevent="remove(idx)" class="outline contrast small">X</button></td>
 							</tr>

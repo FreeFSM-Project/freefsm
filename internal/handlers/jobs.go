@@ -408,7 +408,8 @@ func (h *JobHandler) CreateNextOccurrence(w http.ResponseWriter, r *http.Request
 		return
 	}
 	loc := middleware.CompanyLocation(r.Context())
-	nextStart := time.Now().In(loc)
+	now := time.Now().In(loc)
+	nextStart := time.Date(now.Year(), now.Month(), now.Day(), 8, 0, 0, 0, loc)
 	result, err := h.svc.CreateNextOccurrence(r.Context(), id, nextStart)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -345,7 +345,7 @@ func (s *JobService) CreateNextOccurrence(ctx context.Context, sourceID int64, n
 		StatusID:          newStatusID,
 		BillingType:       source.BillingType,
 		StartTime:         nextStart,
-		EndTime:           shiftedTime(source.EndTime, delta),
+		EndTime:           nextStart.Add(time.Hour),
 		DueDate:           shiftedTime(source.DueDate, delta),
 		ArrivalStart:      shiftedTime(source.ArrivalWindowStart, delta),
 		ArrivalEnd:        shiftedTime(source.ArrivalWindowEnd, delta),
@@ -358,7 +358,6 @@ func (s *JobService) CreateNextOccurrence(ctx context.Context, sourceID int64, n
 		CustomFields:      source.CustomFields,
 	}
 	if source.StartTime == nil || source.StartTime.IsZero() {
-		params.EndTime = time.Time{}
 		params.DueDate = time.Time{}
 		params.ArrivalStart = time.Time{}
 		params.ArrivalEnd = time.Time{}
